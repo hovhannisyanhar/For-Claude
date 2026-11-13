@@ -1,0 +1,78 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+
+export const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+
+export const slugArg = () => {
+	const slug = process.argv.slice(2).find((a) => !a.startsWith('--'));
+	if (!slug) {
+		console.error('Укажите slug видео, например: npm run make -- octopus');
+		process.exit(1);
+	}
+	return slug;
+};
+
+export const flag = (name, def) => {
+	const a = process.argv.find((x) => x.startsWith(`--${name}=`));
+	if (a) return a.split('=').slice(1).join('=');
+	if (process.argv.includes(`--${name}`)) return true;
+	return def;
+};
+
+export const paths = (slug) => ({
+	script: path.join(ROOT, 'videos', slug, 'script.json'),
+	genDir: path.join(ROOT, 'public', 'generated', slug),
+	genRel: `generated/${slug}`,
+	manifest: path.join(ROOT, 'public', 'generated', slug, 'manifest.json'),
+	outDir: path.join(ROOT, 'out', slug),
+});
+
+export const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
+export const writeJson = (p, d) => {
+	fs.mkdirSync(path.dirname(p), {recursive: true});
+	fs.writeFileSync(p, JSON.stringify(d, null, 2));
+};
+
+export const probeDuration = (file) =>
+	parseFloat(
+		execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file], {
+			encoding: 'utf8',
+		}).trim(),
+	);
+
+/** Браузер для рендера: системный Chromium, если есть, иначе Remotion скачает свой */
+export const browserArgs = () => {
+	const candidates = [
+		process.env.REMOTION_BROWSER,
+		'/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell',
+	].filter(Boolean);
+	const found = candidates.find((p) => fs.existsSync(p));
+	return found ? [`--browser-executable=${found}`] : [];
+};
+
+const SCENE_TYPES = ['hook', 'stat', 'fact', 'list', 'compare', 'outro'];
+
+/** Проверка сценария до трат на озвучку */
+export const validateScript = (s) => {
+	const errors = [];
+	const warn = [];
+	if (!s.title) errors.push('нет title');
+	if (!Array.isArray(s.scenes) || !s.scenes.length) errors.push('нет scenes');
+	(s.scenes ?? []).forEach((sc, i) => {
+		const n = `сцена ${i + 1} (${sc.type})`;
+		if (!SCENE_TYPES.includes(sc.type)) errors.push(`${n}: неизвестный type`);
+		if (!sc.voice?.trim()) errors.push(`${n}: пустой voice`);
+		if (sc.type === 'hook' && sc.text?.split(/\s+/).length > 7) warn.push(`${n}: хук длиннее 7 слов`);
+		if (sc.type === 'stat' && (sc.value + (sc.suffix ?? '')).length > 9)
+			warn.push(`${n}: длинное число — лучше "500" + suffix " млн"`);
+		if (sc.type === 'list' && sc.items?.length > 4) warn.push(`${n}: больше 4 пунктов не влезет красиво`);
+		if (/\d/.test(sc.voice ?? '')) warn.push(`${n}: цифры в voice — лучше прописью, чтобы голос правильно склонял`);
+	});
+	if (s.scenes?.[0]?.type !== 'hook') warn.push('первая сцена не hook — первые 2 секунды решают всё');
+	const words = (s.scenes ?? []).reduce((a, sc) => a + (sc.voice ?? '').split(/\s+/).length, 0);
+	const est = words / 2.6;
+	if (est > 60) warn.push(`оценка длительности ${est.toFixed(0)} с — для Reels/TikTok лучше 25–45 с`);
+	if (!s.sources?.length) warn.push('нет sources — факты должны быть проверены');
+	return {errors, warn, estSeconds: est};
+};
