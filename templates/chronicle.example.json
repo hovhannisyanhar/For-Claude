@@ -1,0 +1,303 @@
+{
+  "title": "Nike: от багажника машины до миллиардов",
+  "style": "chronicle",
+  "accent": "#e0531f",
+  "caption": "Логотип за $35, кроссовки из вафельницы и слоган из последних слов заключённого 👟 Какой бренд разобрать следующим? Пиши в комментариях 👇",
+  "hashtags": [
+    "#nike",
+    "#историябренда",
+    "#факты",
+    "#бизнес",
+    "#кроссовки",
+    "#airjordan",
+    "#justdoit"
+  ],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Nike,_Inc.",
+    "https://en.wikipedia.org/wiki/Swoosh",
+    "https://en.wikipedia.org/wiki/Bill_Bowerman",
+    "https://en.wikipedia.org/wiki/Air_Jordan",
+    "https://en.wikipedia.org/wiki/Just_Do_It",
+    "https://www.mentalfloss.com/article/73277/14-things-you-might-not-know-about-nike"
+  ],
+  "scenes": [
+    {
+      "block": "black",
+      "blockTop": 1010,
+      "clips": [
+        {
+          "src": "assets/nike/old-logo.jpg",
+          "kind": "photo",
+          "tone": "color",
+          "x": 520,
+          "y": 640,
+          "w": 720,
+          "rotate": -4
+        }
+      ],
+      "stamp": {
+        "text": "$35",
+        "sub": "ЗА ЛОГОТИП",
+        "x": 790,
+        "y": 360,
+        "rotate": 9
+      },
+      "headline": "Логотип\nза 35 долларов",
+      "headlineY": 1050,
+      "headlineSize": 104,
+      "voice": "Этот логотип стоит миллиарды. А нарисовали его за тридцать пять долларов."
+    },
+    {
+      "year": "1964",
+      "block": "red",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/knight-bowerman.jpg",
+          "kind": "photo",
+          "tone": "bw",
+          "x": 560,
+          "y": 720,
+          "w": 640,
+          "rotate": -3
+        }
+      ],
+      "headline": "Blue Ribbon Sports",
+      "headlineY": 1110,
+      "headlineSize": 84,
+      "voice": "Шестьдесят четвёртый год. Бегун Фил Найт и его тренер Билл Бауэрман открывают Blue Ribbon Sports."
+    },
+    {
+      "year": "1964",
+      "block": "red",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/knight-1957.jpg",
+          "kind": "photo",
+          "tone": "bw",
+          "x": 330,
+          "y": 680,
+          "w": 360,
+          "rotate": -6,
+          "caption": "Фил Найт"
+        }
+      ],
+      "stamp": {
+        "text": "Из багажника",
+        "sub": "ПРОДАЖИ НА СТАДИОНАХ",
+        "x": 730,
+        "y": 560,
+        "rotate": 8
+      },
+      "stat": {
+        "value": "1300",
+        "suffix": " пар",
+        "label": "за первый год",
+        "y": 1095
+      },
+      "voice": "Продают японские кроссовки прямо из машины на стадионах. За первый год — тысяча триста пар."
+    },
+    {
+      "year": "1971",
+      "block": "olive",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/nike-goddess-crop.jpg",
+          "kind": "photo",
+          "tone": "sepia",
+          "x": 560,
+          "y": 690,
+          "w": 460,
+          "rotate": 3,
+          "caption": "Ника — богиня победы"
+        }
+      ],
+      "headline": "Nike",
+      "headlineY": 1080,
+      "headlineSize": 170,
+      "voice": "В семьдесят первом — новое имя: Nike, в честь греческой богини победы."
+    },
+    {
+      "year": "1971",
+      "block": "olive",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/old-logo.jpg",
+          "kind": "photo",
+          "tone": "color",
+          "x": 520,
+          "y": 650,
+          "w": 640,
+          "rotate": -3
+        }
+      ],
+      "stamp": {
+        "text": "$35",
+        "sub": "ВЕСЬ ГОНОРАР",
+        "x": 800,
+        "y": 930,
+        "rotate": -10
+      },
+      "note": "студентка, $2 в час",
+      "noteY": 1110,
+      "voice": "Логотип рисует студентка Кэролин Дэвидсон. Два доллара в час — итого тридцать пять долларов."
+    },
+    {
+      "year": "1971",
+      "block": "orange",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/waffle-iron-open.jpg",
+          "kind": "photo",
+          "tone": "sepia",
+          "x": 380,
+          "y": 640,
+          "w": 500,
+          "rotate": -5,
+          "caption": "Вафельница"
+        },
+        {
+          "src": "assets/nike/waffle-racer.jpg",
+          "kind": "photo",
+          "tone": "color",
+          "x": 790,
+          "y": 760,
+          "w": 330,
+          "rotate": 6,
+          "delay": 14
+        }
+      ],
+      "headline": "Вафельная\nподошва",
+      "headlineY": 1090,
+      "headlineSize": 92,
+      "voice": "А Бауэрман заливает резину в вафельницу жены — так рождается легендарная вафельная подошва."
+    },
+    {
+      "year": "1985",
+      "block": "red",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/jordan-1985.jpg",
+          "kind": "photo",
+          "tone": "bw",
+          "x": 400,
+          "y": 650,
+          "w": 520,
+          "rotate": -4
+        },
+        {
+          "src": "assets/nike/aj1-cut.png",
+          "kind": "sticker",
+          "x": 760,
+          "y": 920,
+          "w": 470,
+          "rotate": 7,
+          "delay": 16
+        }
+      ],
+      "headline": "Air Jordan",
+      "headlineY": 1100,
+      "headlineSize": 130,
+      "voice": "Восемьдесят пятый. Nike делает кроссовки для новичка «Чикаго Буллз» — Майкла Джордана."
+    },
+    {
+      "year": "1985",
+      "block": "red",
+      "blockTop": 1070,
+      "clips": [
+        {
+          "src": "assets/nike/aj1-cut.png",
+          "kind": "sticker",
+          "x": 540,
+          "y": 790,
+          "w": 600,
+          "rotate": -5
+        }
+      ],
+      "stamp": {
+        "text": "План: $3 млн",
+        "sub": "ЗА ТРИ ГОДА",
+        "x": 560,
+        "y": 520,
+        "rotate": -6
+      },
+      "stat": {
+        "value": "100",
+        "prefix": "$",
+        "suffix": "+ млн",
+        "label": "за первый год",
+        "y": 1095
+      },
+      "voice": "План — три миллиона за три года. А за первый год продали, по оценкам, больше чем на сто миллионов."
+    },
+    {
+      "year": "1988",
+      "block": "black",
+      "blockTop": 820,
+      "label": "Вдохновлено: «Let's do it»",
+      "labelY": 640,
+      "headline": "Just\ndo it.",
+      "headlineY": 870,
+      "headlineSize": 190,
+      "voice": "Восемьдесят восьмой: слоган Just Do It. Его вдохновили последние слова приговорённого к казни — «Давайте сделаем это»."
+    },
+    {
+      "year": "2026",
+      "block": "orange",
+      "blockTop": 1040,
+      "clips": [
+        {
+          "src": "assets/nike/cortez.jpg",
+          "kind": "photo",
+          "tone": "color",
+          "x": 540,
+          "y": 650,
+          "w": 740,
+          "rotate": -3,
+          "caption": "Nike Cortez"
+        }
+      ],
+      "stat": {
+        "value": "46",
+        "prefix": "$",
+        "suffix": " млрд",
+        "label": "выручка за год",
+        "y": 1075
+      },
+      "voice": "Сегодня выручка Nike — больше сорока шести миллиардов долларов в год."
+    },
+    {
+      "block": "red",
+      "blockTop": 920,
+      "clips": [
+        {
+          "src": "assets/nike/knight-bowerman.jpg",
+          "kind": "photo",
+          "tone": "bw",
+          "x": 540,
+          "y": 560,
+          "w": 500,
+          "rotate": 4
+        }
+      ],
+      "stamp": {
+        "text": "Подпишись",
+        "sub": "ИСТОРИИ БРЕНДОВ",
+        "x": 560,
+        "y": 860,
+        "rotate": -7
+      },
+      "note": "а всё началось с багажника",
+      "noteY": 1010,
+      "voice": "А всё началось с багажника машины. Подпишись на истории брендов."
+    }
+  ],
+  "tts": {
+    "speed": 1.12
+  }
+}

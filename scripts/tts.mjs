@@ -74,7 +74,7 @@ const elevenlabs = async (text, prev, next) => {
 				model_id: EL.model,
 				previous_text: prev || undefined,
 				next_text: next || undefined,
-				voice_settings: {stability: 0.4, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true, speed: 1.05},
+				voice_settings: {stability: 0.4, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true, speed: script.tts?.speed ?? 1.05},
 			}),
 		},
 	);
@@ -95,7 +95,7 @@ const openai = async (text) => {
 
 fs.mkdirSync(P.genDir, {recursive: true});
 const old = fs.existsSync(P.manifest) ? readJson(P.manifest) : {scenes: []};
-const voiceKey = provider === 'elevenlabs' ? `${EL.voiceId}/${EL.model}` : provider === 'openai' ? `${OA.voice}/${OA.model}` : 'none';
+const voiceKey = provider === 'elevenlabs' ? `${EL.voiceId}/${EL.model}/${script.tts?.speed ?? 1.05}` : provider === 'openai' ? `${OA.voice}/${OA.model}` : 'none';
 const out = {provider, scenes: []};
 
 for (const [i, sc] of script.scenes.entries()) {

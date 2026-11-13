@@ -7,6 +7,11 @@ const CYRILLIC = 'U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116';
 const FACES: Array<{family: string; file: string; weight: number}> = [
 	...[700, 800, 900].map((w) => ({family: 'Unbounded', file: 'unbounded', weight: w})),
 	...[500, 600, 700, 800].map((w) => ({family: 'Manrope', file: 'manrope', weight: w})),
+	// стиль «Хроника»
+	...[500, 700].map((w) => ({family: 'Oswald', file: 'oswald', weight: w})),
+	{family: 'PT Mono', file: 'pt-mono', weight: 400},
+	...[700, 900].map((w) => ({family: 'Playfair Display', file: 'playfair-display', weight: w})),
+	{family: 'Caveat', file: 'caveat', weight: 700},
 ];
 
 let started = false;

@@ -8,7 +8,8 @@
     "tts": "NODE_USE_ENV_PROXY=1 node scripts/tts.mjs",
     "render": "node scripts/render.mjs",
     "make": "node scripts/make.mjs",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "img": "NODE_USE_ENV_PROXY=1 node scripts/commons.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.538",
@@ -20,7 +21,11 @@
     "remotion": "4.0.538"
   },
   "devDependencies": {
+    "@fontsource/caveat": "5.2.8",
     "@fontsource/manrope": "5.2.8",
+    "@fontsource/oswald": "5.2.8",
+    "@fontsource/playfair-display": "5.2.8",
+    "@fontsource/pt-mono": "5.2.8",
     "@fontsource/unbounded": "5.2.8",
     "@types/react": "19.1.12",
     "typescript": "5.9.3"
