@@ -1,0 +1,117 @@
+{
+  "title": "Сны поездов (2025): о чём фильм — без спойлеров",
+  "style": "cinema",
+  "accent": "#e3b46a",
+  "tts": {
+    "voiceId": "1kb4Md8n0kMNktygYhDF",
+    "model": "eleven_multilingual_v2",
+    "speed": 0.95,
+    "settings": {
+      "stability": 0.55,
+      "similarity_boost": 0.8,
+      "style": 0.3,
+      "use_speaker_boost": true
+    }
+  },
+  "music": "generated/train-dreams/ambient.mp3",
+  "musicVolume": 0.22,
+  "coverFrame": 95,
+  "caption": "Одна жизнь длиной в целый век — тихое, красивое кино о времени и о том, что остаётся после нас 🚂🌲 Без спойлеров. Смотрели «Сны поездов»? Как вам? 👇",
+  "hashtags": [
+    "#кино",
+    "#чтопосмотреть",
+    "#фильмы",
+    "#netflix",
+    "#сныпоездов",
+    "#traindreams",
+    "#джоэлэдгертон",
+    "#оскар"
+  ],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Train_Dreams_(film)",
+    "https://www.whats-on-netflix.com/news/train-dreams-netflix-movie-release-date-cast/",
+    "https://blackbearpictures.com/film-and-tv/train-dreams",
+    "https://www.screendaily.com/features/how-depression-era-photography-inspired-the-oscar-nominated-visuals-for-train-dreams/5213736.article",
+    "https://www.motionpictures.org/2026/03/train-dreams-behind-the-majestic-visuals-of-joel-edgertons-pacific-northwest-epic-2/",
+    "https://en.wikipedia.org/wiki/Adolpho_Veloso"
+  ],
+  "scenes": [
+    {
+      "set": "night",
+      "title": "Одна жизнь\nдлиной в век",
+      "titleSize": 110,
+      "textY": 360,
+      "voice": "Это история одного человека. И целого века, который пронёсся мимо него, как поезд в ночи.",
+      "pause": 18
+    },
+    {
+      "set": "station",
+      "kicker": "Айдахо · 1893",
+      "title": "Сирота\nс поезда",
+      "voice": "Тысяча восемьсот девяносто третий год. Поезд привозит в Айдахо семилетнего сироту. Его зовут Роберт Грейнье."
+    },
+    {
+      "set": "forest",
+      "kicker": "Лесоруб",
+      "title": "Вековые сосны",
+      "voice": "Он вырастет тихим, немногословным человеком. Станет лесорубом — будет валить огромные вековые сосны."
+    },
+    {
+      "set": "bridge",
+      "kicker": "Железная дорога",
+      "title": "Путь\nв новый век",
+      "voice": "И строить мосты для железной дороги, которая меняет всю страну."
+    },
+    {
+      "set": "cabin",
+      "kicker": "Глэдис",
+      "title": "Хижина у реки",
+      "voice": "Однажды он встретит Глэдис. Вместе они построят хижину у реки — маленький тёплый мир посреди огромного леса."
+    },
+    {
+      "set": "seasons",
+      "title": "Сезон\nза сезоном",
+      "voice": "Но работа уводит его из дома на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить."
+    },
+    {
+      "set": "reel",
+      "kicker": "Netflix · 2025",
+      "title": "Сны поездов",
+      "titleSize": 112,
+      "textY": 300,
+      "credits": [
+        {
+          "role": "Режиссёр",
+          "name": "Клинт Бентли"
+        },
+        {
+          "role": "По повести",
+          "name": "Дениса Джонсона"
+        },
+        {
+          "role": "В главных ролях",
+          "name": "Джоэл Эдгертон\nФелисити Джонс"
+        }
+      ],
+      "voice": "«Сны поездов» — фильм Клинта Бентли по повести Дениса Джонсона. Роберта играет Джоэл Эдгертон, Глэдис — Фелисити Джонс."
+    },
+    {
+      "set": "campfire",
+      "stat": {
+        "value": "4",
+        "label": "номинации на «Оскар»",
+        "sub": "включая «Лучший фильм»"
+      },
+      "textY": 300,
+      "voice": "Его снимали почти без искусственного света: солнце, костры, свечи. И четыре номинации на «Оскар», включая лучший фильм."
+    },
+    {
+      "set": "outro",
+      "title": "Тихое кино\nо большой жизни",
+      "text": "Смотрели? Напишите в комментариях",
+      "cta": "Подписывайтесь",
+      "textY": 340,
+      "voice": "Это тихое кино — о времени, одиночестве и о том, что остаётся после нас. Смотрели? Напишите в комментариях."
+    }
+  ]
+}

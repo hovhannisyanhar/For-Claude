@@ -61,7 +61,7 @@ export const validateScript = (s) => {
 	if (!Array.isArray(s.scenes) || !s.scenes.length) errors.push('нет scenes');
 	(s.scenes ?? []).forEach((sc, i) => {
 		const n = `сцена ${i + 1} (${sc.type})`;
-		if (s.style !== 'chronicle' && !SCENE_TYPES.includes(sc.type)) errors.push(`${n}: неизвестный type`);
+		if (!['chronicle', 'cinema'].includes(s.style) && !SCENE_TYPES.includes(sc.type)) errors.push(`${n}: неизвестный type`);
 		for (const c of sc.clips ?? [])
 			if (!fs.existsSync(path.join(ROOT, 'public', c.src))) errors.push(`${n}: нет файла public/${c.src}`);
 		if (!sc.voice?.trim()) errors.push(`${n}: пустой voice`);
@@ -71,10 +71,10 @@ export const validateScript = (s) => {
 		if (sc.type === 'list' && sc.items?.length > 4) warn.push(`${n}: больше 4 пунктов не влезет красиво`);
 		if (/\d/.test(sc.voice ?? '')) warn.push(`${n}: цифры в voice — лучше прописью, чтобы голос правильно склонял`);
 	});
-	if (s.style !== 'chronicle' && s.scenes?.[0]?.type !== 'hook') warn.push('первая сцена не hook — первые 2 секунды решают всё');
+	if (!['chronicle', 'cinema'].includes(s.style) && s.scenes?.[0]?.type !== 'hook') warn.push('первая сцена не hook — первые 2 секунды решают всё');
 	const words = (s.scenes ?? []).reduce((a, sc) => a + (sc.voice ?? '').split(/\s+/).length, 0);
 	const est = words / 2.6;
-	const maxSec = s.style === 'chronicle' ? 65 : 50;
+	const maxSec = s.style === 'chronicle' ? 65 : s.style === 'cinema' ? 70 : 50;
 	if (est > maxSec) warn.push(`оценка длительности ${est.toFixed(0)} с — для Reels/TikTok лучше до ${maxSec} с`);
 	if (!s.sources?.length) warn.push('нет sources — факты должны быть проверены');
 	return {errors, warn, estSeconds: est};

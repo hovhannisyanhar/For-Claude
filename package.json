@@ -9,7 +9,9 @@
     "render": "node scripts/render.mjs",
     "make": "node scripts/make.mjs",
     "check": "tsc --noEmit",
-    "img": "NODE_USE_ENV_PROXY=1 node scripts/commons.mjs"
+    "img": "NODE_USE_ENV_PROXY=1 node scripts/commons.mjs",
+    "ambient": "node scripts/ambient.mjs",
+    "stills": "node scripts/stills.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.538",

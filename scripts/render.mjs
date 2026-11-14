@@ -15,7 +15,7 @@ if (!fs.existsSync(P.manifest)) {
 const manifest = readJson(P.manifest);
 
 const chronicle = script.style === 'chronicle';
-const composition = chronicle ? 'ChronicleVideo' : 'FactVideo';
+const composition = chronicle ? 'ChronicleVideo' : script.style === 'cinema' ? 'CinemaVideo' : 'FactVideo';
 const props = {
 	title: script.title,
 	style: script.style,
@@ -56,7 +56,7 @@ if (!preview) {
 	writeJson(coverProps, {...props, showCaptions: false});
 	execFileSync(
 		remotion,
-		['still', 'src/index.ts', composition, `--props=${coverProps}`, '--log=error', ...browserArgs(), path.join(P.outDir, 'cover.jpg'), '--frame=28'],
+		['still', 'src/index.ts', composition, `--props=${coverProps}`, '--log=error', ...browserArgs(), path.join(P.outDir, 'cover.jpg'), `--frame=${script.coverFrame ?? 28}`],
 		{cwd: ROOT, stdio: 'inherit'},
 	);
 	fs.rmSync(coverProps);
