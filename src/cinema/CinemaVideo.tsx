@@ -20,7 +20,7 @@ import type {CinemaProps, CinemaShot} from './types';
 loadFonts();
 
 /** Растворение между планами, кадры */
-export const DISSOLVE = 30;
+export const DISSOLVE = 24;
 const TAIL = 10;
 const LAST_TAIL = 90;
 

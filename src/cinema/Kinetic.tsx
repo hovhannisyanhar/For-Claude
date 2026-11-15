@@ -65,8 +65,8 @@ const toBlocks = (phrases: Phrase[], emph: Set<string>): Phrase[] => {
 const widthOf = (text: string, kind: Kind) => {
 	const n = [...text].length;
 	if (kind === 'script') return n * SIZE.script * 0.38;
-	if (kind === 'caps') return n * (SIZE.caps * 0.52 + 9);
-	return n * SIZE.serif * 0.47;
+	if (kind === 'caps') return n * (SIZE.caps * 0.6 + 10);
+	return n * SIZE.serif * 0.55;
 };
 
 type Item = {w: Word; text: string; kind: Kind; i: number};
@@ -117,7 +117,7 @@ const layout = (ph: Phrase, emph: Set<string>): Item[][] => {
 const SerifWord: React.FC<{text: string; st: number}> = ({text, st}) => {
 	const frame = useCurrentFrame();
 	return (
-		<span style={{display: 'inline-block', overflow: 'hidden', padding: '0.04em 0.02em 0.14em', marginBottom: '-0.14em', verticalAlign: 'baseline'}}>
+		<span style={{display: 'inline-block', whiteSpace: 'nowrap', flexShrink: 0, overflow: 'hidden', padding: '0.04em 0.02em 0.14em', marginBottom: '-0.14em', verticalAlign: 'baseline'}}>
 			{[...text].map((ch, k) => {
 				const p = interpolate(frame, [st + k * 1.1, st + k * 1.1 + 13], [0, 1], {...clamp, easing: Easing.out(Easing.exp)});
 				return (
@@ -145,6 +145,8 @@ const CapsWord: React.FC<{text: string; st: number; accent: string}> = ({text, s
 		<span
 			style={{
 				display: 'inline-block',
+				whiteSpace: 'nowrap',
+				flexShrink: 0,
 				fontFamily: F_CAPS,
 				fontWeight: 500,
 				fontSize: SIZE.caps,
@@ -170,7 +172,7 @@ const ScriptWord: React.FC<{text: string; st: number; accent: string; tilt: numb
 	const settle = interpolate(frame, [st, st + dur + 10], [1.12, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	const w = widthOf(text, 'script');
 	return (
-		<span style={{display: 'inline-block', position: 'relative', transform: `rotate(${tilt}deg) scale(${settle})`, padding: '0 0.15em'}}>
+		<span style={{display: 'inline-block', whiteSpace: 'nowrap', flexShrink: 0, position: 'relative', transform: `rotate(${tilt}deg) scale(${settle})`, padding: '0 0.15em'}}>
 			<span
 				style={{
 					display: 'inline-block',
@@ -275,7 +277,9 @@ export const KineticText: React.FC<{
 					key={li}
 					style={{
 						display: 'flex',
-						flexWrap: 'nowrap',
+						flexWrap: 'wrap',
+						justifyContent: mood.align === 'left' ? 'flex-start' : mood.align === 'right' ? 'flex-end' : 'center',
+						maxWidth: '100%',
 						alignItems: 'baseline',
 						columnGap: 22,
 						textAlign: mood.align,

@@ -57,7 +57,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "valley",
@@ -81,7 +81,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 50
+      "pause": 36
     },
     {
       "set": "logging",
@@ -116,7 +116,7 @@
           "volume": 0.22
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "bridge",
@@ -139,7 +139,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "cabin",
@@ -163,7 +163,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "seasons",
@@ -181,7 +181,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "campfire",
@@ -206,7 +206,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "lake",
@@ -230,7 +230,7 @@
           "volume": 0.22
         }
       ],
-      "pause": 40
+      "pause": 28
     },
     {
       "set": "dawn",
@@ -248,7 +248,7 @@
         }
       ],
       "finalTitle": "Сны поездов",
-      "pause": 40
+      "pause": 28
     }
   ],
   "musicPrompt": "Slow, intimate cinematic score for a quiet period drama about a lumberjack's life in the early 1900s American Northwest forests. Fingerpicked acoustic guitar, warm sustained strings, soft felt piano, distant harmonica breath. Melancholic, tender, nostalgic, spacious, no drums, gentle swell near the end, 62 bpm. Instrumental.",

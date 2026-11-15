@@ -34,7 +34,9 @@ const post = async (url, body) => {
 	throw new Error('ElevenLabs недоступен');
 };
 
-const out = {scenes: [], music: null};
+const prevSound = fs.existsSync(path.join(P.genDir, 'sound.json')) ? readJson(path.join(P.genDir, 'sound.json')) : null;
+// --no-music: оставить уже сгенерированную музыку (не тратить кредиты при правке таймингов)
+const out = {scenes: [], music: flag('no-music', false) ? (prevSound?.music ?? null) : null};
 for (const [i, sc] of script.scenes.entries()) {
 	const list = [];
 	for (const fx of sc.sfx ?? []) {
