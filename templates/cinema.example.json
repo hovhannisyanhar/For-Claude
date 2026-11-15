@@ -14,7 +14,7 @@
     }
   },
   "music": "generated/train-dreams/music.mp3",
-  "musicVolume": 0.16,
+  "musicVolume": 0.3,
   "coverFrame": 185,
   "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
   "hashtags": [
@@ -49,13 +49,13 @@
           "prompt": "old steam locomotive slowly arriving at a small wooden country station at dawn, chuffing slowing down, brakes squealing, long steam hiss",
           "at": 0,
           "duration": 9,
-          "volume": 0.275
+          "volume": 0.22
         },
         {
           "prompt": "cold early morning forest ambience, light wind, distant crows",
           "at": 0,
           "duration": 10,
-          "volume": 0.175
+          "volume": 0.12
         }
       ],
       "pause": 12
@@ -73,13 +73,13 @@
           "prompt": "distant steam train whistle echoing across a wide night valley, then soft rumble of a far away train",
           "at": 0.3,
           "duration": 7,
-          "volume": 0.25
+          "volume": 0.22
         },
         {
           "prompt": "quiet night in the mountains, crickets, soft wind, an owl far away",
           "at": 0,
           "duration": 8,
-          "volume": 0.15
+          "volume": 0.12
         }
       ],
       "pause": 22
@@ -98,13 +98,13 @@
           "prompt": "deep old growth forest ambience, birds singing, light breeze in tall pines",
           "at": 0,
           "duration": 11,
-          "volume": 0.175
+          "volume": 0.12
         },
         {
           "prompt": "single heavy axe chop into a thick tree trunk, crisp wooden thunk",
           "at": 0.9,
           "duration": 1,
-          "volume": 0.3,
+          "volume": 0.22,
           "repeat": {
             "every": 1.4,
             "count": 5
@@ -114,7 +114,7 @@
           "prompt": "giant tree creaking and cracking then crashing down to the forest floor far away",
           "at": 7,
           "duration": 5,
-          "volume": 0.225
+          "volume": 0.22
         }
       ]
     },
@@ -130,13 +130,13 @@
           "prompt": "railroad bridge construction at dusk, distant hammers striking wooden beams and iron spikes, gusty wind",
           "at": 0,
           "duration": 7,
-          "volume": 0.2
+          "volume": 0.22
         },
         {
           "prompt": "crows cawing ominously, low wind gust, tense atmosphere",
           "at": 1.5,
           "duration": 5,
-          "volume": 0.175
+          "volume": 0.12
         }
       ],
       "pause": 20
@@ -154,13 +154,13 @@
           "prompt": "gentle river flowing past a cabin on a warm summer evening, crickets, soft frogs",
           "at": 0,
           "duration": 11,
-          "volume": 0.2
+          "volume": 0.12
         },
         {
           "prompt": "crackling fireplace heard from a cabin porch, soft and cozy",
           "at": 1,
           "duration": 8,
-          "volume": 0.09
+          "volume": 0.12
         }
       ]
     },
@@ -177,7 +177,7 @@
           "prompt": "footsteps crunching on autumn leaves then on snow, wind through bare trees, wind slowly turning into winter blizzard",
           "at": 0,
           "duration": 11,
-          "volume": 0.2
+          "volume": 0.12
         }
       ]
     },
@@ -195,13 +195,13 @@
           "prompt": "campfire crackling and popping at night in a pine forest, gentle",
           "at": 0,
           "duration": 11,
-          "volume": 0.25
+          "volume": 0.12
         },
         {
           "prompt": "old film projector whirring softly",
           "at": 6,
           "duration": 5,
-          "volume": 0.075
+          "volume": 0.12
         }
       ]
     },
@@ -218,13 +218,13 @@
           "prompt": "still lake at night in a misty forest, very quiet water lapping, loon call far away",
           "at": 0,
           "duration": 11,
-          "volume": 0.175
+          "volume": 0.12
         },
         {
           "prompt": "lonely steam train whistle far away across a lake at night, long echo",
           "at": 3.4,
           "duration": 5,
-          "volume": 0.275
+          "volume": 0.22
         }
       ]
     },
@@ -240,7 +240,7 @@
           "prompt": "soft dawn in the mountains, first birds waking up, gentle breeze",
           "at": 0,
           "duration": 11,
-          "volume": 0.175
+          "volume": 0.12
         }
       ],
       "finalTitle": "Сны поездов"

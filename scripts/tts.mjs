@@ -4,7 +4,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import {flag, paths, probeDuration, readJson, slugArg, validateScript, writeJson} from './lib.mjs';
+import {flag, normalizeLoudness, paths, probeDuration, readJson, slugArg, validateScript, writeJson} from './lib.mjs';
+
+// Голос приводим к −16 LUFS: тогда громкость шумов/музыки в сценарии — относительно голоса
+const VOICE_LUFS = -16;
 
 const slug = slugArg();
 const P = paths(slug);
@@ -103,6 +106,10 @@ for (const [i, sc] of script.scenes.entries()) {
 	const prevEntry = old.scenes[i];
 	const file = `scene-${i + 1}-${hash}.mp3`;
 	if (prevEntry?.hash === hash && (provider === 'none' || fs.existsSync(path.join(P.genDir, file)))) {
+		if (provider !== 'none' && prevEntry.norm !== VOICE_LUFS) {
+			normalizeLoudness(path.join(P.genDir, file), path.join(P.genDir, file), VOICE_LUFS);
+			prevEntry.norm = VOICE_LUFS;
+		}
 		out.scenes.push(prevEntry);
 		console.log(`✓ сцена ${i + 1}: из кэша`);
 		continue;
@@ -119,8 +126,9 @@ for (const [i, sc] of script.scenes.entries()) {
 			: await elevenlabs(sc.voice, script.scenes[i - 1]?.voice, script.scenes[i + 1]?.voice);
 	const abs = path.join(P.genDir, file);
 	fs.writeFileSync(abs, r.audio);
+	normalizeLoudness(abs, abs, VOICE_LUFS);
 	const duration = probeDuration(abs);
-	out.scenes.push({hash, audio: `${P.genRel}/${file}`, duration, words: r.words ?? estimateWords(sc.voice, duration)});
+	out.scenes.push({hash, audio: `${P.genRel}/${file}`, duration, norm: VOICE_LUFS, words: r.words ?? estimateWords(sc.voice, duration)});
 	console.log(`${duration.toFixed(1)} с`);
 }
 

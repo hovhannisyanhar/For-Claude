@@ -5,7 +5,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import {flag, paths, probeDuration, readJson, slugArg, writeJson} from './lib.mjs';
+import {flag, normalizeLoudness, paths, probeDuration, readJson, slugArg, writeJson} from './lib.mjs';
+
+// Шумы и музыка приводятся к −20 LUFS (голос −16), volume в сценарии — множитель к этому уровню
+const BED_LUFS = -20;
 
 const slug = slugArg();
 const P = paths(slug);
@@ -43,9 +46,12 @@ for (const [i, sc] of script.scenes.entries()) {
 			fs.writeFileSync(abs, await post('https://api.elevenlabs.io/v1/sound-generation?output_format=mp3_44100_128', {text: fx.prompt, duration_seconds: dur, prompt_influence: 0.5}));
 			console.log('✓');
 		}
-		const len = probeDuration(abs);
+		const normFile = file.replace(/\.mp3$/, `.n${-BED_LUFS}.mp3`);
+		const normAbs = path.join(dir, normFile);
+		if (!fs.existsSync(normAbs)) normalizeLoudness(abs, normAbs, BED_LUFS, 12);
+		const len = probeDuration(normAbs);
 		const times = fx.repeat ? Array.from({length: fx.repeat.count}, (_, k) => (fx.at ?? 0) + k * fx.repeat.every) : [fx.at ?? 0];
-		for (const at of times) list.push({src: `${P.genRel}/sfx/${file}`, at, duration: len, volume: fx.volume ?? 0.4});
+		for (const at of times) list.push({src: `${P.genRel}/sfx/${normFile}`, at, duration: len, volume: fx.volume ?? 0.4});
 	}
 	out.scenes.push(list);
 }
@@ -59,7 +65,9 @@ if (script.musicPrompt && !flag('no-music', false)) {
 		fs.writeFileSync(abs, await post('https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128', {prompt: script.musicPrompt, music_length_ms: ms}));
 		console.log('✓');
 	}
-	out.music = `${P.genRel}/${file}`;
+	const normFile = file.replace(/\.mp3$/, `.n${-BED_LUFS}.mp3`);
+	if (!fs.existsSync(path.join(P.genDir, normFile))) normalizeLoudness(abs, path.join(P.genDir, normFile), BED_LUFS, 12);
+	out.music = `${P.genRel}/${normFile}`;
 }
 writeJson(path.join(P.genDir, 'sound.json'), out);
 console.log(`🎧 ${out.scenes.flat().length} звуков${out.music ? ' + музыка' : ''}, ролик ~${totalSec.toFixed(1)} с`);

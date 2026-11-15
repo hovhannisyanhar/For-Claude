@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {execFileSync} from 'node:child_process';
+import {execFileSync, spawnSync} from 'node:child_process';
 
 export const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
@@ -78,4 +78,19 @@ export const validateScript = (s) => {
 	if (est > maxSec) warn.push(`оценка длительности ${est.toFixed(0)} с — для Reels/TikTok лучше до ${maxSec} с`);
 	if (!s.sources?.length) warn.push('нет sources — факты должны быть проверены');
 	return {errors, warn, estSeconds: est};
+};
+
+/**
+ * Приводит файл к целевой громкости (LUFS): усиление + лимитер.
+ * maxGain — не поднимать почти тишину сильнее, чем на столько дБ.
+ */
+export const normalizeLoudness = (src, dst, target, maxGain = 18) => {
+	const r = spawnSync('ffmpeg', ['-hide_banner', '-nostats', '-i', src, '-af', 'ebur128', '-f', 'null', '-'], {encoding: 'utf8'});
+	const m = [...(r.stderr ?? '').matchAll(/I:\s+(-?[\d.]+) LUFS/g)].pop();
+	const cur = m ? parseFloat(m[1]) : target;
+	const gain = Math.max(-30, Math.min(maxGain, target - (Number.isFinite(cur) ? cur : target)));
+	const tmp = dst + '.tmp.mp3';
+	execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', src, '-af', `volume=${gain.toFixed(2)}dB,alimiter=limit=0.95:level=false`, '-ar', '44100', '-b:a', '160k', tmp]);
+	fs.renameSync(tmp, dst);
+	return {from: cur, gain};
 };
