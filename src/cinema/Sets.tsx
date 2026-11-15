@@ -24,6 +24,7 @@ import {
 	rnd,
 } from './kit';
 import {Figure, chopPose, sitPose, walkPose} from './people';
+import {RIPLEY_CAMERA, RIPLEY_SETS} from './SetsRipley';
 import type {CinemaSet} from './types';
 
 type SetProps = {frame: number; frames: number};
@@ -816,6 +817,7 @@ const SETS: Record<CinemaSet, React.FC<SetProps>> = {
 	forest: Logging,
 	reel: Campfire,
 	outro: Lake,
+	...RIPLEY_SETS,
 };
 
 /** Кадрирование: камера ближе к действию (масштаб, точка фокуса) */
@@ -828,6 +830,7 @@ const CAMERA: Partial<Record<CinemaSet, [number, number, number]>> = {
 	campfire: [1.35, 540, 1330],
 	lake: [1.2, 620, 1330],
 	dawn: [1.1, 640, 1300],
+	...RIPLEY_CAMERA,
 };
 
 export const SetView: React.FC<{set: CinemaSet; frame: number; frames: number}> = ({set, frame, frames}) => {
