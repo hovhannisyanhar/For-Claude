@@ -51,7 +51,7 @@ export const RemotionRoot: React.FC = () => (
 			height={1920}
 			fps={FPS}
 			durationInFrames={1}
-			defaultProps={{title: 'Рипли', subtitle: 'он захотел чужую жизнь', kicker: 'мини-сериал · 2024', note: 'без спойлеров'} as CoverProps}
+			defaultProps={{lines: [{text: 'он украл'}, {text: 'чужую', big: true}, {text: 'жизнь', big: true}]} as CoverProps}
 		/>
 	</>
 );
