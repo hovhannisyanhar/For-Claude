@@ -71,4 +71,8 @@ export type CinemaProps = {
 	music?: string;
 	musicVolume?: number;
 	showCaptions?: boolean;
+	/** Шрифты кинетического текста: пресет (classic · noir · modern · display · hand) или своя тройка. Менять от ролика к ролику */
+	fonts?: import('./Kinetic').FontPreset | import('./Kinetic').KineticFonts;
+	/** Старый «плёночный» вид: мерцание яркости, дрожание кадра, пылинки, живое зерно. По умолчанию выключен */
+	film?: boolean;
 };

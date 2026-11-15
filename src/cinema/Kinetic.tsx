@@ -9,6 +9,24 @@ import type {Word} from '../types';
 export const F_SCRIPT = 'Great Vibes';
 export const F_SERIF = 'Cormorant Garamond';
 export const F_CAPS = 'Oswald';
+
+/** Шрифтовая тройка ролика: рукописный (ключевые слова), основной, капители (служебные) */
+export type KineticFonts = {script: string; serif: string; caps: string; serifWeight?: number; italic?: boolean; capsWeight?: number};
+export const FONT_PRESETS = {
+	classic: {script: 'Great Vibes', serif: 'Cormorant Garamond', caps: 'Oswald'},
+	noir: {script: 'Marck Script', serif: 'Playfair Display', caps: 'Tenor Sans', serifWeight: 700, italic: false, capsWeight: 400},
+	modern: {script: 'Great Vibes', serif: 'Jost', caps: 'Tenor Sans', serifWeight: 400, italic: false, capsWeight: 400},
+	display: {script: 'Marck Script', serif: 'Yeseva One', caps: 'Jost', serifWeight: 400, italic: false, capsWeight: 400},
+	hand: {script: 'Caveat', serif: 'Cormorant Garamond', caps: 'Tenor Sans', capsWeight: 400},
+} satisfies Record<string, KineticFonts>;
+export type FontPreset = keyof typeof FONT_PRESETS;
+/** Текущая тройка (на весь рендер одна — задаётся из пропсов CinemaVideo) */
+export const FONT: KineticFonts = {...FONT_PRESETS.classic};
+export const setKineticFonts = (f?: FontPreset | KineticFonts) => {
+	const next = typeof f === 'string' ? FONT_PRESETS[f] ?? FONT_PRESETS.classic : f ?? FONT_PRESETS.classic;
+	for (const k of Object.keys(FONT) as Array<keyof KineticFonts>) delete FONT[k];
+	Object.assign(FONT, next);
+};
 const CREAM = '#f3ead8';
 const SIDE_L = 80;
 const SIDE_R = 150;
@@ -147,8 +165,8 @@ const CapsWord: React.FC<{text: string; st: number; accent: string}> = ({text, s
 				display: 'inline-block',
 				whiteSpace: 'nowrap',
 				flexShrink: 0,
-				fontFamily: F_CAPS,
-				fontWeight: 500,
+				fontFamily: FONT.caps,
+				fontWeight: FONT.capsWeight ?? 500,
 				fontSize: SIZE.caps,
 				textTransform: 'uppercase',
 				letterSpacing: `${0.7 - 0.5 * p}em`,
@@ -176,7 +194,7 @@ const ScriptWord: React.FC<{text: string; st: number; accent: string; tilt: numb
 			<span
 				style={{
 					display: 'inline-block',
-					fontFamily: F_SCRIPT,
+					fontFamily: FONT.script,
 					fontSize: SIZE.script,
 					lineHeight: 1.05,
 					color: accent,
@@ -285,9 +303,9 @@ export const KineticText: React.FC<{
 						alignItems: 'baseline',
 						columnGap: 22,
 						textAlign: mood.align,
-						fontFamily: F_SERIF,
-						fontWeight: mood.italic ? 600 : 700,
-						fontStyle: mood.italic ? 'italic' : 'normal',
+						fontFamily: FONT.serif,
+						fontWeight: FONT.serifWeight ?? (mood.italic ? 600 : 700),
+						fontStyle: mood.italic && FONT.italic !== false ? 'italic' : 'normal',
 						fontSize: SIZE.serif,
 						lineHeight: 1.04,
 						color: CREAM,
@@ -318,8 +336,8 @@ export const FinalTitle: React.FC<{text: string; start: number; accent: string}>
 		<div style={{position: 'absolute', top: 470, left: SIDE_L, right: SIDE_R, textAlign: 'center', color: CREAM}}>
 			<div
 				style={{
-					fontFamily: F_SERIF,
-					fontWeight: 700,
+					fontFamily: FONT.serif,
+					fontWeight: FONT.serifWeight ?? 700,
 					fontSize: 128,
 					lineHeight: 1,
 					letterSpacing: `${0.12 - 0.08 * p}em`,
