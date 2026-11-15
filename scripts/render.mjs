@@ -53,6 +53,10 @@ execFileSync(
 );
 
 if (!preview) {
+	// Громкость под соцсети: −14 LUFS, видео не перекодируется
+	const tmp = videoOut.replace(/\.mp4$/, '.norm.mp4');
+	execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', videoOut, '-c:v', 'copy', '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', tmp]);
+	fs.renameSync(tmp, videoOut);
 	// Обложка: кадр хука после появления текста, без субтитров
 	const coverProps = path.join(P.outDir, 'cover-props.json');
 	writeJson(coverProps, {...props, showCaptions: false});
