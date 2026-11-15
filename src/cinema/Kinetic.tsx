@@ -180,7 +180,9 @@ const ScriptWord: React.FC<{text: string; st: number; accent: string; tilt: numb
 					fontSize: SIZE.script,
 					lineHeight: 1.05,
 					color: accent,
-					clipPath: `inset(-30% ${(1 - p) * 115 - 15}% -40% -15%)`,
+					// маска с запасом 15% под росчерки по краям; при p=0 закрыто целиком (иначе виден хвостик первой буквы)
+					clipPath: `inset(-30% ${(1 - p) * 130 - 15}% -40% -15%)`,
+					opacity: interpolate(frame, [st, st + 5], [0, 1], clamp),
 					paddingRight: '0.12em',
 					textShadow: `0 0 50px ${accent}55, 0 6px 26px rgba(0,0,0,0.8)`,
 				}}

@@ -64,11 +64,13 @@ if (!preview) {
 		fs.copyFileSync(fs.existsSync(raw) ? raw : path.join(ROOT, 'public', sound.music), path.join(P.outDir, 'music.mp3'));
 	}
 	// Обложка: кадр хука после появления текста, без субтитров
+	// В «Кино» со script.cover — шрифтовая обложка на градиенте (композиция CinemaCover)
+	const fontCover = script.style === 'cinema' && script.cover;
 	const coverProps = path.join(P.outDir, 'cover-props.json');
-	writeJson(coverProps, {...props, showCaptions: false});
+	writeJson(coverProps, fontCover ? script.cover : {...props, showCaptions: false});
 	execFileSync(
 		remotion,
-		['still', 'src/index.ts', composition, `--props=${coverProps}`, '--log=error', ...browserArgs(), path.join(P.outDir, 'cover.jpg'), `--frame=${script.coverFrame ?? 28}`],
+		['still', 'src/index.ts', fontCover ? 'CinemaCover' : composition, `--props=${coverProps}`, '--log=error', ...browserArgs(), path.join(P.outDir, 'cover.jpg'), `--frame=${fontCover ? 0 : script.coverFrame ?? 28}`],
 		{cwd: ROOT, stdio: 'inherit'},
 	);
 	fs.rmSync(coverProps);
