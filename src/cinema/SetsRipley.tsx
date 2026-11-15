@@ -4,6 +4,7 @@ import React from 'react';
 import {Easing, interpolate} from 'remotion';
 import {Birds, Clouds, Fog, H, Layer, Particles, Sky, Smoke, Stars, W, clamp, rnd} from './kit';
 import {Figure, sitPose, walkPose} from './people';
+import {DICKIE, MARGE, Person, TOM, TOM_HAT, TOM_LINEN, type Look} from './person';
 
 type SetProps = {frame: number; frames: number};
 const ease = Easing.inOut(Easing.cubic);
@@ -171,10 +172,10 @@ const Mirror: React.FC<SetProps> = ({frame, frames}) => {
 					<circle cx={mx + 160} cy={my + 60} r={200} fill="url(#lamp)" opacity={0.4 * flick} />
 					{/* Дики — светлый пиджак, проявляется и совпадает с Томом */}
 					<g opacity={0.25 + merge * 0.6}>
-						<Figure x={mx + 170 - merge * 170} y={my + 520} h={560} facing={-1} color="#efe3c8" pose={{armL: 6, armR: -4, head: -2}} hat={false} />
+						<Person x={mx + 170 - merge * 170} y={my + 520} h={560} facing={-1} look={DICKIE} tint={{color: '#3a4d4f', amount: 0.25}} pose={{armL: 6, armR: -4, head: -2}} />
 					</g>
 					<g opacity={1 - merge * 0.55}>
-						<Figure x={mx} y={my + 520} h={560} facing={-1} color="#0a0d0f" rim={{color: '#f2b86a', side: 1, strength: 0.8}} pose={{armL: 6, armR: -4}} hat={false} />
+						<Person x={mx} y={my + 520} h={560} facing={-1} look={TOM} tint={{color: '#0a0d0f', amount: 0.6}} rim={{color: '#f2b86a', side: 1, strength: 0.8}} pose={{armL: 6, armR: -4}} />
 					</g>
 					{/* блик на стекле */}
 					<path d={`M${mx - 160},${my - 260} L${mx - 90},${my - 260} L${mx - 220},${my + 120} L${mx - 260},${my + 120} Z`} fill="#ffffff" opacity={0.07} />
@@ -182,7 +183,7 @@ const Mirror: React.FC<SetProps> = ({frame, frames}) => {
 			</Layer>
 			<Layer p={p} depth={0.8} pan={[20, 0]} zoom={0.1}>
 				{/* Том со спины на переднем плане */}
-				<Figure x={420} y={1980} h={980} facing={1} color="#06080a" rim={{color: '#f0a858', side: -1, strength: 0.7 * flick}} pose={{armL: 4, armR: -3}} hat={false} />
+				<Person x={360} y={2020} h={1000} facing={1} look={TOM} tint={{color: '#06080a', amount: 0.72}} rim={{color: '#f0a858', side: -1, strength: 0.7 * flick}} pose={{armL: 4, armR: -3, head: 4}} />
 			</Layer>
 			<Particles frame={frame} count={40} kind="dust" seed="mirror-dust" area={[0, 700, 700, 900]} opacity={0.5} />
 		</>
@@ -282,15 +283,15 @@ const NyRoom: React.FC<SetProps> = ({frame, frames}) => {
 				<rect x={250} y={1360} width={130} height={10} fill="#1b110c" />
 				<rect x={258} y={1370} width={8} height={120} fill="#1b110c" />
 				<rect x={366} y={1370} width={8} height={120} fill="#1b110c" />
-				<Figure
+				<Person
 					x={320}
 					y={1490}
 					h={420}
 					facing={1}
-					color="#0b0807"
-					rim={{color: '#ffcf8a', side: 1, strength: 0.75}}
-					hat={false}
-					pose={sitPose({armL: 150, elbowL: 120, armR: 40, elbowR: 50, lean: 6 - startle * 8, head: startle * -22})}
+					look={{...TOM, top: '#f1eee6', shirt: undefined, tie: undefined, rolled: true}}
+					tint={{color: '#1a0f0a', amount: 0.35}}
+					rim={{color: '#ffcf8a', side: 1, strength: 0.6}}
+					pose={sitPose({armL: 72, elbowL: 18, armR: 40, elbowR: 50, lean: 10 - startle * 10, head: startle * -22})}
 				/>
 			</Layer>
 		</>
@@ -360,7 +361,7 @@ const Liner: React.FC<SetProps> = ({frame, frames}) => {
 				))}
 				{/* Том с чемоданом идёт по трапу */}
 				<g>
-					<Figure x={tx} y={ty} h={210} facing={1} color="#1d2433" pose={{...walkPose(frame / 6, 0.8), armR: 2, elbowR: 0}} hat />
+					<Person x={tx} y={ty} h={210} facing={1} look={TOM_HAT} pose={{...walkPose(frame / 6, 0.8), armR: 2, elbowR: 0}} />
 					<rect x={tx - 26} y={ty - 82} width={30} height={22} rx={3} fill="#7a4a28" />
 				</g>
 				{/* провожающие */}
@@ -370,16 +371,15 @@ const Liner: React.FC<SetProps> = ({frame, frames}) => {
 					[860, '#e8d6a8', -1],
 					[930, '#3f6e58', -1],
 				].map(([x, c, f], i) => (
-					<Figure
+					<Person
 						key={i}
 						x={x as number}
 						y={1560}
 						h={250}
 						facing={f as 1 | -1}
-						kind={i % 2 ? 'woman' : 'man'}
-						color={c as string}
+						look={(i % 2 ? {...MARGE, top: c as string} : {...TOM_HAT, top: c as string, hat: '#3a3a3a'}) as Look}
 						pose={{armL: 150 + Math.sin(frame / 5 + i) * 18, elbowL: 10, armR: -4}}
-						hat={i % 2 === 0}
+						shadow={0.25}
 					/>
 				))}
 			</Layer>
@@ -515,17 +515,23 @@ const Terrace: React.FC<SetProps> = ({frame, frames}) => {
 				<line x1={712} y1={1192} x2={712} y2={1210} stroke="#cfe7ef" strokeWidth={2} />
 				<circle cx={708} cy={1182} r={3} fill="#6a8a2a" />
 				{/* Мардж за столом — поворачивается к Тому */}
-				<Figure x={560} y={1330} h={260} facing={look > 0.5 ? 1 : 1} kind="woman" color="#2f6a8a" pose={sitPose({armL: 70, elbowL: 20, armR: 60, elbowR: 30, lean: 10 - look * 14, head: -look * 24})} />
+				<g fill="#e9e1d0">
+					<rect x={500} y={1262} width={64} height={7} rx={3} />
+					<rect x={504} y={1180} width={6} height={86} />
+					<rect x={504} y={1268} width={5} height={64} />
+					<rect x={556} y={1268} width={5} height={64} />
+				</g>
+				<Person x={560} y={1330} h={260} facing={1} look={MARGE} pose={sitPose({armL: 70, elbowL: 20, armR: 60, elbowR: 30, lean: 10 - look * 14, head: -look * 24})} />
 				{/* Дики в шезлонге */}
 				<path d="M140,1330 L360,1290 L420,1180 L400,1172 L340,1276 L130,1316 Z" fill="#f4efe4" />
 				<path d="M150,1318 L344,1282 L398,1180" stroke="#2f7fbf" strokeWidth={10} fill="none" strokeDasharray="22 14" />
 				<line x1={160} y1={1326} x2={180} y2={1380} stroke="#9a7a52" strokeWidth={6} />
 				<line x1={360} y1={1294} x2={330} y2={1380} stroke="#9a7a52" strokeWidth={6} />
 				<g transform="rotate(-14 330 1300)">
-					<Figure x={330} y={1300} h={270} facing={-1} color="#f2ead8" rim={{color: '#c9b48c', side: 1, strength: 0.5}} hat={false} pose={sitPose({thighL: 82, thighR: 76, kneeL: 20, kneeR: 30, armL: 110 + sip, elbowL: 80, armR: 20, lean: -22})} />
+					<Person x={330} y={1300} h={270} facing={-1} look={DICKIE} pose={sitPose({thighL: 82, thighR: 76, kneeL: 20, kneeR: 30, armL: 60 + sip * 0.6, elbowL: 95, armR: 20, lean: -22})} />
 				</g>
 				{/* Том у перил */}
-				<Figure x={900} y={1350} h={330} facing={-1} color="#1d2a3c" rim={{color: '#fff0c8', side: 1, strength: 0.6}} hat={false} pose={{armL: 8, armR: -6, head: 4}} />
+				<Person x={900} y={1350} h={330} facing={-1} look={TOM} rim={{color: '#fff0c8', side: 1, strength: 0.5}} pose={{armL: 8, armR: -6, head: 4}} shadow={0.3} />
 			</Layer>
 			<Particles frame={frame} count={25} kind="dust" seed="tdust" area={[0, 900, W, 500]} opacity={0.4} color="#fff6d8" />
 		</>
@@ -586,13 +592,13 @@ const Wardrobe: React.FC<SetProps> = ({frame, frames}) => {
 				</defs>
 				<g clipPath="url(#ward-mirror)">
 					<rect x={705} y={695} width={200} height={750} fill="#5d4a3a" opacity={0.6} />
-					<Figure x={810} y={1500} h={620} facing={-1} color="#d9e6f0" rim={{color: '#ffffff', side: -1, strength: 0.4}} hat={false} pose={{armL: 35, elbowL: 125 + adjust, armR: 25, elbowR: 132 - adjust, head: -6}} />
+					<Person x={810} y={1500} h={620} facing={-1} look={TOM_LINEN} tint={{color: '#5d4a3a', amount: 0.25}} pose={{armL: 35, elbowL: 125 + adjust, armR: 25, elbowR: 132 - adjust, head: -6}} />
 					<path d="M720,700 L780,700 L705,1100 L705,900 Z" fill="#ffffff" opacity={0.08} />
 				</g>
 			</Layer>
 			<Layer p={p} depth={0.75} pan={[50, 0]} zoom={0.14}>
 				{/* Том в рубашке Дики */}
-				<Figure x={540} y={1580} h={640} facing={1} color="#cfdde9" rim={{color: '#7a5a40', side: -1, strength: 0.9}} hat={false} pose={{armL: 35, elbowL: 125 + adjust, armR: 25, elbowR: 132 - adjust, head: 6}} />
+				<Person x={540} y={1580} h={640} facing={1} look={TOM_LINEN} rim={{color: '#ffd79a', side: 1, strength: 0.6}} pose={{armL: 35, elbowL: 125 + adjust, armR: 25, elbowR: 132 - adjust, head: 6}} shadow={0.3} />
 			</Layer>
 			<Particles frame={frame} count={60} kind="dust" seed="wdust" area={[450, 600, 600, 1000]} opacity={0.7} />
 		</>
@@ -625,9 +631,9 @@ const Boat: React.FC<SetProps> = ({frame, frames}) => {
 					<path d="M250,1290 L880,1290 L876,1302 L254,1302 Z" fill="#f2b06a" opacity={0.7} />
 					<rect x={540} y={1260} width={60} height={30} fill="#1c1420" />
 					{/* Том на корме */}
-					<Figure x={340} y={1300} h={240} facing={1} color="#120c18" rim={{color: '#ffc27a', side: 1, strength: 0.75}} hat={false} pose={sitPose({armL: 60, elbowL: 40, armR: 50, elbowR: 50, lean: 14})} />
+					<Person x={340} y={1300} h={240} facing={1} look={TOM_LINEN} tint={{color: '#1a1020', amount: 0.7}} rim={{color: '#ffc27a', side: 1, strength: 0.75}} pose={sitPose({armL: 34, elbowL: 30, armR: 26, elbowR: 36, lean: 16})} />
 					{/* Дики на носу, спиной к Тому */}
-					<Figure x={790} y={1300} h={240} facing={1} color="#2a1e30" rim={{color: '#ffd8a0', side: -1, strength: 0.65}} hat={false} pose={sitPose({armL: 40, elbowL: 30, armR: 30, elbowR: 20, lean: 18, head: -10})} />
+					<Person x={790} y={1300} h={240} facing={1} look={DICKIE} tint={{color: '#2a1e30', amount: 0.6}} rim={{color: '#ffd8a0', side: -1, strength: 0.65}} pose={sitPose({armL: 40, elbowL: 30, armR: 30, elbowR: 20, lean: 18, head: -10})} />
 				</g>
 				{/* отражение лодки */}
 				<path d={`M260,${1390 + bob} L870,${1390 + bob} L820,${1440 + bob} L320,${1440 + bob} Z`} fill="#1c1420" opacity={0.35} />
@@ -718,7 +724,7 @@ const NightSea: React.FC<SetProps> = ({frame, frames}) => {
 			<Layer p={p} depth={0.8} pan={[-20, 0]} zoom={0.12}>
 				{/* Том на камнях смотрит на виллу */}
 				<path d="M560,1560 Q700,1480 860,1500 Q1000,1510 1180,1460 L1180,2000 L560,2000 Z" fill="#05070f" />
-				<Figure x={790} y={1500} h={360} facing={-1} color="#04060c" rim={{color: '#cfd8f0', side: 1, strength: 0.7}} hat={false} pose={{armL: 6, armR: -6, head: 4}} />
+				<Person x={790} y={1500} h={360} facing={-1} look={TOM} tint={{color: '#04060c', amount: 0.82}} rim={{color: '#cfd8f0', side: 1, strength: 0.7}} pose={{armL: 6, armR: -6, head: 4}} />
 			</Layer>
 		</>
 	);
