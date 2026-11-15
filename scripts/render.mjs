@@ -24,7 +24,7 @@ const props = {
 	accent: script.accent,
 	handle: script.handle,
 	theme: script.theme || 'midnight',
-	music: sound?.music ?? script.music,
+	music: script.musicSeparate ? null : (sound?.music ?? script.music ?? null),
 	musicVolume: script.musicVolume,
 	scenes: script.scenes.map((sc, i) => ({...sc, ...manifest.scenes[i], ...(sound ? {sfx: sound.scenes[i]} : {})})),
 };
@@ -57,6 +57,11 @@ if (!preview) {
 	const tmp = videoOut.replace(/\.mp4$/, '.norm.mp4');
 	execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', videoOut, '-c:v', 'copy', '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', tmp]);
 	fs.renameSync(tmp, videoOut);
+	// Музыка отдельным файлом (для монтажа в редакторе)
+	if (script.musicSeparate && sound?.music) {
+		const raw = path.join(ROOT, 'public', sound.music.replace(/\.n\d+\.mp3$/, '.mp3'));
+		fs.copyFileSync(fs.existsSync(raw) ? raw : path.join(ROOT, 'public', sound.music), path.join(P.outDir, 'music.mp3'));
+	}
 	// Обложка: кадр хука после появления текста, без субтитров
 	const coverProps = path.join(P.outDir, 'cover-props.json');
 	writeJson(coverProps, {...props, showCaptions: false});

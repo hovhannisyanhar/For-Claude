@@ -15,14 +15,14 @@ const SIDE_R = 150;
 const MAX_W = 1080 - SIDE_L - SIDE_R;
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
-const SIZE = {script: 176, serif: 104, caps: 44};
+const SIZE = {script: 160, serif: 92, caps: 40};
 const STOP = new Set(['и', 'в', 'на', 'по', 'а', 'но', 'ни', 'не', 'он', 'его', 'ему', 'это', 'так', 'там', 'тут', 'чем', 'что', 'как', 'же', 'из', 'за', 'до', 'у', 'к', 'с', 'о', 'от', 'при', 'эту', 'то', 'их', 'есть', 'было', 'одной', 'почти', 'только', 'которым', 'которая', 'которую', 'после', 'просто', 'потом', 'здесь', 'этого', 'каждый', 'вокруг']);
 
 export const norm = (w: string) => w.toLowerCase().replace(/[«»"“”.,!?;:—…]/g, '');
 const clean = (w: string) => w.replace(/[.,;:!?…]+$/g, '').replace(/^—$/, '');
 
 type Kind = 'script' | 'serif' | 'caps';
-type Phrase = {words: Word[]; start: number; end: number};
+type Phrase = {words: Word[]; start: number; end: number; breaks?: number[]};
 
 /** Слова озвучки → фразы: по знакам препинания, до 5 слов / ~28 символов */
 const toPhrases = (words: Word[]): Phrase[] => {
@@ -40,6 +40,25 @@ const toPhrases = (words: Word[]): Phrase[] => {
 		else if (/[,;:—]»?$/.test(w.text) && cur.length >= 2) flush();
 	}
 	flush();
+	return out;
+};
+
+/** Фразы → «экраны»: слова копятся в кадре (до ~9 слов, до 4 строк), потом блок уходит целиком */
+const toBlocks = (phrases: Phrase[], emph: Set<string>): Phrase[] => {
+	const out: Phrase[] = [];
+	let cur: Phrase | null = null;
+	for (const ph of phrases) {
+		if (cur) {
+			const merged: Phrase = {words: [...cur.words, ...ph.words], start: cur.start, end: ph.end, breaks: [...(cur.breaks ?? []), cur.words.length]};
+			if (merged.words.length <= 9 && layout(merged, emph).length <= 4) {
+				cur = merged;
+				continue;
+			}
+			out.push(cur);
+		}
+		cur = {...ph, breaks: []};
+	}
+	if (cur) out.push(cur);
 	return out;
 };
 
@@ -65,16 +84,22 @@ const layout = (ph: Phrase, emph: Set<string>): Item[][] => {
 	const lines: Item[][] = [];
 	let cur: Item[] = [];
 	let cw = 0;
+	const breaks = new Set(ph.breaks ?? []);
 	for (const it of items) {
 		const wd = widthOf(it.text, it.kind) + 26;
-		if (it.kind === 'script') {
-			if (cur.length) lines.push(cur);
-			lines.push([it]);
+		if (breaks.has(it.i) && cur.length) {
+			lines.push(cur);
 			cur = [];
 			cw = 0;
+		}
+		const curScript = cur.length > 0 && cur.every((x) => x.kind === 'script');
+		if (it.kind === 'script' && !(curScript && cw + wd <= MAX_W)) {
+			if (cur.length) lines.push(cur);
+			cur = [it];
+			cw = wd;
 			continue;
 		}
-		if (cur.length && cw + wd > MAX_W) {
+		if (cur.length && (cw + wd > MAX_W || (curScript && it.kind !== 'script'))) {
 			lines.push(cur);
 			cur = [];
 			cw = 0;
@@ -153,7 +178,8 @@ const ScriptWord: React.FC<{text: string; st: number; accent: string; tilt: numb
 					fontSize: SIZE.script,
 					lineHeight: 1.05,
 					color: accent,
-					clipPath: `inset(-20% ${(1 - p) * 100}% -30% -5%)`,
+					clipPath: `inset(-30% ${(1 - p) * 115 - 15}% -40% -15%)`,
+					paddingRight: '0.12em',
 					textShadow: `0 0 50px ${accent}55, 0 6px 26px rgba(0,0,0,0.8)`,
 				}}
 			>
@@ -185,7 +211,7 @@ const moodFor = (seed: string): Mood => {
 	const exits = ['rise', 'drift', 'fall'] as const;
 	return {
 		align: aligns[Math.floor(r('a') * aligns.length)],
-		dy: Math.floor(r('y') * 3) * 70,
+		dy: Math.floor(r('y') * 3) * 30,
 		italic: r('i') > 0.5,
 		exit: exits[Math.floor(r('e') * exits.length)],
 		tilt: -3 - r('t') * 4,
@@ -203,11 +229,11 @@ export const KineticText: React.FC<{
 }> = ({words, emphasis, accent, frames, top, finalTitle, seed}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
-	const phrases = useMemo(() => toPhrases(words), [words]);
 	const emph = useMemo(() => new Set(emphasis.map(norm)), [emphasis]);
+	const phrases = useMemo(() => toBlocks(toPhrases(words), emph), [words, emph]);
 	const t = (frame - AUDIO_DELAY) / fps;
 	const lastW = words[words.length - 1];
-	const lastEnd = finalTitle ? AUDIO_DELAY + (lastW?.end ?? 0) * fps + 4 : frames - 4;
+	const lastEnd = finalTitle ? AUDIO_DELAY + (lastW?.end ?? 0) * fps + 20 : frames - 2;
 	const idx = phrases.findIndex((ph, i) => {
 		const next = phrases[i + 1];
 		return t >= ph.start - 0.12 && (next ? t < next.start - 0.06 : frame < lastEnd);
@@ -277,34 +303,30 @@ export const KineticText: React.FC<{
 	);
 };
 
-/** Финальный титр: первое слово рукописным, остальное — разрядкой капителью с засечками */
+/** Финальный титр: одним шрифтом (антиква), буквы поднимаются, разрядка медленно сжимается */
 export const FinalTitle: React.FC<{text: string; start: number; accent: string}> = ({text, start, accent}) => {
 	const frame = useCurrentFrame();
-	const [first, ...rest] = text.split(' ');
-	const restText = rest.join(' ');
-	const p = interpolate(frame, [start + 16, start + 40], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
-	const line = interpolate(frame, [start + 30, start + 60], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+	const p = interpolate(frame, [start, start + 70], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+	const line = interpolate(frame, [start + 30, start + 70], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	return (
-		<div style={{position: 'absolute', top: 420, left: SIDE_L, right: SIDE_R, textAlign: 'center', color: CREAM}}>
-			<div style={{display: 'flex', justifyContent: 'center'}}>
-				<ScriptWord text={first} st={start} accent={accent} tilt={-6} />
-			</div>
+		<div style={{position: 'absolute', top: 470, left: SIDE_L, right: SIDE_R, textAlign: 'center', color: CREAM}}>
 			<div
 				style={{
-					marginTop: -20,
 					fontFamily: F_SERIF,
 					fontWeight: 700,
-					fontSize: 96,
-					textTransform: 'uppercase',
-					letterSpacing: `${0.5 - 0.3 * p}em`,
-					opacity: p,
-					filter: `blur(${(1 - p) * 8}px)`,
+					fontSize: 128,
+					lineHeight: 1,
+					letterSpacing: `${0.12 - 0.08 * p}em`,
 					textShadow: '0 8px 50px rgba(0,0,0,0.8)',
 				}}
 			>
-				{restText}
+				{text.split(' ').map((w, wi) => (
+					<div key={wi}>
+						<SerifWord text={w} st={start + wi * 10} />
+					</div>
+				))}
 			</div>
-			<div style={{margin: '22px auto 0', height: 2, width: 300 * line, background: accent, opacity: 0.8}} />
+			<div style={{margin: '26px auto 0', height: 2, width: 300 * line, background: accent, opacity: 0.8}} />
 		</div>
 	);
 };

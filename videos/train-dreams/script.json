@@ -13,7 +13,6 @@
       "use_speaker_boost": true
     }
   },
-  "music": "generated/train-dreams/music.mp3",
   "musicVolume": 0.3,
   "coverFrame": 185,
   "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
@@ -58,7 +57,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 12
+      "pause": 40
     },
     {
       "set": "valley",
@@ -82,7 +81,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 22
+      "pause": 50
     },
     {
       "set": "logging",
@@ -116,7 +115,8 @@
           "duration": 5,
           "volume": 0.22
         }
-      ]
+      ],
+      "pause": 40
     },
     {
       "set": "bridge",
@@ -139,7 +139,7 @@
           "volume": 0.12
         }
       ],
-      "pause": 20
+      "pause": 40
     },
     {
       "set": "cabin",
@@ -162,7 +162,8 @@
           "duration": 8,
           "volume": 0.12
         }
-      ]
+      ],
+      "pause": 40
     },
     {
       "set": "seasons",
@@ -179,7 +180,8 @@
           "duration": 11,
           "volume": 0.12
         }
-      ]
+      ],
+      "pause": 40
     },
     {
       "set": "campfire",
@@ -203,7 +205,8 @@
           "duration": 5,
           "volume": 0.12
         }
-      ]
+      ],
+      "pause": 40
     },
     {
       "set": "lake",
@@ -226,7 +229,8 @@
           "duration": 5,
           "volume": 0.22
         }
-      ]
+      ],
+      "pause": 40
     },
     {
       "set": "dawn",
@@ -243,8 +247,10 @@
           "volume": 0.12
         }
       ],
-      "finalTitle": "Сны поездов"
+      "finalTitle": "Сны поездов",
+      "pause": 40
     }
   ],
-  "musicPrompt": "Slow, intimate cinematic score for a quiet period drama about a lumberjack's life in the early 1900s American Northwest forests. Fingerpicked acoustic guitar, warm sustained strings, soft felt piano, distant harmonica breath. Melancholic, tender, nostalgic, spacious, no drums, gentle swell near the end, 62 bpm. Instrumental."
+  "musicPrompt": "Slow, intimate cinematic score for a quiet period drama about a lumberjack's life in the early 1900s American Northwest forests. Fingerpicked acoustic guitar, warm sustained strings, soft felt piano, distant harmonica breath. Melancholic, tender, nostalgic, spacious, no drums, gentle swell near the end, 62 bpm. Instrumental.",
+  "musicSeparate": true
 }
