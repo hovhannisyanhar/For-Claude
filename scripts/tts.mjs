@@ -1,6 +1,7 @@
 // Озвучка сценария: по одному mp3 на сцену + тайминги слов для субтитров.
 // Провайдер: TTS_PROVIDER=elevenlabs (по умолчанию) | openai | none
 //   none — без голоса, длительность по оценке (для черновиков и проверки визуала)
+// ttsText в сцене — текст для ElevenLabs с аудиотегами ([whispers] …); на экран идёт voice
 // --only=1,3 — озвучить только эти сцены (остальные: из кэша или оценка длительности)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -40,7 +41,13 @@ const OA = {
 const wordsFromAlignment = (al) => {
 	const words = [];
 	let cur = null;
+	let tag = false; // [аудиотеги] не попадают в слова на экране
 	al.characters.forEach((ch, i) => {
+		if (ch === '[') tag = true;
+		if (tag) {
+			if (ch === ']') tag = false;
+			return;
+		}
 		if (/\s/.test(ch)) {
 			if (cur) words.push(cur);
 			cur = null;
@@ -105,7 +112,7 @@ const out = {provider, scenes: []};
 const only = new Set(String(flag('only', '')).split(',').filter(Boolean).map(Number));
 
 for (const [i, sc] of script.scenes.entries()) {
-	const hash = crypto.createHash('sha1').update(`${provider}|${voiceKey}|${sc.voice}`).digest('hex').slice(0, 10);
+	const hash = crypto.createHash('sha1').update(`${provider}|${voiceKey}|${sc.ttsText ?? sc.voice}`).digest('hex').slice(0, 10);
 	const prevEntry = old.scenes[i];
 	if (only.size && !only.has(i + 1)) {
 		if (prevEntry) out.scenes.push(prevEntry);
@@ -134,7 +141,7 @@ for (const [i, sc] of script.scenes.entries()) {
 	const r =
 		provider === 'openai'
 			? await openai(sc.voice)
-			: await elevenlabs(sc.voice, script.scenes[i - 1]?.voice, script.scenes[i + 1]?.voice);
+			: await elevenlabs(sc.ttsText ?? sc.voice, script.scenes[i - 1]?.voice, script.scenes[i + 1]?.voice);
 	const abs = path.join(P.genDir, file);
 	fs.writeFileSync(abs, r.audio);
 	normalizeLoudness(abs, abs, VOICE_LUFS);
