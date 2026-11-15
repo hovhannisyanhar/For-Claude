@@ -16,15 +16,17 @@ const manifest = readJson(P.manifest);
 
 const chronicle = script.style === 'chronicle';
 const composition = chronicle ? 'ChronicleVideo' : script.style === 'cinema' ? 'CinemaVideo' : 'FactVideo';
+const soundFile = path.join(P.genDir, 'sound.json');
+const sound = fs.existsSync(soundFile) ? readJson(soundFile) : null;
 const props = {
 	title: script.title,
 	style: script.style,
 	accent: script.accent,
 	handle: script.handle,
 	theme: script.theme || 'midnight',
-	music: script.music,
+	music: sound?.music ?? script.music,
 	musicVolume: script.musicVolume,
-	scenes: script.scenes.map((sc, i) => ({...sc, ...manifest.scenes[i]})),
+	scenes: script.scenes.map((sc, i) => ({...sc, ...manifest.scenes[i], ...(sound ? {sfx: sound.scenes[i]} : {})})),
 };
 fs.mkdirSync(P.outDir, {recursive: true});
 const propsFile = path.join(P.outDir, 'props.json');

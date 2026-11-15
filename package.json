@@ -11,7 +11,8 @@
     "check": "tsc --noEmit",
     "img": "NODE_USE_ENV_PROXY=1 node scripts/commons.mjs",
     "ambient": "node scripts/ambient.mjs",
-    "stills": "node scripts/stills.mjs"
+    "stills": "node scripts/stills.mjs",
+    "sound": "NODE_USE_ENV_PROXY=1 node scripts/sound.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.538",

@@ -20,8 +20,8 @@ loadFonts();
 
 /** Растворение между планами, кадры */
 export const DISSOLVE = 20;
-const TAIL = 14;
-const LAST_TAIL = 75;
+const TAIL = 10;
+const LAST_TAIL = 90;
 
 export const shotFrames = (s: CinemaShot, isLast: boolean) =>
 	AUDIO_DELAY + Math.ceil((s.duration ?? estimateDuration(s.voice)) * FPS) + (s.pause ?? TAIL) + (isLast ? LAST_TAIL : 0);
@@ -196,42 +196,106 @@ const Titles: React.FC<{shot: CinemaShot; frames: number; accent: string; isLast
 	);
 };
 
-/** Субтитры: спокойные, с засечками, текущее слово — тёплым */
-const Subtitles: React.FC<{words: Word[]; accent: string}> = ({words, accent}) => {
+const norm = (w: string) => w.toLowerCase().replace(/[«»"“”.,!?;:—…]/g, '');
+const clean = (w: string) => w.replace(/[.,;:!?…]+$/g, '').replace(/^[—]$/, '');
+
+type Phrase = {words: Word[]; start: number; end: number};
+/** Слова озвучки → фразы для экрана: по знакам препинания, до 5 слов / ~26 символов */
+const toPhrases = (words: Word[]): Phrase[] => {
+	const out: Phrase[] = [];
+	let cur: Word[] = [];
+	const flush = () => {
+		if (cur.length) out.push({words: cur, start: cur[0].start, end: cur[cur.length - 1].end});
+		cur = [];
+	};
+	for (const w of words) {
+		const len = cur.reduce((a, x) => a + x.text.length + 1, 0) + w.text.length;
+		if (cur.length >= 5 || (cur.length >= 2 && len > 26)) flush();
+		cur.push(w);
+		if (/[.!?…]»?$/.test(w.text)) flush();
+		else if (/[,;:—]»?$/.test(w.text) && cur.length >= 2) flush();
+	}
+	flush();
+	return out;
+};
+
+/** Кинетическая типографика: слова проявляются ровно под голос, ключевые — крупнее и тёплым цветом */
+const KineticText: React.FC<{words: Word[]; emphasis: string[]; accent: string; frames: number; top: number; finalTitle?: boolean}> = ({words, emphasis, accent, frames, top, finalTitle}) => {
 	const frame = useCurrentFrame();
 	const {fps} = useVideoConfig();
+	const phrases = useMemo(() => toPhrases(words), [words]);
+	const emph = useMemo(() => new Set(emphasis.map(norm)), [emphasis]);
 	const t = (frame - AUDIO_DELAY) / fps;
-	const chunks = useMemo(() => chunkWords(words), [words]);
-	const idx = chunks.findIndex((c, i) => {
-		const next = chunks[i + 1];
-		return t >= c.start - 0.05 && (next ? t < next.start - 0.05 : t < c.end + 0.5);
+	const lastW = words[words.length - 1];
+	const lastEnd = finalTitle ? AUDIO_DELAY + (lastW?.end ?? 0) * fps + 4 : frames - 4;
+	const idx = phrases.findIndex((ph, i) => {
+		const next = phrases[i + 1];
+		return t >= ph.start - 0.12 && (next ? t < next.start - 0.06 : frame < lastEnd);
 	});
 	if (idx < 0) return null;
-	const chunk = chunks[idx];
-	const st = AUDIO_DELAY + (chunk.start - 0.05) * fps;
-	const p = interpolate(frame - st, [0, 6], [0, 1], clamp);
+	const ph = phrases[idx];
+	const next = phrases[idx + 1];
+	const endF = next ? AUDIO_DELAY + (next.start - 0.06) * fps : lastEnd;
+	const out = interpolate(frame, [endF - 7, endF], [1, 0], clamp);
 	return (
-		<div style={{position: 'absolute', left: SIDE_L, right: SIDE_R, top: 1330, textAlign: 'center', opacity: p}}>
-			<span
-				style={{
-					fontFamily: F_TEXT,
-					fontWeight: 700,
-					fontSize: 54,
-					lineHeight: 1.25,
-					color: CREAM,
-					textShadow: '0 3px 14px rgba(0,0,0,0.95), 0 0 30px rgba(0,0,0,0.7)',
-				}}
-			>
-				{chunk.words.map((w, i) => {
-					const active = t >= w.start - 0.03 && t < w.end + 0.1;
-					return (
-						<span key={i} style={{color: active ? accent : CREAM}}>
-							{w.text.replace(/[«»"“”]/g, '')}
-							{i < chunk.words.length - 1 ? ' ' : ''}
-						</span>
-					);
-				})}
-			</span>
+		<div
+			style={{
+				position: 'absolute',
+				top,
+				left: SIDE_L,
+				right: SIDE_R,
+				display: 'flex',
+				flexWrap: 'wrap',
+				justifyContent: 'center',
+				alignItems: 'baseline',
+				columnGap: 22,
+				rowGap: 4,
+				opacity: out,
+				transform: `translateY(${(1 - out) * -24}px)`,
+				filter: `blur(${(1 - out) * 6}px)`,
+			}}
+		>
+			{ph.words.map((w, i) => {
+				const isE = emph.has(norm(w.text));
+				const st = AUDIO_DELAY + (w.start - 0.06) * fps;
+				const p = interpolate(frame, [st, st + 10], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+				const pop = isE ? interpolate(frame, [st, st + 14], [1.3, 1], {...clamp, easing: Easing.out(Easing.back(2))}) : 1;
+				const text = clean(w.text);
+				if (!text) return null;
+				return (
+					<span
+						key={i}
+						style={{
+							display: 'inline-block',
+							fontFamily: F_SERIF,
+							fontWeight: isE ? 900 : 700,
+							fontSize: isE ? 122 : 96,
+							lineHeight: 1.12,
+							color: isE ? accent : CREAM,
+							opacity: p,
+							transform: `translateY(${(1 - p) * 30}px) scale(${pop})`,
+							filter: `blur(${(1 - p) * 10}px)`,
+							textShadow: isE
+								? `0 0 40px ${accent}66, 0 6px 30px rgba(0,0,0,0.85)`
+								: '0 6px 30px rgba(0,0,0,0.85), 0 2px 6px rgba(0,0,0,0.6)',
+						}}
+					>
+						{text}
+					</span>
+				);
+			})}
+		</div>
+	);
+};
+
+/** Финальный титр */
+const FinalTitle: React.FC<{text: string; start: number; accent: string}> = ({text, start, accent}) => {
+	const frame = useCurrentFrame();
+	const line = interpolate(frame, [start + 10, start + 40], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+	return (
+		<div style={{position: 'absolute', top: 470, left: SIDE_L, right: SIDE_R, textAlign: 'center', color: CREAM}}>
+			<RevealText text={text} start={start} stagger={2} style={{fontFamily: F_SERIF, fontWeight: 900, fontSize: 132, lineHeight: 1, textShadow: '0 8px 50px rgba(0,0,0,0.8)'}} />
+			<div style={{margin: '28px auto 0', height: 2, width: 260 * line, background: accent, opacity: 0.8}} />
 		</div>
 	);
 };
@@ -245,7 +309,7 @@ const FilmLook: React.FC = () => {
 	const bars = interpolate(frame, [0, 30], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	const specks = Array.from({length: 3}).filter((_, i) => random(`sp${frame}-${i}`) > 0.82);
 	const fadeIn = 1 - interpolate(frame, [0, 24], [0, 1], clamp);
-	const fadeOut = interpolate(frame, [durationInFrames - 22, durationInFrames - 1], [0, 1], clamp);
+	const fadeOut = interpolate(frame, [durationInFrames - 40, durationInFrames - 1], [0, 1], clamp);
 	return (
 		<AbsoluteFill style={{pointerEvents: 'none'}}>
 			{/* тёплый грейд + виньетка */}
@@ -253,7 +317,7 @@ const FilmLook: React.FC = () => {
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse 75% 60% at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.72) 100%)'}} />
 			<AbsoluteFill style={{background: flicker > 0 ? `rgba(255,240,210,${flicker})` : `rgba(0,0,0,${-flicker})`}} />
 			{/* зерно (в половинном разрешении — крупнее и быстрее) */}
-			<svg width={540} height={960} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, opacity: 0.16, mixBlendMode: 'overlay'}}>
+			<svg width={540} height={960} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, opacity: 0.13, mixBlendMode: 'overlay'}}>
 				<filter id={`grain${seed}`}>
 					<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={2} seed={seed} stitchTiles="stitch" />
 					<feColorMatrix type="saturate" values="0" />
@@ -323,10 +387,14 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 						<ShotView shot={shot} frames={frames} total={frames + (isLast ? 0 : DISSOLVE)} first={i === 0} />
 					</Sequence>
 				))}
+				<AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 22%, rgba(0,0,0,0) 42%)'}} />
 				{timeline.map(({shot, from, frames, words, isLast}, i) => (
 					<Sequence key={`t${i}`} from={from} durationInFrames={frames} name={`${i + 1}. текст`}>
-						<Titles shot={shot} frames={frames} accent={accent} isLast={isLast} />
-						{showCaptions && <Subtitles words={words} accent={accent} />}
+						{(shot.title || shot.stat || shot.credits) && <Titles shot={shot} frames={frames} accent={accent} isLast={isLast} />}
+						{showCaptions && <KineticText words={words} emphasis={shot.emphasis ?? []} accent={accent} frames={frames} top={shot.textY ?? 290} finalTitle={Boolean(shot.finalTitle)} />}
+						{shot.finalTitle && (
+							<FinalTitle text={shot.finalTitle} accent={accent} start={AUDIO_DELAY + Math.ceil((shot.words?.[shot.words.length - 1]?.end ?? shot.duration ?? estimateDuration(shot.voice)) * FPS) + 14} />
+						)}
 						{shot.audio && (
 							<Sequence from={AUDIO_DELAY}>
 								<Audio src={staticFile(shot.audio)} />
@@ -335,15 +403,38 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 					</Sequence>
 				))}
 			</GateWeave>
+			{timeline.flatMap(({shot, from}, i) =>
+				(shot.sfx ?? []).map((fx, k) => {
+					const len = Math.ceil(fx.duration * FPS);
+					return (
+						<Sequence key={`fx${i}-${k}`} from={from + Math.round(fx.at * FPS)} durationInFrames={len} name={`звук ${i + 1}.${k + 1}`}>
+							<Audio src={staticFile(fx.src)} volume={(f) => fx.volume * interpolate(f, [0, 6, len - 18, len], [0, 1, 1, 0], clamp)} />
+						</Sequence>
+					);
+				}),
+			)}
 			<FilmLook />
 			{music && (
 				<Audio
 					src={staticFile(music)}
 					loop
-					volume={(f) =>
-						musicVolume *
-						interpolate(f, [0, 30, durationInFrames - 45, durationInFrames - 1], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
-					}
+					volume={(f) => {
+						// приглушаем музыку под голосом
+						const near = Math.max(
+							0,
+							...timeline.map((t) => {
+								const a = t.from + AUDIO_DELAY;
+								const b = a + (t.shot.duration ?? 0) * FPS;
+								const d = f < a ? a - f : f > b ? f - b : 0;
+								return Math.max(0, 1 - d / 15);
+							}),
+						);
+						return (
+							musicVolume *
+							(1 - 0.45 * near) *
+							interpolate(f, [0, 30, durationInFrames - 60, durationInFrames - 1], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})
+						);
+					}}
 				/>
 			)}
 		</AbsoluteFill>

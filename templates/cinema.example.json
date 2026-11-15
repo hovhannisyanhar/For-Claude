@@ -5,7 +5,7 @@
   "tts": {
     "voiceId": "1kb4Md8n0kMNktygYhDF",
     "model": "eleven_multilingual_v2",
-    "speed": 0.95,
+    "speed": 1.0,
     "settings": {
       "stability": 0.55,
       "similarity_boost": 0.8,
@@ -13,10 +13,10 @@
       "use_speaker_boost": true
     }
   },
-  "music": "generated/train-dreams/ambient.mp3",
-  "musicVolume": 0.22,
-  "coverFrame": 95,
-  "caption": "Одна жизнь длиной в целый век — тихое, красивое кино о времени и о том, что остаётся после нас 🚂🌲 Без спойлеров. Смотрели «Сны поездов»? Как вам? 👇",
+  "music": "generated/train-dreams/music.mp3",
+  "musicVolume": 0.32,
+  "coverFrame": 60,
+  "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
   "hashtags": [
     "#кино",
     "#чтопосмотреть",
@@ -37,81 +37,214 @@
   ],
   "scenes": [
     {
-      "set": "night",
-      "title": "Одна жизнь\nдлиной в век",
-      "titleSize": 110,
-      "textY": 360,
-      "voice": "Это история одного человека. И целого века, который пронёсся мимо него, как поезд в ночи.",
-      "pause": 18
-    },
-    {
       "set": "station",
-      "kicker": "Айдахо · 1893",
-      "title": "Сирота\nс поезда",
-      "voice": "Тысяча восемьсот девяносто третий год. Поезд привозит в Айдахо семилетнего сироту. Его зовут Роберт Грейнье."
+      "voice": "Его привезли на поезде, когда ему было семь лет. Ни семьи, ни дома. Только железная дорога и бесконечный лес.",
+      "emphasis": [
+        "семь",
+        "бесконечный",
+        "лес."
+      ],
+      "sfx": [
+        {
+          "prompt": "old steam locomotive slowly arriving at a small wooden country station at dawn, chuffing slowing down, brakes squealing, long steam hiss",
+          "at": 0,
+          "duration": 9,
+          "volume": 0.55
+        },
+        {
+          "prompt": "cold early morning forest ambience, light wind, distant crows",
+          "at": 0,
+          "duration": 10,
+          "volume": 0.35
+        }
+      ],
+      "pause": 12
     },
     {
-      "set": "forest",
-      "kicker": "Лесоруб",
-      "title": "Вековые сосны",
-      "voice": "Он вырастет тихим, немногословным человеком. Станет лесорубом — будет валить огромные вековые сосны."
+      "set": "valley",
+      "voice": "Так начинается «Сны поездов». История одной жизни длиной почти в целый век.",
+      "emphasis": [
+        "«Сны",
+        "поездов».",
+        "век."
+      ],
+      "sfx": [
+        {
+          "prompt": "distant steam train whistle echoing across a wide night valley, then soft rumble of a far away train",
+          "at": 0.3,
+          "duration": 7,
+          "volume": 0.5
+        },
+        {
+          "prompt": "quiet night in the mountains, crickets, soft wind, an owl far away",
+          "at": 0,
+          "duration": 8,
+          "volume": 0.3
+        }
+      ],
+      "pause": 22
+    },
+    {
+      "set": "logging",
+      "voice": "Роберт вырастает молчаливым лесорубом. Он валит сосны выше любого дома и строит мосты, по которым в эту глушь приходит новое время.",
+      "emphasis": [
+        "лесорубом.",
+        "сосны",
+        "новое",
+        "время."
+      ],
+      "sfx": [
+        {
+          "prompt": "deep old growth forest ambience, birds singing, light breeze in tall pines",
+          "at": 0,
+          "duration": 11,
+          "volume": 0.35
+        },
+        {
+          "prompt": "single heavy axe chop into a thick tree trunk, crisp wooden thunk",
+          "at": 0.9,
+          "duration": 1,
+          "volume": 0.6,
+          "repeat": {
+            "every": 1.4,
+            "count": 5
+          }
+        },
+        {
+          "prompt": "giant tree creaking and cracking then crashing down to the forest floor far away",
+          "at": 7,
+          "duration": 5,
+          "volume": 0.45
+        }
+      ]
     },
     {
       "set": "bridge",
-      "kicker": "Железная дорога",
-      "title": "Путь\nв новый век",
-      "voice": "И строить мосты для железной дороги, которая меняет всю страну."
+      "voice": "На одной из строек он видит то, что потом будет преследовать его годами.",
+      "emphasis": [
+        "видит",
+        "годами."
+      ],
+      "sfx": [
+        {
+          "prompt": "railroad bridge construction at dusk, distant hammers striking wooden beams and iron spikes, gusty wind",
+          "at": 0,
+          "duration": 7,
+          "volume": 0.4
+        },
+        {
+          "prompt": "crows cawing ominously, low wind gust, tense atmosphere",
+          "at": 1.5,
+          "duration": 5,
+          "volume": 0.35
+        }
+      ],
+      "pause": 20
     },
     {
       "set": "cabin",
-      "kicker": "Глэдис",
-      "title": "Хижина у реки",
-      "voice": "Однажды он встретит Глэдис. Вместе они построят хижину у реки — маленький тёплый мир посреди огромного леса."
+      "voice": "А потом появляется Глэдис. Они ставят маленький дом у реки, и впервые у Роберта есть место, куда хочется возвращаться.",
+      "emphasis": [
+        "Глэдис.",
+        "дом",
+        "возвращаться."
+      ],
+      "sfx": [
+        {
+          "prompt": "gentle river flowing past a cabin on a warm summer evening, crickets, soft frogs",
+          "at": 0,
+          "duration": 11,
+          "volume": 0.4
+        },
+        {
+          "prompt": "crackling fireplace heard from a cabin porch, soft and cozy",
+          "at": 1,
+          "duration": 8,
+          "volume": 0.18
+        }
+      ]
     },
     {
       "set": "seasons",
-      "title": "Сезон\nза сезоном",
-      "voice": "Но работа уводит его из дома на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить."
-    },
-    {
-      "set": "reel",
-      "kicker": "Netflix · 2025",
-      "title": "Сны поездов",
-      "titleSize": 112,
-      "textY": 300,
-      "credits": [
-        {
-          "role": "Режиссёр",
-          "name": "Клинт Бентли"
-        },
-        {
-          "role": "По повести",
-          "name": "Дениса Джонсона"
-        },
-        {
-          "role": "В главных ролях",
-          "name": "Джоэл Эдгертон\nФелисити Джонс"
-        }
+      "voice": "Но работа снова и снова уводит его в лес, на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить.",
+      "emphasis": [
+        "лес,",
+        "месяцы.",
+        "быстрее,"
       ],
-      "voice": "«Сны поездов» — фильм Клинта Бентли по повести Дениса Джонсона. Роберта играет Джоэл Эдгертон, Глэдис — Фелисити Джонс."
+      "sfx": [
+        {
+          "prompt": "footsteps crunching on autumn leaves then on snow, wind through bare trees, wind slowly turning into winter blizzard",
+          "at": 0,
+          "duration": 11,
+          "volume": 0.4
+        }
+      ]
     },
     {
       "set": "campfire",
-      "stat": {
-        "value": "4",
-        "label": "номинации на «Оскар»",
-        "sub": "включая «Лучший фильм»"
-      },
-      "textY": 300,
-      "voice": "Его снимали почти без искусственного света: солнце, костры, свечи. И четыре номинации на «Оскар», включая лучший фильм."
+      "voice": "Фильм снимали почти без ламп. Солнце, костры, свечи. Поэтому каждый кадр похож на старую фотографию, которая вдруг ожила.",
+      "emphasis": [
+        "Солнце,",
+        "костры,",
+        "свечи.",
+        "ожила."
+      ],
+      "sfx": [
+        {
+          "prompt": "campfire crackling and popping at night in a pine forest, gentle",
+          "at": 0,
+          "duration": 11,
+          "volume": 0.5
+        },
+        {
+          "prompt": "old film projector whirring softly",
+          "at": 6,
+          "duration": 5,
+          "volume": 0.15
+        }
+      ]
     },
     {
-      "set": "outro",
-      "title": "Тихое кино\nо большой жизни",
-      "text": "Смотрели? Напишите в комментариях",
-      "cta": "Подписывайтесь",
-      "textY": 340,
-      "voice": "Это тихое кино — о времени, одиночестве и о том, что остаётся после нас. Смотрели? Напишите в комментариях."
+      "set": "lake",
+      "voice": "Здесь нет погонь и громких сцен. Есть тишина, лес и гудок поезда вдалеке. И от этого почему-то невозможно оторваться.",
+      "emphasis": [
+        "тишина,",
+        "гудок",
+        "оторваться."
+      ],
+      "sfx": [
+        {
+          "prompt": "still lake at night in a misty forest, very quiet water lapping, loon call far away",
+          "at": 0,
+          "duration": 11,
+          "volume": 0.35
+        },
+        {
+          "prompt": "lonely steam train whistle far away across a lake at night, long echo",
+          "at": 3.4,
+          "duration": 5,
+          "volume": 0.55
+        }
+      ]
+    },
+    {
+      "set": "dawn",
+      "voice": "Четыре номинации на «Оскар». Кино, после которого хочется выключить свет и просто посидеть в тишине.",
+      "emphasis": [
+        "«Оскар».",
+        "тишине."
+      ],
+      "sfx": [
+        {
+          "prompt": "soft dawn in the mountains, first birds waking up, gentle breeze",
+          "at": 0,
+          "duration": 11,
+          "volume": 0.35
+        }
+      ],
+      "finalTitle": "Сны поездов"
     }
-  ]
+  ],
+  "musicPrompt": "Slow, intimate cinematic score for a quiet period drama about a lumberjack's life in the early 1900s American Northwest forests. Fingerpicked acoustic guitar, warm sustained strings, soft felt piano, distant harmonica breath. Melancholic, tender, nostalgic, spacious, no drums, gentle swell near the end, 62 bpm. Instrumental."
 }
