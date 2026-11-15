@@ -56,6 +56,8 @@ export type CinemaProps = {
 	/** Цвет акцента (тёплый янтарь по умолчанию) */
 	accent?: string;
 	scenes: CinemaShot[];
+	/** Финальный кадр: официальная обложка + название (рус/англ) и год */
+	poster?: {src: string; titleRu: string; titleEn: string; year: string} | null;
 	music?: string;
 	musicVolume?: number;
 	showCaptions?: boolean;

@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import {
 	AbsoluteFill,
 	Audio,
+	Img,
 	Easing,
 	Sequence,
 	interpolate,
@@ -24,9 +25,40 @@ export const DISSOLVE = 24;
 const TAIL = 10;
 const LAST_TAIL = 90;
 
-export const shotFrames = (s: CinemaShot, isLast: boolean) =>
-	AUDIO_DELAY + Math.ceil((s.duration ?? estimateDuration(s.voice)) * FPS) + (s.pause ?? TAIL) + (isLast ? LAST_TAIL : 0);
-export const cinemaTotal = (scenes: CinemaShot[]) => scenes.reduce((a, s, i) => a + shotFrames(s, i === scenes.length - 1), 0);
+/** Длительность финального кадра с обложкой */
+export const POSTER_FRAMES = 135;
+export const shotFrames = (s: CinemaShot, isLast: boolean, poster = false) =>
+	AUDIO_DELAY + Math.ceil((s.duration ?? estimateDuration(s.voice)) * FPS) + (s.pause ?? TAIL) + (isLast && !poster ? LAST_TAIL : 0);
+export const cinemaTotal = (scenes: CinemaShot[], poster = false) =>
+	scenes.reduce((a, s, i) => a + shotFrames(s, i === scenes.length - 1, poster), 0) + (poster ? POSTER_FRAMES : 0);
+
+const F_SANS = 'Manrope';
+
+/** Финальный кадр: обложка фильма, название на русском и английском, год */
+const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>}> = ({poster}) => {
+	const frame = useCurrentFrame();
+	const inP = interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
+	const zoom = interpolate(frame, [0, POSTER_FRAMES], [1, 1.04]);
+	const t1 = interpolate(frame, [18, 36], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+	const t2 = interpolate(frame, [28, 46], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+	return (
+		<AbsoluteFill style={{opacity: inP, background: '#000'}}>
+			<Img src={staticFile(poster.src)} style={{position: 'absolute', inset: -80, width: 1240, height: 2080, objectFit: 'cover', filter: 'blur(40px) brightness(0.32) saturate(0.9)'}} />
+			<div style={{position: 'absolute', top: 230, left: 0, right: 0, display: 'flex', justifyContent: 'center'}}>
+				<Img
+					src={staticFile(poster.src)}
+					style={{width: 600, height: 890, objectFit: 'cover', borderRadius: 6, transform: `scale(${zoom})`, boxShadow: '0 30px 80px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.08)'}}
+				/>
+			</div>
+			<div style={{position: 'absolute', top: 1180, left: SIDE_L, right: SIDE_R - 70, textAlign: 'center', color: CREAM}}>
+				<div style={{fontFamily: F_SANS, fontWeight: 800, fontSize: 56, lineHeight: 1.1, opacity: t1, transform: `translateY(${(1 - t1) * 16}px)`}}>{poster.titleRu}</div>
+				<div style={{fontFamily: F_SANS, fontWeight: 700, fontSize: 34, marginTop: 12, letterSpacing: 1, opacity: 0.75 * t2, transform: `translateY(${(1 - t2) * 12}px)`}}>
+					{poster.titleEn} · {poster.year}
+				</div>
+			</div>
+		</AbsoluteFill>
+	);
+};
 
 const CREAM = '#f3ead8';
 const F_SERIF = 'Playfair Display';
@@ -206,7 +238,7 @@ const FilmLook: React.FC = () => {
 	const bars = interpolate(frame, [0, 30], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	const specks = Array.from({length: 3}).filter((_, i) => random(`sp${frame}-${i}`) > 0.82);
 	const fadeIn = 1 - interpolate(frame, [0, 24], [0, 1], clamp);
-	const fadeOut = interpolate(frame, [durationInFrames - 40, durationInFrames - 1], [0, 1], clamp);
+	const fadeOut = interpolate(frame, [durationInFrames - 22, durationInFrames - 1], [0, 1], clamp);
 	return (
 		<AbsoluteFill style={{pointerEvents: 'none'}}>
 			{/* тёплый грейд + виньетка */}
@@ -262,19 +294,20 @@ const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first
 	);
 };
 
-export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true}) => {
+export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster}) => {
 	const {durationInFrames} = useVideoConfig();
 	const timeline = useMemo(() => {
 		let from = 0;
 		return scenes.map((shot, i) => {
 			const isLast = i === scenes.length - 1;
-			const frames = shotFrames(shot, isLast);
+			const frames = shotFrames(shot, isLast, Boolean(poster));
 			const words = shot.words ?? estimateWords(shot.voice, shot.duration ?? estimateDuration(shot.voice));
 			const item = {shot, from, frames, words, isLast};
 			from += frames;
 			return item;
 		});
-	}, [scenes]);
+	}, [scenes, poster]);
+	const scenesEnd = timeline.length ? timeline[timeline.length - 1].from + timeline[timeline.length - 1].frames : 0;
 
 	/** 1 — идёт речь, плавно спадает до 0 за полсекунды до/после */
 	const speechNear = (f: number) =>
@@ -292,16 +325,16 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 		<AbsoluteFill style={{background: '#000'}}>
 			<GateWeave>
 				{timeline.map(({shot, from, frames, isLast}, i) => (
-					<Sequence key={`v${i}`} from={from} durationInFrames={frames + (isLast ? 0 : DISSOLVE)} name={`${i + 1}. ${shot.set}`}>
-						<ShotView shot={shot} frames={frames} total={frames + (isLast ? 0 : DISSOLVE)} first={i === 0} />
+					<Sequence key={`v${i}`} from={from} durationInFrames={frames + (isLast && !poster ? 0 : DISSOLVE)} name={`${i + 1}. ${shot.set}`}>
+						<ShotView shot={shot} frames={frames} total={frames + (isLast && !poster ? 0 : DISSOLVE)} first={i === 0} />
 					</Sequence>
 				))}
 				<AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 22%, rgba(0,0,0,0) 42%)'}} />
 				{timeline.map(({shot, from, frames, words, isLast}, i) => (
 					<Sequence key={`t${i}`} from={from} durationInFrames={frames} name={`${i + 1}. текст`}>
 						{(shot.title || shot.stat || shot.credits) && <Titles shot={shot} frames={frames} accent={accent} isLast={isLast} />}
-						{showCaptions && <KineticText words={words} emphasis={shot.emphasis ?? []} accent={accent} frames={frames} top={shot.textY ?? 290} finalTitle={Boolean(shot.finalTitle)} seed={`k${i}`} />}
-						{shot.finalTitle && (
+						{showCaptions && <KineticText words={words} emphasis={shot.emphasis ?? []} accent={accent} frames={frames} top={shot.textY ?? 290} finalTitle={Boolean(shot.finalTitle) && !poster} seed={`k${i}`} />}
+						{shot.finalTitle && !poster && (
 							<FinalTitle text={shot.finalTitle} accent={accent} start={AUDIO_DELAY + Math.ceil((shot.words?.[shot.words.length - 1]?.end ?? shot.duration ?? estimateDuration(shot.voice)) * FPS) + 14} />
 						)}
 						{shot.audio && (
@@ -312,6 +345,11 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 					</Sequence>
 				))}
 			</GateWeave>
+			{poster && (
+				<Sequence from={scenesEnd} durationInFrames={POSTER_FRAMES} name="обложка">
+					<PosterCard poster={poster} />
+				</Sequence>
+			)}
 			{timeline.flatMap(({shot, from}, i) =>
 				(shot.sfx ?? []).map((fx, k) => {
 					const len = Math.ceil(fx.duration * FPS);

@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import {flag, normalizeLoudness, paths, probeDuration, readJson, slugArg, writeJson} from './lib.mjs';
+import {elevenCredits, flag, normalizeLoudness, reportSpent, paths, probeDuration, readJson, slugArg, writeJson} from './lib.mjs';
 
 // Шумы и музыка приводятся к −20 LUFS (голос −16), volume в сценарии — множитель к этому уровню
 const BED_LUFS = -20;
@@ -17,9 +17,10 @@ const man = readJson(P.manifest);
 const KEY = process.env.ELEVENLABS_API_KEY || 'injected-by-proxy';
 const dir = path.join(P.genDir, 'sfx');
 fs.mkdirSync(dir, {recursive: true});
+const creditsBefore = await elevenCredits();
 
 const FPS = 30;
-const tail = (sc, last) => 4 + Math.ceil(man.scenes[script.scenes.indexOf(sc)].duration * FPS) + (sc.pause ?? 10) + (last ? 90 : 0);
+const tail = (sc, last) => 4 + Math.ceil(man.scenes[script.scenes.indexOf(sc)].duration * FPS) + (sc.pause ?? 10) + (last ? (script.poster ? 135 : 90) : 0);
 const totalSec = script.scenes.reduce((a, sc, i) => a + tail(sc, i === script.scenes.length - 1), 0) / FPS;
 
 const hash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 10);
@@ -73,3 +74,4 @@ if (script.musicPrompt && !flag('no-music', false)) {
 }
 writeJson(path.join(P.genDir, 'sound.json'), out);
 console.log(`🎧 ${out.scenes.flat().length} звуков${out.music ? ' + музыка' : ''}, ролик ~${totalSec.toFixed(1)} с`);
+reportSpent(creditsBefore, await elevenCredits(), 'звуки и музыка');

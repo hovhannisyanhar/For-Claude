@@ -23,6 +23,7 @@ const props = {
 	style: script.style,
 	accent: script.accent,
 	handle: script.handle,
+	poster: script.poster ?? null,
 	theme: script.theme || 'midnight',
 	music: script.musicSeparate ? null : (sound?.music ?? script.music ?? null),
 	musicVolume: script.musicVolume,

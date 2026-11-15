@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import {flag, normalizeLoudness, paths, probeDuration, readJson, slugArg, validateScript, writeJson} from './lib.mjs';
+import {elevenCredits, flag, normalizeLoudness, reportSpent, paths, probeDuration, readJson, slugArg, validateScript, writeJson} from './lib.mjs';
 
 // Голос приводим к −16 LUFS: тогда громкость шумов/музыки в сценарии — относительно голоса
 const VOICE_LUFS = -16;
@@ -97,6 +97,7 @@ const openai = async (text) => {
 };
 
 fs.mkdirSync(P.genDir, {recursive: true});
+const creditsBefore = provider === 'elevenlabs' ? await elevenCredits() : null;
 const old = fs.existsSync(P.manifest) ? readJson(P.manifest) : {scenes: []};
 const voiceKey = provider === 'elevenlabs' ? `${EL.voiceId}/${EL.model}/${script.tts?.speed ?? 1.05}/${JSON.stringify(script.tts?.settings ?? {})}` : provider === 'openai' ? `${OA.voice}/${OA.model}` : 'none';
 const out = {provider, scenes: []};
@@ -135,3 +136,4 @@ for (const [i, sc] of script.scenes.entries()) {
 writeJson(P.manifest, out);
 const total = out.scenes.reduce((a, s) => a + s.duration, 0);
 console.log(`\nГотово: ${out.scenes.length} сцен, ~${total.toFixed(1)} с речи → ${path.relative(process.cwd(), P.manifest)}`);
+if (creditsBefore) reportSpent(creditsBefore, await elevenCredits(), 'озвучка');

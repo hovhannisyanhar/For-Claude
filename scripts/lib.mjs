@@ -94,3 +94,21 @@ export const normalizeLoudness = (src, dst, target, maxGain = 18) => {
 	fs.renameSync(tmp, dst);
 	return {from: cur, gain};
 };
+
+/** Баланс ElevenLabs: {used, limit, left, tier} или null, если ключ не может читать подписку */
+export const elevenCredits = async () => {
+	try {
+		const r = await fetch('https://api.elevenlabs.io/v1/user/subscription', {headers: {'xi-api-key': process.env.ELEVENLABS_API_KEY || 'injected-by-proxy'}});
+		if (!r.ok) return null;
+		const j = await r.json();
+		return {used: j.character_count, limit: j.character_limit, left: j.character_limit - j.character_count, tier: j.tier};
+	} catch {
+		return null;
+	}
+};
+
+/** Печатает фактический расход между двумя замерами баланса */
+export const reportSpent = (before, after, what) => {
+	if (!before || !after) return;
+	console.log(`💳 ${what}: потрачено ${after.used - before.used} кредитов ElevenLabs, осталось ${after.left} из ${after.limit}`);
+};
