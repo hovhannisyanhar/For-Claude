@@ -1,6 +1,7 @@
 // Озвучка сценария: по одному mp3 на сцену + тайминги слов для субтитров.
 // Провайдер: TTS_PROVIDER=elevenlabs (по умолчанию) | openai | none
 //   none — без голоса, длительность по оценке (для черновиков и проверки визуала)
+// --only=1,3 — озвучить только эти сцены (остальные: из кэша или оценка длительности)
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -101,10 +102,19 @@ const creditsBefore = provider === 'elevenlabs' ? await elevenCredits() : null;
 const old = fs.existsSync(P.manifest) ? readJson(P.manifest) : {scenes: []};
 const voiceKey = provider === 'elevenlabs' ? `${EL.voiceId}/${EL.model}/${script.tts?.speed ?? 1.05}/${JSON.stringify(script.tts?.settings ?? {})}` : provider === 'openai' ? `${OA.voice}/${OA.model}` : 'none';
 const out = {provider, scenes: []};
+const only = new Set(String(flag('only', '')).split(',').filter(Boolean).map(Number));
 
 for (const [i, sc] of script.scenes.entries()) {
 	const hash = crypto.createHash('sha1').update(`${provider}|${voiceKey}|${sc.voice}`).digest('hex').slice(0, 10);
 	const prevEntry = old.scenes[i];
+	if (only.size && !only.has(i + 1)) {
+		if (prevEntry) out.scenes.push(prevEntry);
+		else {
+			const duration = Math.max(1.6, sc.voice.split(/\s+/).length / 2.6 + 0.3);
+			out.scenes.push({hash: 'skip', duration, words: estimateWords(sc.voice, duration)});
+		}
+		continue;
+	}
 	const file = `scene-${i + 1}-${hash}.mp3`;
 	if (prevEntry?.hash === hash && (provider === 'none' || fs.existsSync(path.join(P.genDir, file)))) {
 		if (provider !== 'none' && prevEntry.norm !== VOICE_LUFS) {
