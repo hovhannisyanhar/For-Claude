@@ -251,12 +251,44 @@
       "pause": 28
     }
   ],
-  "musicPrompt": "Slow, intimate cinematic score for a quiet period drama about a lumberjack's life in the early 1900s American Northwest forests. Fingerpicked acoustic guitar, warm sustained strings, soft felt piano, distant harmonica breath. Melancholic, tender, nostalgic, spacious, no drums, gentle swell near the end, 62 bpm. Instrumental.",
   "musicSeparate": true,
   "poster": {
     "src": "assets/train-dreams/poster.jpg",
     "titleRu": "Сны поездов",
     "titleEn": "Train Dreams",
     "year": "2025"
+  },
+  "instaCover": {
+    "top": "Одна жизнь",
+    "main": "Длиной\nв век",
+    "base": [
+      "#08130f",
+      "#0e2b25",
+      "#123630",
+      "#0a1a16"
+    ],
+    "glows": [
+      {
+        "x": 230,
+        "y": 1650,
+        "r": 540,
+        "color": "#d08a3a",
+        "opacity": 0.75
+      },
+      {
+        "x": 940,
+        "y": 1250,
+        "r": 420,
+        "color": "#b9925a",
+        "opacity": 0.45
+      },
+      {
+        "x": 700,
+        "y": 230,
+        "r": 440,
+        "color": "#1d5a52",
+        "opacity": 0.55
+      }
+    ]
   }
 }

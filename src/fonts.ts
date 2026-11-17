@@ -18,6 +18,8 @@ const FACES: Array<{family: string; file: string; weight: number; style?: 'norma
 	),
 	{family: 'Great Vibes', file: 'great-vibes', weight: 400},
 	{family: 'Marck Script', file: 'marck-script', weight: 400},
+	// обложка для Instagram
+	{family: 'Montserrat', file: 'montserrat', weight: 300},
 ];
 
 let started = false;
