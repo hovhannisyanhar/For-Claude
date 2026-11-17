@@ -5,6 +5,7 @@
   "scripts": {
     "studio": "remotion studio",
     "new": "node scripts/new-video.mjs",
+    "tighten": "NODE_USE_ENV_PROXY=1 node scripts/tighten.mjs",
     "tts": "NODE_USE_ENV_PROXY=1 node scripts/tts.mjs",
     "render": "node scripts/render.mjs",
     "make": "node scripts/make.mjs",
