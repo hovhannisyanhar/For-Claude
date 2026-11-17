@@ -3,6 +3,7 @@ import {
 	AbsoluteFill,
 	Audio,
 	Img,
+	OffthreadVideo,
 	Easing,
 	Sequence,
 	interpolate,
@@ -15,8 +16,8 @@ import {loadFonts} from '../fonts';
 import {AUDIO_DELAY, FPS, chunkWords, estimateDuration, estimateWords} from '../timing';
 import type {Word} from '../types';
 import {SetView} from './Sets';
-import {FinalTitle, KineticText} from './Kinetic';
-import type {CinemaProps, CinemaShot} from './types';
+import {FinalTitle, KineticText, setKineticFonts} from './Kinetic';
+import type {CinemaProps, CinemaSet, CinemaShot} from './types';
 
 loadFonts();
 
@@ -35,12 +36,13 @@ export const cinemaTotal = (scenes: CinemaShot[], poster = false) =>
 const F_SANS = 'Manrope';
 
 /** Финальный кадр: обложка фильма, название на русском и английском, год */
-const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>}> = ({poster}) => {
+const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>; accent: string}> = ({poster, accent}) => {
 	const frame = useCurrentFrame();
 	const inP = interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
 	const zoom = interpolate(frame, [0, POSTER_FRAMES], [1, 1.04]);
 	const t1 = interpolate(frame, [18, 36], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	const t2 = interpolate(frame, [28, 46], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+	const t3 = interpolate(frame, [44, 62], [0, 1], {...clamp, easing: Easing.out(Easing.back(1.6))});
 	return (
 		<AbsoluteFill style={{opacity: inP, background: '#000'}}>
 			<Img src={staticFile(poster.src)} style={{position: 'absolute', inset: -80, width: 1240, height: 2080, objectFit: 'cover', filter: 'blur(40px) brightness(0.32) saturate(0.9)'}} />
@@ -55,6 +57,12 @@ const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>}> = ({pos
 				<div style={{fontFamily: F_SANS, fontWeight: 700, fontSize: 34, marginTop: 12, letterSpacing: 1, opacity: 0.75 * t2, transform: `translateY(${(1 - t2) * 12}px)`}}>
 					{poster.titleEn} · {poster.year}
 				</div>
+				{poster.cta && (
+					<div style={{marginTop: 34, display: 'inline-flex', alignItems: 'center', gap: 14, padding: '14px 34px', borderRadius: 999, background: accent, color: '#fff', fontFamily: F_SANS, fontWeight: 800, fontSize: 34, letterSpacing: 0.5, opacity: t3, transform: `scale(${0.9 + 0.1 * t3})`, boxShadow: '0 10px 30px rgba(0,0,0,0.45)'}}>
+						{poster.cta}
+						<span style={{fontSize: 36, transform: `scale(${1 + 0.18 * Math.max(0, Math.sin((frame - 60) / 5)) * (frame > 60 && frame < 80 ? 1 : 0)})`}}>❤</span>
+					</div>
+				)}
 			</div>
 		</AbsoluteFill>
 	);
@@ -230,13 +238,14 @@ const Titles: React.FC<{shot: CinemaShot; frames: number; accent: string; isLast
 };
 
 /** Плёнка: зерно, виньетка, мерцание, пылинки, каше */
-const FilmLook: React.FC = () => {
+const FilmLook: React.FC<{film?: boolean}> = ({film = false}) => {
 	const frame = useCurrentFrame();
 	const {durationInFrames} = useVideoConfig();
-	const seed = frame % 8;
-	const flicker = 0.035 * (random(`fl${frame}`) - 0.5);
+	// чистый режим: неподвижное лёгкое зерно, без мерцания яркости и пылинок
+	const seed = film ? frame % 8 : 3;
+	const flicker = film ? 0.035 * (random(`fl${frame}`) - 0.5) : 0;
 	const bars = interpolate(frame, [0, 30], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
-	const specks = Array.from({length: 3}).filter((_, i) => random(`sp${frame}-${i}`) > 0.82);
+	const specks = film ? Array.from({length: 3}).filter((_, i) => random(`sp${frame}-${i}`) > 0.82) : [];
 	const fadeIn = 1 - interpolate(frame, [0, 24], [0, 1], clamp);
 	const fadeOut = interpolate(frame, [durationInFrames - 22, durationInFrames - 1], [0, 1], clamp);
 	return (
@@ -246,7 +255,7 @@ const FilmLook: React.FC = () => {
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse 75% 60% at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.72) 100%)'}} />
 			<AbsoluteFill style={{background: flicker > 0 ? `rgba(255,240,210,${flicker})` : `rgba(0,0,0,${-flicker})`}} />
 			{/* зерно (в половинном разрешении — крупнее и быстрее) */}
-			<svg width={540} height={960} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, opacity: 0.13, mixBlendMode: 'overlay'}}>
+			<svg width={540} height={960} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, opacity: film ? 0.13 : 0.07, mixBlendMode: 'overlay'}}>
 				<filter id={`grain${seed}`}>
 					<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={2} seed={seed} stitchTiles="stitch" />
 					<feColorMatrix type="saturate" values="0" />
@@ -276,8 +285,9 @@ const FilmLook: React.FC = () => {
 };
 
 /** Лёгкое дрожание кадра, как у проектора */
-const GateWeave: React.FC<{children: React.ReactNode}> = ({children}) => {
+const GateWeave: React.FC<{children: React.ReactNode; on?: boolean}> = ({children, on = false}) => {
 	const frame = useCurrentFrame();
+	if (!on) return <AbsoluteFill>{children}</AbsoluteFill>;
 	const k = Math.floor(frame / 2);
 	const dx = (random(`gx${k}`) - 0.5) * 2;
 	const dy = (random(`gy${k}`) - 0.5) * 2.5;
@@ -289,12 +299,13 @@ const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first
 	const op = first ? 1 : interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
 	return (
 		<AbsoluteFill style={{opacity: op}}>
-			<SetView set={shot.set} frame={frame} frames={total} />
+			{shot.clip ? <OffthreadVideo src={staticFile(shot.clip)} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} /> : <SetView set={shot.set as CinemaSet} frame={frame} frames={total} />}
 		</AbsoluteFill>
 	);
 };
 
-export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster}) => {
+export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false}) => {
+	setKineticFonts(fonts);
 	const {durationInFrames} = useVideoConfig();
 	const timeline = useMemo(() => {
 		let from = 0;
@@ -323,7 +334,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 
 	return (
 		<AbsoluteFill style={{background: '#000'}}>
-			<GateWeave>
+			<GateWeave on={film}>
 				{timeline.map(({shot, from, frames, isLast}, i) => (
 					<Sequence key={`v${i}`} from={from} durationInFrames={frames + (isLast && !poster ? 0 : DISSOLVE)} name={`${i + 1}. ${shot.set}`}>
 						<ShotView shot={shot} frames={frames} total={frames + (isLast && !poster ? 0 : DISSOLVE)} first={i === 0} />
@@ -347,7 +358,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 			</GateWeave>
 			{poster && (
 				<Sequence from={scenesEnd} durationInFrames={POSTER_FRAMES} name="обложка">
-					<PosterCard poster={poster} />
+					<PosterCard poster={poster} accent={accent} />
 				</Sequence>
 			)}
 			{timeline.flatMap(({shot, from}, i) =>
@@ -363,7 +374,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 					);
 				}),
 			)}
-			<FilmLook />
+			<FilmLook film={film} />
 			{music && (
 				<Audio
 					src={staticFile(music)}

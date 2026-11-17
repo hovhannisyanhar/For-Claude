@@ -1,0 +1,169 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#000;overflow:hidden}svg{display:block}</style>
+</head><body><div id="root"></div>
+<script>
+// Пробные кадры «Сёгуна» в 2D-векторе: ?shot=hall|shore&w=&h=
+const P = new URLSearchParams(location.search);
+const SHOT = P.get('shot') || 'hall';
+const W = +(P.get('w') || 1080), H = +(P.get('h') || 1920);
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function shade(hex, k) {
+  const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const t = k > 0 ? 255 : 0, a = Math.abs(k);
+  r = Math.round(r + (t - r) * a); g = Math.round(g + (t - g) * a); b = Math.round(b + (t - b) * a);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+const defs = [];
+let gid = 0;
+// вертикальный градиент: светлее сверху
+function V(c, k = 0.18, d = 0.28) { const id = 'v' + gid++; defs.push(`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(c, k)}"/><stop offset="1" stop-color="${shade(c, -d)}"/></linearGradient>`); return `url(#${id})`; }
+function R(c, k = 0.2, d = 0.3) { const id = 'r' + gid++; defs.push(`<radialGradient id="${id}" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="${shade(c, k)}"/><stop offset="0.6" stop-color="${c}"/><stop offset="1" stop-color="${shade(c, -d)}"/></radialGradient>`); return `url(#${id})`; }
+function glow(cx, cy, r, c, op = 1) { const id = 'g' + gid++; defs.push(`<radialGradient id="${id}"><stop offset="0" stop-color="${c}" stop-opacity="${op}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`); return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${id})"/>`; }
+defs.push(`<filter id="blur8"><feGaussianBlur stdDeviation="8"/></filter><filter id="blur20"><feGaussianBlur stdDeviation="20"/></filter><filter id="soft"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/></filter>`);
+
+// ---- персонаж ----
+function person(x, y, s, o) {
+  // x,y — центр низа фигуры; s — масштаб (голова r=90*s)
+  const hr = 90 * s, skin = o.skin || '#eab089', robe = o.robe, robeD = shade(robe, -0.3);
+  let body = '', headY;
+  if (o.pose === 'seiza') {
+    body += `<ellipse cx="${x}" cy="${y - 40 * s}" rx="${175 * s}" ry="${60 * s}" fill="${V(o.robe2 || robeD)}"/>`;
+    body += `<path d="M${x - 120 * s},${y - 50 * s} L${x - 112 * s},${y - 270 * s} Q${x},${y - 300 * s} ${x + 112 * s},${y - 270 * s} L${x + 120 * s},${y - 50 * s} Z" fill="${V(robe)}"/>`;
+    headY = y - 300 * s - hr * 0.85;
+  } else {
+    if (o.trousers) {
+      body += `<rect x="${x - 62 * s}" y="${y - 210 * s}" width="${54 * s}" height="${200 * s}" rx="${18 * s}" fill="${V(o.robe2)}"/><rect x="${x + 8 * s}" y="${y - 210 * s}" width="${54 * s}" height="${200 * s}" rx="${18 * s}" fill="${V(o.robe2)}"/>`;
+      body += `<ellipse cx="${x - 35 * s}" cy="${y - 8 * s}" rx="${38 * s}" ry="${16 * s}" fill="#2a1d15"/><ellipse cx="${x + 35 * s}" cy="${y - 8 * s}" rx="${38 * s}" ry="${16 * s}" fill="#2a1d15"/>`;
+      body += `<path d="M${x - 92 * s},${y - 190 * s} L${x - 100 * s},${y - 390 * s} Q${x},${y - 420 * s} ${x + 100 * s},${y - 390 * s} L${x + 92 * s},${y - 190 * s} Z" fill="${V(robe, 0.25, 0.2)}"/>`;
+      body += `<path d="M${x - 22 * s},${y - 405 * s} L${x},${y - 340 * s} L${x + 22 * s},${y - 405 * s}" fill="${shade(skin, -0.1)}"/>`;
+      headY = y - 410 * s - hr * 0.85;
+    } else {
+      body += `<path d="M${x - 130 * s},${y} L${x - 95 * s},${y - 380 * s} Q${x},${y - 410 * s} ${x + 95 * s},${y - 380 * s} L${x + 130 * s},${y} Q${x},${y + 14 * s} ${x - 130 * s},${y} Z" fill="${V(robe)}"/>`;
+      body += `<path d="M${x - 30 * s},${y - 395 * s} L${x + 40 * s},${y - 120 * s}" stroke="${robeD}" stroke-width="${8 * s}"/>`;
+      headY = y - 400 * s - hr * 0.85;
+    }
+  }
+  const sy = o.pose === 'seiza' ? y - 270 * s : y - (o.trousers ? 385 : 375) * s;
+  if (o.kataginu) {
+    body += `<path d="M${x - 200 * s},${sy - 10 * s} L${x + 200 * s},${sy - 10 * s} L${x + 150 * s},${sy + 22 * s} L${x - 150 * s},${sy + 22 * s} Z" fill="${V(o.kataginu, 0.3, 0.1)}"/>`;
+    body += `<path d="M${x - 110 * s},${sy + 15 * s} L${x - 20 * s},${sy + 15 * s} L${x - 30 * s},${sy + 180 * s} L${x - 100 * s},${sy + 180 * s} Z" fill="${V(o.kataginu, 0.1, 0.25)}"/><path d="M${x + 110 * s},${sy + 15 * s} L${x + 20 * s},${sy + 15 * s} L${x + 30 * s},${sy + 180 * s} L${x + 100 * s},${sy + 180 * s} Z" fill="${V(o.kataginu, 0.1, 0.25)}"/>`;
+  }
+  if (o.mon) body += `<circle cx="${x - 65 * s}" cy="${sy + 70 * s}" r="${16 * s}" fill="${o.mon}"/><circle cx="${x + 65 * s}" cy="${sy + 70 * s}" r="${16 * s}" fill="${o.mon}"/>`;
+  // руки
+  const arm = (side) => {
+    const sx = x + side * 110 * s;
+    if (o.pose === 'seiza') return `<path d="M${sx},${sy + 10 * s} Q${x + side * 150 * s},${sy + 150 * s} ${x + side * 60 * s},${y - 90 * s}" stroke="${V(robe)}" stroke-width="${70 * s}" fill="none" stroke-linecap="round"/><ellipse cx="${x + side * 55 * s}" cy="${y - 85 * s}" rx="${30 * s}" ry="${24 * s}" fill="${R(skin)}"/>`;
+    const hx = x + side * 125 * s, hy = sy + 230 * s;
+    return `<path d="M${sx},${sy + 10 * s} L${hx},${hy}" stroke="${V(robe, 0.25, 0.2)}" stroke-width="${62 * s}" stroke-linecap="round"/><circle cx="${hx}" cy="${hy + 22 * s}" r="${27 * s}" fill="${R(skin)}"/>`;
+  };
+  body += arm(-1) + arm(1);
+  if (o.spear) body = `<line x1="${x + 125 * s}" y1="${y + 10 * s}" x2="${x + 125 * s}" y2="${y - 900 * s}" stroke="#6b4a2a" stroke-width="${12 * s}"/><path d="M${x + 125 * s},${y - 990 * s} L${x + 140 * s},${y - 900 * s} L${x + 110 * s},${y - 900 * s} Z" fill="${V('#c8ccd0', 0.3, 0.3)}"/>` + body;
+  // голова
+  let hd = '';
+  const hairC = o.hair || '#1e1814';
+  if (o.hairStyle === 'blond') hd += `<ellipse cx="${x}" cy="${headY - 10 * s}" rx="${hr * 1.12}" ry="${hr * 1.05}" fill="${R(hairC, 0.2, 0.25)}"/>`;
+  if (o.hairStyle === 'topknot') hd += `<ellipse cx="${x}" cy="${headY + 8 * s}" rx="${hr * 1.06}" ry="${hr * 0.98}" fill="${hairC}"/>`;
+  hd += `<ellipse cx="${x - hr}" cy="${headY + 10 * s}" rx="${16 * s}" ry="${24 * s}" fill="${shade(skin, -0.1)}"/><ellipse cx="${x + hr}" cy="${headY + 10 * s}" rx="${16 * s}" ry="${24 * s}" fill="${shade(skin, -0.1)}"/>`;
+  hd += `<ellipse cx="${x}" cy="${headY}" rx="${hr * 0.95}" ry="${hr}" fill="${R(skin, 0.15, 0.18)}"/>`;
+  if (o.hairStyle === 'topknot') {
+    hd += `<path d="M${x - hr * 0.96},${headY + 10 * s} Q${x - hr * 0.95},${headY - hr * 0.55} ${x - hr * 0.55},${headY - hr * 0.62} L${x - hr * 0.62},${headY + 5 * s} Z" fill="${hairC}"/><path d="M${x + hr * 0.96},${headY + 10 * s} Q${x + hr * 0.95},${headY - hr * 0.55} ${x + hr * 0.55},${headY - hr * 0.62} L${x + hr * 0.62},${headY + 5 * s} Z" fill="${hairC}"/>`;
+    hd += `<rect x="${x - 14 * s}" y="${headY - hr - 40 * s}" width="${28 * s}" height="${56 * s}" rx="${13 * s}" fill="${hairC}"/><rect x="${x - 16 * s}" y="${headY - hr - 4 * s}" width="${32 * s}" height="${9 * s}" fill="#e8e0d0"/>`;
+    if (o.grey) hd += `<path d="M${x - hr * 0.9},${headY - 10 * s} q${8 * s},-${30 * s} ${20 * s},-${40 * s}" stroke="#9a948c" stroke-width="${5 * s}" fill="none"/><path d="M${x + hr * 0.9},${headY - 10 * s} q-${8 * s},-${30 * s} -${20 * s},-${40 * s}" stroke="#9a948c" stroke-width="${5 * s}" fill="none"/>`;
+  }
+  if (o.hairStyle === 'blond') {
+    hd += `<path d="M${x - hr * 0.95},${headY - 5 * s} Q${x - hr * 0.6},${headY - hr * 1.25} ${x + hr * 0.2},${headY - hr * 0.9} Q${x + hr * 0.9},${headY - hr * 0.9} ${x + hr * 0.95},${headY} Q${x + hr * 0.4},${headY - hr * 0.55} ${x - hr * 0.1},${headY - hr * 0.5} Q${x - hr * 0.7},${headY - hr * 0.4} ${x - hr * 0.95},${headY - 5 * s} Z" fill="${R(hairC, 0.25, 0.1)}"/>`;
+    hd += `<path d="M${x - hr * 0.8},${headY + 20 * s} Q${x - hr * 0.7},${headY + hr * 1.15} ${x},${headY + hr * 1.12} Q${x + hr * 0.7},${headY + hr * 1.15} ${x + hr * 0.8},${headY + 20 * s} Q${x},${headY + hr * 0.75} ${x - hr * 0.8},${headY + 20 * s} Z" fill="${R(hairC, 0.15, 0.2)}"/>`;
+  }
+  const ey = headY + 5 * s;
+  [-1, 1].forEach(side => {
+    const ex = x + side * 34 * s;
+    hd += `<ellipse cx="${ex}" cy="${ey}" rx="${17 * s}" ry="${(o.squint ? 13 : 19) * s}" fill="#fbfaf3"/><ellipse cx="${ex}" cy="${ey + 2 * s}" rx="${11 * s}" ry="${(o.squint ? 10 : 13) * s}" fill="${o.iris || '#3a2414'}"/><circle cx="${ex}" cy="${ey + 2 * s}" r="${6 * s}" fill="#120a06"/><circle cx="${ex + 4 * s}" cy="${ey - 4 * s}" r="${3.5 * s}" fill="#fff"/>`;
+    const fr = o.frown ?? 0.3;
+    hd += `<path d="M${ex + side * 22 * s},${ey - 30 * s - fr * 15 * s} L${ex - side * 18 * s},${ey - 30 * s + fr * 15 * s}" stroke="${o.hairStyle === 'blond' ? shade(hairC, -0.3) : hairC}" stroke-width="${7 * s}" stroke-linecap="round"/>`;
+  });
+  hd += `<ellipse cx="${x}" cy="${ey + 30 * s}" rx="${9 * s}" ry="${7 * s}" fill="${shade(skin, -0.15)}"/>`;
+  if (o.hairStyle !== 'blond') hd += `<path d="M${x - 14 * s},${ey + 55 * s} L${x + 14 * s},${ey + 55 * s}" stroke="#6a2a24" stroke-width="${5 * s}" stroke-linecap="round"/>`;
+  else hd += `<path d="M${x - 26 * s},${ey + 48 * s} Q${x},${ey + 38 * s} ${x + 26 * s},${ey + 48 * s}" stroke="${shade(hairC, -0.2)}" stroke-width="${10 * s}" fill="none" stroke-linecap="round"/><ellipse cx="${x}" cy="${ey + 64 * s}" rx="${12 * s}" ry="${6 * s}" fill="#6a2a24"/>`;
+  hd += `<ellipse cx="${x - 55 * s}" cy="${ey + 32 * s}" rx="${16 * s}" ry="${9 * s}" fill="#ff7c74" opacity="0.25"/><ellipse cx="${x + 55 * s}" cy="${ey + 32 * s}" rx="${16 * s}" ry="${9 * s}" fill="#ff7c74" opacity="0.25"/>`;
+  if (o.hat) hd += `<path d="M${x - 230 * s},${headY - hr * 0.1} L${x},${headY - hr * 1.25} L${x + 230 * s},${headY - hr * 0.1} Q${x},${headY - hr * 0.3} ${x - 230 * s},${headY - hr * 0.1} Z" fill="${V('#c8a865', 0.2, 0.25)}"/>`;
+  return `<g filter="url(#soft)">${body}${hd}</g>`;
+}
+
+const out = [];
+if (SHOT === 'hall') {
+  // бумажная стена с тенями регентов
+  out.push(`<rect width="1080" height="1920" fill="${V('#c99a5c', -0.45, 0.0)}"/>`);
+  const regents = [150, 395, 685, 930];
+  regents.forEach(x => out.push(glow(x + 90, 1100, 300, '#ffd080', 1)));
+  let sil = '';
+  regents.forEach((x, i) => {
+    const y0 = 1330;
+    sil += `<ellipse cx="${x}" cy="${y0 - 40}" rx="125" ry="55"/><path d="M${x - 90},${y0 - 60} L${x - 130},${y0 - 300} L${x + 130},${y0 - 300} L${x + 90},${y0 - 60} Z"/>`;
+    sil += `<path d="M${x - 170},${y0 - 285} L${x + 170},${y0 - 285} L${x + 105},${y0 - 335} L${x - 105},${y0 - 335} Z"/><circle cx="${x}" cy="${y0 - 395}" r="62"/><ellipse cx="${x + (i % 2 ? 8 : -8)}" cy="${y0 - 465}" rx="13" ry="30"/>`;
+    sil += `<rect x="${x - 240}" y="${y0 - 175}" width="290" height="16" transform="rotate(${i % 2 ? -18 : -12} ${x - 100} ${y0 - 165})"/>`;
+  });
+  out.push(`<g fill="#2b1206" opacity="0.8" filter="url(#blur8)">${sil}</g>`);
+  // решётка сёдзи
+  let lat = '';
+  for (let x = 0; x <= 1080; x += 135) lat += `<rect x="${x - 6}" y="0" width="12" height="1380"/>`;
+  for (let y = 0; y <= 1380; y += 230) lat += `<rect x="0" y="${y - 6}" width="1080" height="12"/>`;
+  out.push(`<g fill="#2b1a10">${lat}<rect x="0" y="1360" width="1080" height="34"/></g>`);
+  // пол-татами в перспективе
+  out.push(`<path d="M0,1390 L1080,1390 L1080,1920 L0,1920 Z" fill="${V('#9a8650', -0.1, 0.55)}"/>`);
+  let tl = '';
+  [-1200, -500, 200, 900, 1600, 2300].forEach(x => tl += `<line x1="${540 + (x - 540) * 0.3}" y1="1390" x2="${x}" y2="1920"/>`);
+  [1480, 1650].forEach(y => tl += `<line x1="0" y1="${y}" x2="1080" y2="${y}"/>`);
+  out.push(`<g stroke="#26301f" stroke-width="10" opacity="0.85">${tl}</g>`);
+  out.push(glow(540, 1600, 420, '#ffcf80', 0.35));
+  // фонари-андон
+  const andon = (x, y, s) => `${glow(x, y - 140 * s, 260 * s, '#ffb860', 0.8)}<rect x="${x - 60 * s}" y="${y - 230 * s}" width="${120 * s}" height="${190 * s}" fill="${V('#fff0c8', 0.1, 0.12)}"/><g fill="#2a170d"><rect x="${x - 66 * s}" y="${y - 236 * s}" width="${132 * s}" height="12"/><rect x="${x - 66 * s}" y="${y - 240 * s}" width="10" height="${240 * s}"/><rect x="${x + 56 * s}" y="${y - 240 * s}" width="10" height="${240 * s}"/><rect x="${x - 4}" y="${y - 230 * s}" width="8" height="${190 * s}" opacity="0.4"/></g>`;
+  out.push(andon(150, 1560, 1.1));
+  // подставка с мечами
+  out.push(`<g><rect x="745" y="1440" width="16" height="140" fill="#140a08"/><rect x="945" y="1440" width="16" height="140" fill="#140a08"/><rect x="725" y="1570" width="255" height="18" rx="6" fill="#140a08"/><rect x="705" y="1455" width="300" height="20" rx="10" fill="#1d0e0a"/><rect x="730" y="1500" width="250" height="18" rx="9" fill="#1d0e0a"/><circle cx="790" cy="1465" r="16" fill="#c9a24a"/><circle cx="800" cy="1509" r="14" fill="#c9a24a"/></g>`);
+  out.push(person(500, 1660, 1.05, { pose: 'seiza', robe: '#3a2a1e', robe2: '#241812', kataginu: '#6a4220', mon: '#e2bb5c', hairStyle: 'topknot', grey: true, squint: true, frown: 0.35 }));
+  out.push(andon(960, 1800, 1.25));
+} else {
+  // небо
+  out.push(`<rect width="1080" height="1100" fill="${V('#6f7f8b', -0.3, 0.0)}"/>`);
+  out.push(glow(300, 880, 420, '#ffe6bf', 0.9));
+  let cl = '';
+  for (let i = 0; i < 18; i++) cl += `<ellipse cx="${rnd() * 1080}" cy="${80 + rnd() * 650}" rx="${160 + rnd() * 200}" ry="${30 + rnd() * 40}" fill="${shade('#3b4652', rnd() * 0.3)}" opacity="0.6"/>`;
+  out.push(`<g filter="url(#blur20)">${cl}</g>`);
+  // море
+  out.push(`<rect y="980" width="1080" height="260" fill="${V('#4b6873', 0.15, 0.2)}"/>`);
+  let wv = '';
+  for (let i = 0; i < 22; i++) { const y = 1000 + rnd() * 220, x = rnd() * 1080; wv += `<path d="M${x},${y} q30,-10 60,0 t60,0" stroke="#dfe8e6" stroke-width="4" fill="none" opacity="${0.25 + rnd() * 0.4}"/>`; }
+  out.push(wv);
+  // деревня
+  const house = (x, y, s) => `<rect x="${x - 70 * s}" y="${y - 80 * s}" width="${140 * s}" height="${80 * s}" fill="${V('#5a4a3a')}"/><path d="M${x - 105 * s},${y - 70 * s} L${x},${y - 165 * s} L${x + 105 * s},${y - 70 * s} Z" fill="${V('#9c8a5c', 0.15, 0.2)}"/><rect x="${x - 15 * s}" y="${y - 50 * s}" width="${30 * s}" height="${50 * s}" fill="#2a1d14"/>`;
+  out.push(`<g opacity="0.85">${house(110, 1110, 0.8)}${house(260, 1080, 0.6)}</g>`);
+  // скалы и корабль
+  out.push(`<g transform="rotate(12 800 1050)">
+    <path d="M520,1030 L640,1125 L1010,1125 L1110,980 Q900,1010 640,980 Z" fill="${V('#5a3f2b', 0.15, 0.3)}"/>
+    <path d="M940,990 L940,880 L1120,880 L1120,990 Z" fill="${V('#4e3626', 0.15, 0.3)}"/>
+    <path d="M560,1035 L1080,1035" stroke="#2a1a10" stroke-width="6"/><path d="M600,1070 L1060,1070" stroke="#2a1a10" stroke-width="4" opacity="0.6"/>
+    <rect x="796" y="420" width="16" height="600" fill="#3a2618"/><rect x="660" y="520" width="300" height="12" fill="#3a2618"/>
+    <rect x="640" y="760" width="14" height="250" fill="#3a2618" transform="rotate(-25 647 1000)"/>
+    <path d="M675,535 L945,535 Q960,700 930,790 L880,740 L860,800 L820,760 L790,820 L750,770 L700,790 Q680,700 675,535 Z" fill="${V('#e3dac2', 0.1, 0.2)}"/>
+    <line x1="804" y1="420" x2="560" y2="1030" stroke="#2a2018" stroke-width="3"/><line x1="804" y1="420" x2="1080" y2="980" stroke="#2a2018" stroke-width="3"/>
+  </g>`);
+  out.push(`<g fill="${V('#3a3c3e', 0.15, 0.3)}"><path d="M480,1170 Q540,1040 640,1060 Q720,1080 700,1180 Z"/><path d="M820,1180 Q880,1070 990,1090 Q1080,1120 1080,1190 Z"/></g>`);
+  // песок
+  out.push(`<path d="M0,1190 Q540,1150 1080,1195 L1080,1920 L0,1920 Z" fill="${V('#c8b48c', 0.1, 0.25)}"/>`);
+  out.push(`<path d="M0,1192 Q540,1150 1080,1197" stroke="#f1f4f2" stroke-width="10" fill="none" opacity="0.8"/>`);
+  out.push(`<g fill="#a89470" opacity="0.6"><ellipse cx="300" cy="1500" rx="140" ry="10"/><ellipse cx="820" cy="1640" rx="180" ry="12"/></g>`);
+  // лодка
+  out.push(`<path d="M60,1300 Q200,1350 340,1300 L320,1270 L80,1270 Z" fill="${V('#5b4330', 0.15, 0.3)}"/>`);
+  // люди
+  out.push(`<ellipse cx="540" cy="1685" rx="150" ry="22" fill="#000" opacity="0.18"/>`);
+  out.push(person(250, 1560, 0.82, { robe: '#4b5a6a', hairStyle: 'topknot', hat: true, spear: true, frown: 0.4 }));
+  out.push(person(860, 1590, 0.86, { robe: '#7a6440', hairStyle: 'topknot', hat: true, spear: true, frown: 0.4 }));
+  out.push(person(540, 1690, 1.0, { trousers: true, robe: '#e4ddcc', robe2: '#3a3430', skin: '#efb995', hair: '#b08844', hairStyle: 'blond', iris: '#3b6a8a', frown: -0.2 }));
+}
+// виньетка
+defs.push(`<radialGradient id="vig" cx="0.5" cy="0.5" r="0.75"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.55"/></radialGradient>`);
+out.push(`<rect width="1080" height="1920" fill="url(#vig)"/>`);
+document.getElementById('root').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 1080 1920"><defs>${defs.join('')}</defs>${out.join('\n')}</svg>`;
+window.__done = true;
+</script></body></html>

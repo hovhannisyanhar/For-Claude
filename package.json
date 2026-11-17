@@ -5,6 +5,8 @@
   "scripts": {
     "studio": "remotion studio",
     "new": "node scripts/new-video.mjs",
+    "scenes3d": "node scripts/scenes3d.mjs",
+    "tighten": "NODE_USE_ENV_PROXY=1 node scripts/tighten.mjs",
     "tts": "NODE_USE_ENV_PROXY=1 node scripts/tts.mjs",
     "render": "node scripts/render.mjs",
     "make": "node scripts/make.mjs",
@@ -13,7 +15,8 @@
     "ambient": "node scripts/ambient.mjs",
     "stills": "node scripts/stills.mjs",
     "sound": "NODE_USE_ENV_PROXY=1 node scripts/sound.mjs",
-    "cost": "NODE_USE_ENV_PROXY=1 node scripts/cost.mjs"
+    "cost": "NODE_USE_ENV_PROXY=1 node scripts/cost.mjs",
+    "insta": "node scripts/insta.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.538",
@@ -30,11 +33,13 @@
     "@fontsource/great-vibes": "^5.3.0",
     "@fontsource/manrope": "5.2.8",
     "@fontsource/marck-script": "^5.3.0",
+    "@fontsource/montserrat": "^5.3.0",
     "@fontsource/oswald": "5.2.8",
     "@fontsource/playfair-display": "5.2.8",
     "@fontsource/pt-mono": "5.2.8",
     "@fontsource/unbounded": "5.2.8",
     "@types/react": "19.1.12",
+    "three": "^0.170.0",
     "typescript": "5.9.3"
   }
 }

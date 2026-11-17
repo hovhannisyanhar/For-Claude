@@ -22,10 +22,10 @@ const voiceKey = `${voiceId}/${model}/${script.tts?.speed ?? 1.05}/${JSON.string
 let ttsChars = 0;
 const todo = [];
 script.scenes.forEach((sc, i) => {
-	const hash = crypto.createHash('sha1').update(`elevenlabs|${voiceKey}|${sc.voice}`).digest('hex').slice(0, 10);
+	const hash = crypto.createHash('sha1').update(`elevenlabs|${voiceKey}|${sc.ttsText ?? sc.voice}`).digest('hex').slice(0, 10);
 	const cached = man.scenes[i]?.hash === hash && fs.existsSync(path.join(P.genDir, `scene-${i + 1}-${hash}.mp3`));
 	if (!cached) {
-		ttsChars += sc.voice.length;
+		ttsChars += (sc.ttsText ?? sc.voice).length;
 		todo.push(i + 1);
 	}
 });

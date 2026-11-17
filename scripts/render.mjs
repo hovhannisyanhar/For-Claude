@@ -27,7 +27,11 @@ const props = {
 	theme: script.theme || 'midnight',
 	music: script.musicSeparate ? null : (sound?.music ?? script.music ?? null),
 	musicVolume: script.musicVolume,
-	scenes: script.scenes.map((sc, i) => ({...sc, ...manifest.scenes[i], ...(sound ? {sfx: sound.scenes[i]} : {})})),
+	scenes: script.scenes.map((sc, i) => {
+		// 3D-сцены: клип из npm run scenes3d, если он отрендерен
+		const clip = path.join(P.genDir, 'clips', `scene-${i + 1}.mp4`);
+		return {...sc, ...manifest.scenes[i], ...(sound ? {sfx: sound.scenes[i]} : {}), ...(fs.existsSync(clip) ? {clip: `${P.genRel}/clips/scene-${i + 1}.mp4`} : {})};
+	}),
 };
 fs.mkdirSync(P.outDir, {recursive: true});
 const propsFile = path.join(P.outDir, 'props.json');
@@ -64,11 +68,15 @@ if (!preview) {
 		fs.copyFileSync(fs.existsSync(raw) ? raw : path.join(ROOT, 'public', sound.music), path.join(P.outDir, 'music.mp3'));
 	}
 	// Обложка: кадр хука после появления текста, без субтитров
+	// В «Кино» со script.cover — шрифтовая обложка на градиенте (композиция CinemaCover)
+	// Единый шаблон обложки для всех роликов (текст на одной высоте) — script.instaCover → InstaCover
+	const instaCover = script.instaCover;
+	const fontCover = !instaCover && script.style === 'cinema' && script.cover;
 	const coverProps = path.join(P.outDir, 'cover-props.json');
-	writeJson(coverProps, {...props, showCaptions: false});
+	writeJson(coverProps, instaCover ?? (fontCover ? script.cover : {...props, showCaptions: false}));
 	execFileSync(
 		remotion,
-		['still', 'src/index.ts', composition, `--props=${coverProps}`, '--log=error', ...browserArgs(), path.join(P.outDir, 'cover.jpg'), `--frame=${script.coverFrame ?? 28}`],
+		['still', 'src/index.ts', instaCover ? 'InstaCover' : fontCover ? 'CinemaCover' : composition, `--props=${coverProps}`, '--log=error', ...browserArgs(), path.join(P.outDir, 'cover.jpg'), `--frame=${instaCover || fontCover ? 0 : script.coverFrame ?? 28}`, '--jpeg-quality=95'],
 		{cwd: ROOT, stdio: 'inherit'},
 	);
 	fs.rmSync(coverProps);

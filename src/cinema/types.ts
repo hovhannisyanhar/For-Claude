@@ -11,6 +11,16 @@ export type CinemaSet =
 	| 'campfire' // лагерь лесорубов у костра
 	| 'lake' // ночное озеро, мостки, поезд на дальнем берегу с отражением
 	| 'dawn' // рассвет над долиной, герой на холме
+	// «Рипли»
+	| 'mirror' // зеркало: отражение Тома совпадает с Дики
+	| 'nyroom' // каморка в Нью-Йорке, дождь, стук в дверь
+	| 'liner' // лайнер в порту, Том поднимается по трапу
+	| 'atrani' // Атрани: городок у моря
+	| 'terrace' // терраса: Дики, Мардж, Том
+	| 'wardrobe' // Том в рубашке Дики у зеркала
+	| 'boat' // лодка на закате
+	| 'stairs' // ночная лестница, тень
+	| 'nightsea' // ночное море, вилла, Том на камнях
 	// старые имена (алиасы)
 	| 'night'
 	| 'forest'
@@ -24,7 +34,10 @@ export type CinemaShot = {
 	audio?: string;
 	duration?: number;
 	words?: Word[];
-	set: CinemaSet;
+	/** Имя плана: нарисованная декорация из Sets.tsx или 3D-сцена из scenes3d/<slug>.js */
+	set: CinemaSet | (string & {});
+	/** Готовый видеоклип плана (3D-сцены: npm run scenes3d), путь от public/ */
+	clip?: string;
 	/** Мелкая разрядка над заголовком: «АЙДАХО · 1893» */
 	kicker?: string;
 	/** Заголовок с засечками (можно \n) */
@@ -57,8 +70,12 @@ export type CinemaProps = {
 	accent?: string;
 	scenes: CinemaShot[];
 	/** Финальный кадр: официальная обложка + название (рус/англ) и год */
-	poster?: {src: string; titleRu: string; titleEn: string; year: string} | null;
+	poster?: {src: string; titleRu: string; titleEn: string; year: string; /** Плашка-призыв под названием: «Подпишись» */ cta?: string} | null;
 	music?: string;
 	musicVolume?: number;
 	showCaptions?: boolean;
+	/** Шрифты кинетического текста: пресет (classic · noir · modern · display · hand) или своя тройка. Менять от ролика к ролику */
+	fonts?: import('./Kinetic').FontPreset | import('./Kinetic').KineticFonts;
+	/** Старый «плёночный» вид: мерцание яркости, дрожание кадра, пылинки, живое зерно. По умолчанию выключен */
+	film?: boolean;
 };
