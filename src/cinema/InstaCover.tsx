@@ -32,7 +32,7 @@ export const InstaCover: React.FC<InstaCoverProps> = ({
 		{x: 720, y: 220, r: 420, color: '#1f5a78', opacity: 0.5},
 	],
 	textColor = '#f8f1e4',
-	mainSize = 190,
+	mainSize = 150,
 }) => (
 	<AbsoluteFill style={{background: `linear-gradient(180deg, ${base.join(', ')})`}}>
 		{glows.map((g, i) => (
@@ -59,25 +59,26 @@ export const InstaCover: React.FC<InstaCoverProps> = ({
 			</filter>
 			<rect width="100%" height="100%" filter="url(#g)" />
 		</svg>
-		<AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', padding: '0 70px', textAlign: 'center', color: textColor}}>
-			<div style={{transform: 'translateY(-20px)'}}>
-				<div style={{fontFamily: 'Montserrat', fontWeight: 300, fontSize: 64, letterSpacing: '0.32em', marginRight: '-0.32em', textTransform: 'uppercase', marginBottom: 18}}>
-					{top}
-				</div>
-				<div
-					style={{
-						fontFamily: 'Playfair Display',
-						fontWeight: 900,
-						fontSize: mainSize,
-						lineHeight: 1.0,
-						textTransform: 'uppercase',
-						whiteSpace: 'pre-line',
-						textShadow: '0 10px 50px rgba(0,0,0,0.35)',
-					}}
-				>
-					{main}
-				</div>
+		{/* Текст всегда на одной высоте и одного размера — чтобы обложки в сетке профиля стояли ровно.
+		    Верхняя строка: базовая линия ~y 770; главная фраза начинается с y 800 (1–2 строки). Всё внутри зоны 3:4 (y 240–1680). */}
+		<div style={{position: 'absolute', left: 60, right: 60, top: 700, textAlign: 'center', color: textColor}}>
+			<div style={{fontFamily: 'Montserrat', fontWeight: 300, fontSize: 60, lineHeight: '80px', height: 80, letterSpacing: '0.32em', marginRight: '-0.32em', textTransform: 'uppercase', whiteSpace: 'nowrap'}}>
+				{top}
 			</div>
-		</AbsoluteFill>
+			<div
+				style={{
+					marginTop: 20,
+					fontFamily: 'Playfair Display',
+					fontWeight: 900,
+					fontSize: mainSize,
+					lineHeight: 1.0,
+					textTransform: 'uppercase',
+					whiteSpace: 'pre-line',
+					textShadow: '0 10px 50px rgba(0,0,0,0.35)',
+				}}
+			>
+				{main}
+			</div>
+		</div>
 	</AbsoluteFill>
 );

@@ -34,7 +34,10 @@ export type CinemaShot = {
 	audio?: string;
 	duration?: number;
 	words?: Word[];
-	set: CinemaSet;
+	/** Имя плана: нарисованная декорация из Sets.tsx или 3D-сцена из scenes3d/<slug>.js */
+	set: CinemaSet | (string & {});
+	/** Готовый видеоклип плана (3D-сцены: npm run scenes3d), путь от public/ */
+	clip?: string;
 	/** Мелкая разрядка над заголовком: «АЙДАХО · 1893» */
 	kicker?: string;
 	/** Заголовок с засечками (можно \n) */
@@ -67,7 +70,7 @@ export type CinemaProps = {
 	accent?: string;
 	scenes: CinemaShot[];
 	/** Финальный кадр: официальная обложка + название (рус/англ) и год */
-	poster?: {src: string; titleRu: string; titleEn: string; year: string} | null;
+	poster?: {src: string; titleRu: string; titleEn: string; year: string; /** Плашка-призыв под названием: «Подпишись» */ cta?: string} | null;
 	music?: string;
 	musicVolume?: number;
 	showCaptions?: boolean;
