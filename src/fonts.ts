@@ -22,6 +22,8 @@ const FACES: Array<{family: string; file: string; weight: number; style?: 'norma
 	{family: 'Yeseva One', file: 'yeseva-one', weight: 400},
 	...[300, 400].map((w) => ({family: 'Jost', file: 'jost', weight: w})),
 	{family: 'Tenor Sans', file: 'tenor-sans', weight: 400},
+	// обложка для Instagram
+	{family: 'Montserrat', file: 'montserrat', weight: 300},
 ];
 
 let started = false;
