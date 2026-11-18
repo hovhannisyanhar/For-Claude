@@ -89,6 +89,7 @@ const shots = {
         `<ellipse cx="560" cy="1720" rx="420" ry="34" fill="#000" opacity="0.15"/>`,
         person(330, 1730, 1.0, { ...KIN, arms: 'rifle', look: 1, blink: blink(t) }),
         person(lerp(840, 770, ease(t / (T * 0.5))), 1700, 0.97, { ...AHM, look: -1, step: wave(t, 1.2) * (t < T * 0.5 ? 1 : 0), blink: blink(t, 1.5) }),
+        `<rect width="1080" height="950" fill="${grad([[0, '#000', 0.6], [0.6, '#000', 0.25], [1, '#000', 0]])}"/>`,
         dust(t, 30, '#fff1d0', 700, 1700),
       ],
     };
@@ -110,6 +111,7 @@ const shots = {
         `<ellipse cx="540" cy="1860" rx="480" ry="40" fill="#000" opacity="0.15"/>`,
         person(290, 1900, 1.25, { ...KIN, frown: lerp(0.1, 0.55, k), look: 1, blink: blink(t, 0.6) }),
         person(800, 1900, 1.25, { ...AHM, arms: 'point', look: -1, frown: 0.5, nod: wave(t, 1.6), blink: blink(t, 2.1) }),
+        `<rect width="1080" height="950" fill="${grad([[0, '#000', 0.6], [0.6, '#000', 0.25], [1, '#000', 0]])}"/>`,
         dust(t, 20, '#fff6e0', 600, 1700),
       ],
     };
@@ -140,6 +142,7 @@ const shots = {
         mrap(150, 1560, 0.6, '#9c8664'),
         `<ellipse cx="760" cy="1850" rx="260" ry="30" fill="#000" opacity="0.18"/>`,
         person(760, 1840, 1.05, { ...AHM, arms: stop > 0.3 ? 'raise' : 'down', look: -0.6, lookUp: 0.3, frown: 0.6, blink: blink(t, 0.9) }),
+        `<rect width="1080" height="950" fill="${grad([[0, '#000', 0.6], [0.6, '#000', 0.25], [1, '#000', 0]])}"/>`,
         dust(t, 25, '#fff1d0', 900, 1700),
       ],
     };
