@@ -1,0 +1,200 @@
+{
+  "title": "Переводчик (2023): о чём фильм",
+  "style": "cinema",
+  "art": "vector",
+  "accent": "#d9a35a",
+  "fonts": "hand",
+  "tts": {
+    "voiceId": "6A9D8WSMm4rFsg2DWFeE",
+    "model": "eleven_v4",
+    "speed": 1.0,
+    "settings": {
+      "stability": 0.4,
+      "similarity_boost": 0.8,
+      "style": 0.45,
+      "use_speaker_boost": true
+    },
+    "tempo": 1.1
+  },
+  "caption": "Он спас жизнь американскому сержанту, и за это его объявили мишенью 🎖️ Название фильма в конце видео 🎬 Смотрели? 👇",
+  "hashtags": [
+    "#кино",
+    "#чтопосмотреть",
+    "#фильмы",
+    "#военныйфильм",
+    "#афганистан"
+  ],
+  "poster": {
+    "src": "assets/the-covenant/poster.jpg",
+    "titleRu": "Переводчик",
+    "titleEn": "The Covenant",
+    "year": "2023",
+    "cta": "Подпишись"
+  },
+  "instaCover": {
+    "top": "Он спас американца",
+    "main": "И стал\nмишенью",
+    "base": [
+      "#0e0c0a",
+      "#2a1d12",
+      "#3a2814",
+      "#0e0c0a"
+    ],
+    "glows": [
+      {
+        "x": 230,
+        "y": 1650,
+        "r": 540,
+        "color": "#d9a35a",
+        "opacity": 0.65
+      },
+      {
+        "x": 930,
+        "y": 1300,
+        "r": 420,
+        "color": "#8a5a2a",
+        "opacity": 0.5
+      },
+      {
+        "x": 720,
+        "y": 230,
+        "r": 440,
+        "color": "#2a3654",
+        "opacity": 0.6
+      }
+    ]
+  },
+  "sources": [
+    "https://en.wikipedia.org/wiki/Guy_Ritchie%27s_The_Covenant",
+    "https://www.imdb.com/title/tt4873118/plotsummary/",
+    "https://meduza.io/feature/2023/04/29/perevodchik-serieznyy-i-mrachnyy-film-gaya-richi-ob-amerikanskih-voennyh-v-afganistane",
+    "https://novayagazeta.ru/articles/2023/05/18/spasti-akhmeda-media",
+    "https://www.npr.org/2023/04/20/1171132814/guy-ritchies-the-covenant-marks-a-change-of-tone-but-not-pace-for-ritchie",
+    "https://www.navytimes.com/off-duty/military-culture/2023/04/18/guy-ritchies-the-covenant-is-hollywood-meets-no-man-left-behind/"
+  ],
+  "scenes": [
+    {
+      "set": "poster-wall",
+      "voice": "За голову этого человека назначена награда. Его преступление? Он спас жизнь американцу.",
+      "emphasis": [
+        "награда.",
+        "преступление?",
+        "спас"
+      ],
+      "pause": 18
+    },
+    {
+      "set": "base",
+      "voice": "Афганистан. Сержант Джон Кинли получает нового переводчика.",
+      "emphasis": [
+        "Афганистан.",
+        "переводчика."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "argue",
+      "voice": "Ахмед упрям, говорит мало и спорит с командиром при всех. Кинли он раздражает.",
+      "emphasis": [
+        "упрям,",
+        "спорит",
+        "раздражает."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "checkpoint",
+      "voice": "Пока Ахмед не чует ловушку, которую пропустили все.",
+      "emphasis": [
+        "ловушку,"
+      ],
+      "pause": 18
+    },
+    {
+      "set": "ambush",
+      "voice": "А потом удача кончается. Засада. Отряда больше нет.",
+      "emphasis": [
+        "удача",
+        "Засада.",
+        "нет."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "night-rocks",
+      "voice": "Кинли ранен, вокруг талибы, до своих не дойти.",
+      "emphasis": [
+        "ранен,",
+        "талибы,"
+      ],
+      "pause": 18
+    },
+    {
+      "set": "cart",
+      "voice": "Ахмеду проще всего бросить его и спасаться самому. Он не бросает.",
+      "emphasis": [
+        "бросить",
+        "не",
+        "бросает."
+      ],
+      "pause": 18,
+      "ttsText": "Ахмеду проще всего бросить его и спасаться самому... Он не бросает."
+    },
+    {
+      "set": "home",
+      "voice": "Кинли выживает и летит домой. Но там узнаёт то, от чего перестаёт спать.",
+      "emphasis": [
+        "домой.",
+        "спать."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "phone",
+      "voice": "Ахмеду обещали визу. Обещание забыли.",
+      "emphasis": [
+        "визу.",
+        "забыли."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "hideout",
+      "voice": "Теперь он прячется с семьёй, а талибы идут по следу.",
+      "emphasis": [
+        "прячется",
+        "следу."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "door",
+      "voice": "И у сержанта остаётся один вопрос: сколько стоит чужая жизнь, если она спасла твою?",
+      "emphasis": [
+        "вопрос:",
+        "жизнь,",
+        "твою?"
+      ],
+      "pause": 18
+    },
+    {
+      "set": "helicopter",
+      "voice": "Это Гай Ричи, каким его ещё не видели. Ни шуток, ни бандитов. Два часа, в которые не выпускаешь подлокотник.",
+      "emphasis": [
+        "Ричи,",
+        "подлокотник."
+      ],
+      "pause": 18
+    },
+    {
+      "set": "ridge",
+      "voice": "Война заканчивается не тогда, когда ты вернулся домой. А когда вернул долг. Подписывайся: здесь только кино, ради которого стоит отложить телефон.",
+      "emphasis": [
+        "Война",
+        "долг.",
+        "Подписывайся:"
+      ],
+      "pause": 18
+    }
+  ]
+}
