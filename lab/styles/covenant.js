@@ -77,6 +77,15 @@ function jitter(geo, k, s = 3) {
 }
 
 
+const woodTex = canvasTex(512, 512, (g, w, h) => {
+  g.fillStyle = '#5a3520'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 8; i++) {
+    g.fillStyle = `hsl(${20 + rnd() * 6},${40 + rnd() * 10}%,${18 + rnd() * 7}%)`; g.fillRect(0, i * 64, w, 62);
+    g.strokeStyle = 'rgba(20,10,5,0.3)'; g.lineWidth = 1.5;
+    for (let k = 0; k < 6; k++) { g.beginPath(); const y = i * 64 + rnd() * 60; g.moveTo(0, y); for (let x = 0; x < w; x += 32) g.lineTo(x, y + Math.sin(x / 60 + k) * 3); g.stroke(); }
+  }
+}, [1, 1]);
+
 // ---------- солдат / переводчик (стилизованный, крупная голова) ----------
 function soldier(o) {
   const g = new THREE.Group();
@@ -248,7 +257,7 @@ function buildCart() {
   const rk = rockMat('#5d5b62');
   [[-1.6, -0.2, 0.22], [1.8, 0.1, 0.18], [-0.9, -1.4, 0.3], [2.4, -1.2, 0.25], [-2.2, 0.6, 0.15]].forEach(([x, z, s]) => add(jitter(new THREE.IcosahedronGeometry(s, 2), 0.25, 3), rk, [x, s * 0.4, z], { rot: [rnd(), rnd() * 3, 0] }));
   // тележка
-  const cart = new THREE.Group(); cart.position.set(-0.55, 0, -0.6); cart.rotation.y = 0.0; root.add(cart);
+  const cart = new THREE.Group(); cart.position.set(0, 0, -1.25); cart.rotation.y = -Math.PI / 2; root.add(cart);
   const wood = mat('#8a6040', { map: woodTex, rough: 0.75 });
   add(box(1.0, 0.05, 0.55, 0.01), wood, [0, 0.36, 0], { parent: cart });
   [-1, 1].forEach(s => add(box(1.0, 0.1, 0.03, 0.01), wood, [0, 0.42, s * 0.27], { parent: cart }));
@@ -261,11 +270,12 @@ function buildCart() {
   add(new THREE.CylinderGeometry(0.02, 0.02, 0.66, 8), wood, [0, 0.22, 0], { parent: cart, rot: [Math.PI / 2, 0, 0] });
   // Кинли на тележке
   const kin = soldier({ shirt: '#8a7a5e', pants: '#7a6b52', vest: '#6b6448', skin: '#e2ae8a', hair: '#3a2a1c', closed: true, arms: 'down' });
-  kin.rotation.set(-Math.PI / 2, 0, Math.PI / 2); kin.position.set(-0.47, 0.6, 0.0); cart.add(kin);
+  const kinW = new THREE.Group(); kinW.rotation.x = -Math.PI / 2; kinW.position.set(-0.42, 0.5, 0); cart.add(kinW);
+  kin.rotation.z = -Math.PI / 2; kin.scale.setScalar(0.85); kinW.add(kin);
   add(new THREE.PlaneGeometry(0.8, 0.5, 10, 10), mat('#5a5040', { rough: 1, side: THREE.DoubleSide }), [0.05, 0.6, 0.0], { parent: cart, rot: [-Math.PI / 2 + 0.05, 0, 0] }); // одеяло
   // Ахмед впрягся и тянет вверх по склону
-  const ahmed = soldier({ shirt: '#6c5e4c', pants: '#4a4034', scarf: '#7f7364', skin: '#c48b62', hair: '#17110d', frown: 0.45, squint: true, arms: 'pull', lean: 0.45, step: 1, look: -0.35 });
-  ahmed.position.set(0.85, 0.02, -0.6); ahmed.rotation.y = Math.PI / 2 - 0.25; root.add(ahmed);
+  const ahmed = soldier({ shirt: '#6c5e4c', pants: '#4a4034', scarf: '#7f7364', skin: '#c48b62', hair: '#17110d', frown: 0.45, squint: true, arms: 'pull', lean: 0.3, step: 1, look: 0 });
+  ahmed.position.set(0, 0.02, 0.02); ahmed.rotation.y = 0; root.add(ahmed);
   // свет: холодная луна + тёплый отсвет от огней
   scene.add(new THREE.HemisphereLight('#4a5c88', '#141018', 0.7));
   const moon = new THREE.DirectionalLight('#b8c8ff', 2.4); moon.position.set(-5, 6, -6); moon.target.position.set(0, 0, -0.5);
@@ -275,8 +285,9 @@ function buildCart() {
   const rim = new THREE.DirectionalLight('#ffb070', 0.8); rim.position.set(-2, 1.5, -6); scene.add(rim);
   const fill = new THREE.DirectionalLight('#6a7cb0', 0.5); fill.position.set(2, 1.5, 4); scene.add(fill);
   scene.background = new THREE.Color(fogC);
-  camera.fov = 42; camera.position.set(0.3, 0.75, 2.4); camera.lookAt(0.0, 0.9, -3.0);
-  return new THREE.Vector3(0.2, 0.6, -0.6);
+  camera.fov = 42; camera.position.set(0.45, 1.2, 3.1); camera.lookAt(-0.05, 0.62, -0.7);
+  add(sphere(0.55, 32, 20), mat('#f2f0e6', { basic: true, toneMapped: false }), [-3.2, 7.5, -16], { cast: false });
+  return new THREE.Vector3(0, 0.7, 0);
 }
 
 const focus = SHOT === 'base' ? buildBase() : buildCart();
