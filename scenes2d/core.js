@@ -73,6 +73,7 @@ export function person(x, y, s, o) {
   }
   // торс
   b += `<path d="M${x - 98 * s},${ty} L${x - 108 * s},${top + 30 * s} Q${x},${top - 10 * s} ${x + 108 * s},${top + 30 * s} L${x + 98 * s},${ty} Z" fill="${V(o.robe || sh, 0.25, 0.2)}"/>`;
+  if (o.stripes) { for (let k = -80; k <= 80; k += 32) b += `<rect x="${x + (k - 6) * s}" y="${top + 8 * s}" width="${12 * s}" height="${ty - top - 8 * s}" fill="${o.stripes}" opacity="0.55"/>`; if (pose === 'stand') for (const k of [-52, -26, 20, 46]) b += `<rect x="${x + (k - 4) * s}" y="${ty}" width="${8 * s}" height="${legH * s - 30 * s}" fill="${o.stripes}" opacity="0.5"/>`; }
   if (o.vest) {
     b += `<path d="M${x - 92 * s},${ty + 10 * s} L${x - 98 * s},${top + 55 * s} L${x + 98 * s},${top + 55 * s} L${x + 92 * s},${ty + 10 * s} Z" fill="${V(o.vest, 0.15, 0.25)}"/>`;
     [-60, 0, 60].forEach(dx => b += `<rect x="${x + (dx - 24) * s}" y="${ty - 95 * s}" width="${48 * s}" height="${62 * s}" rx="${8 * s}" fill="${V(shade(o.vest, 0.08), 0.2, 0.2)}" stroke="${shade(o.vest, -0.3)}" stroke-width="${2 * s}"/>`);
@@ -105,6 +106,7 @@ export function person(x, y, s, o) {
   let hd = '';
   if (o.veil) hd += `<path d="M${x - hr * 1.25},${top + 60 * s} Q${x - hr * 1.35},${headY - hr * 1.4} ${x},${headY - hr * 1.3} Q${x + hr * 1.35},${headY - hr * 1.4} ${x + hr * 1.25},${top + 60 * s} Z" fill="${V(o.veil, 0.15, 0.25)}"/>`;
   else if (!o.helmet) hd += `<ellipse cx="${x}" cy="${headY - 18 * s}" rx="${hr * 1.02}" ry="${hr * 0.92}" fill="${hairC}"/>`;
+  if (o.longHair && !o.veil) hd += `<path d="M${x - hr * 1.12},${headY + hr * 0.95} Q${x - hr * 1.3},${headY - hr * 1.2} ${x},${headY - hr * 1.12} Q${x + hr * 1.3},${headY - hr * 1.2} ${x + hr * 1.12},${headY + hr * 0.95} Q${x + hr * 0.6},${headY + hr * 1.1} ${x + hr * 0.7},${headY + hr * 0.3} L${x - hr * 0.7},${headY + hr * 0.3} Q${x - hr * 0.6},${headY + hr * 1.1} ${x - hr * 1.12},${headY + hr * 0.95} Z" fill="${V(hairC, 0.15, 0.2)}"/>`;
   if (!o.veil) hd += `<ellipse cx="${x - hr}" cy="${headY + 10 * s}" rx="${16 * s}" ry="${24 * s}" fill="${shade(skin, -0.1)}"/><ellipse cx="${x + hr}" cy="${headY + 10 * s}" rx="${16 * s}" ry="${24 * s}" fill="${shade(skin, -0.1)}"/>`;
   hd += `<ellipse cx="${x}" cy="${headY}" rx="${hr * 0.95}" ry="${hr}" fill="${R(skin, 0.15, 0.18)}"/>`;
   if (!o.helmet && !o.veil) hd += `<path d="M${x - hr * 0.95},${headY - 5 * s} Q${x - hr * 0.6},${headY - hr * 1.15} ${x + hr * 0.3},${headY - hr * 0.95} Q${x + hr * 0.95},${headY - hr * 0.7} ${x + hr * 0.95},${headY - 5 * s} Q${x + hr * 0.5},${headY - hr * 0.5} ${x},${headY - hr * 0.55} Q${x - hr * 0.6},${headY - hr * 0.5} ${x - hr * 0.95},${headY - 5 * s} Z" fill="${hairC}"/>`;
@@ -114,19 +116,23 @@ export function person(x, y, s, o) {
   const closed = o.closed || o.blink;
   [-1, 1].forEach(side => {
     const ex = x + side * 34 * s + lk * 8 * s;
-    if (closed) hd += `<path d="M${ex - 14 * s},${ey + 2 * s} Q${ex},${ey + 9 * s} ${ex + 14 * s},${ey + 2 * s}" stroke="${shade(skin, -0.45)}" stroke-width="${4 * s}" fill="none" stroke-linecap="round"/>`;
+    if (closed || (o.wink && side === 1)) hd += `<path d="M${ex - 14 * s},${ey + 2 * s} Q${ex},${ey + 9 * s} ${ex + 14 * s},${ey + 2 * s}" stroke="${shade(skin, -0.45)}" stroke-width="${4 * s}" fill="none" stroke-linecap="round"/>`;
     else hd += `<ellipse cx="${ex}" cy="${ey}" rx="${17 * s}" ry="${(o.squint ? 12 : 17) * s}" fill="#fbfaf3"/><ellipse cx="${ex + lk * 5 * s}" cy="${ey + 2 * s + (o.lookUp || 0) * -5 * s}" rx="${11 * s}" ry="${(o.squint ? 9 : 12) * s}" fill="${o.iris || '#3a2414'}"/><circle cx="${ex + lk * 5 * s}" cy="${ey + 2 * s + (o.lookUp || 0) * -5 * s}" r="${6 * s}" fill="#120a06"/><circle cx="${ex + 4 * s + lk * 5 * s}" cy="${ey - 4 * s}" r="${3.5 * s}" fill="#fff"/>`;
     const fr = o.frown ?? 0.3;
     hd += `<path d="M${ex + side * 22 * s},${ey - 28 * s - fr * 15 * s} L${ex - side * 18 * s},${ey - 28 * s + fr * 15 * s}" stroke="${o.veil ? '#2a1a12' : hairC}" stroke-width="${(o.veil ? 5 : 8) * s}" stroke-linecap="round"/>`;
   });
   hd += `<ellipse cx="${x}" cy="${ey + 30 * s}" rx="${10 * s}" ry="${8 * s}" fill="${shade(skin, -0.15)}"/>`;
   if (o.beard !== false) hd += `<path d="M${x - 28 * s},${ey + 50 * s} Q${x},${ey + 40 * s} ${x + 28 * s},${ey + 50 * s}" stroke="${shade(hairC, 0.1)}" stroke-width="${11 * s}" fill="none" stroke-linecap="round"/>`;
+  else if (o.smile) hd += `<path d="M${x - 30 * s},${ey + 48 * s} Q${x},${ey + 84 * s} ${x + 30 * s},${ey + 48 * s} Z" fill="#7a2a24"/><path d="M${x - 24 * s},${ey + 50 * s} Q${x},${ey + 56 * s} ${x + 24 * s},${ey + 50 * s}" stroke="#fff" stroke-width="${5 * s}" fill="none"/><ellipse cx="${x - 55 * s}" cy="${ey + 32 * s}" rx="${16 * s}" ry="${9 * s}" fill="#ff7c74" opacity="0.3"/><ellipse cx="${x + 55 * s}" cy="${ey + 32 * s}" rx="${16 * s}" ry="${9 * s}" fill="#ff7c74" opacity="0.3"/>`;
   else hd += `<path d="M${x - 16 * s},${ey + 56 * s} Q${x},${ey + (o.worried ? 50 : 62) * s} ${x + 16 * s},${ey + 56 * s}" stroke="#8a3a30" stroke-width="${5 * s}" fill="none" stroke-linecap="round"/><ellipse cx="${x - 55 * s}" cy="${ey + 32 * s}" rx="${16 * s}" ry="${9 * s}" fill="#ff7c74" opacity="0.25"/><ellipse cx="${x + 55 * s}" cy="${ey + 32 * s}" rx="${16 * s}" ry="${9 * s}" fill="#ff7c74" opacity="0.25"/>`;
   if (o.helmet) {
     hd += `<path d="M${x - hr * 1.18},${headY - 8 * s} Q${x - hr * 1.2},${headY - hr * 1.35} ${x},${headY - hr * 1.38} Q${x + hr * 1.2},${headY - hr * 1.35} ${x + hr * 1.18},${headY - 8 * s} L${x + hr * 1.05},${headY + 10 * s} Q${x},${headY - hr * 0.6} ${x - hr * 1.05},${headY + 10 * s} Z" fill="${V(o.helmet, 0.25, 0.3)}"/>`;
     hd += `<rect x="${x - 22 * s}" y="${headY - hr * 1.15}" width="${44 * s}" height="${26 * s}" rx="${5 * s}" fill="#2a2a28"/>`;
     hd += `<path d="M${x - hr * 0.95},${headY + 15 * s} L${x - hr * 0.7},${headY + hr * 0.9}" stroke="#2a2a28" stroke-width="${6 * s}"/><path d="M${x + hr * 0.95},${headY + 15 * s} L${x + hr * 0.7},${headY + hr * 0.9}" stroke="#2a2a28" stroke-width="${6 * s}"/>`;
   }
+  if (o.moustache) hd += `<path d="M${x - 34 * s},${ey + 46 * s} Q${x - 16 * s},${ey + 32 * s} ${x},${ey + 42 * s} Q${x + 16 * s},${ey + 32 * s} ${x + 34 * s},${ey + 46 * s} Q${x},${ey + 40 * s} ${x - 34 * s},${ey + 46 * s} Z" fill="${hairC}"/>`;
+  if (o.fedora) hd += `<ellipse cx="${x}" cy="${headY - hr * 0.62}" rx="${hr * 1.45}" ry="${hr * 0.26}" fill="${V(o.fedora, 0.2, 0.35)}"/><path d="M${x - hr * 0.86},${headY - hr * 0.62} Q${x - hr * 0.95},${headY - hr * 1.5} ${x - hr * 0.2},${headY - hr * 1.42} Q${x},${headY - hr * 1.3} ${x + hr * 0.2},${headY - hr * 1.42} Q${x + hr * 0.95},${headY - hr * 1.5} ${x + hr * 0.86},${headY - hr * 0.62} Z" fill="${V(o.fedora, 0.25, 0.3)}"/><path d="M${x - hr * 0.88},${headY - hr * 0.78} Q${x},${headY - hr * 0.68} ${x + hr * 0.88},${headY - hr * 0.78} L${x + hr * 0.86},${headY - hr * 0.64} Q${x},${headY - hr * 0.54} ${x - hr * 0.86},${headY - hr * 0.64} Z" fill="${shade(o.fedora, -0.45)}"/>`;
+  if (o.cap) hd += `<path d="M${x - hr * 0.98},${headY - hr * 0.3} Q${x - hr},${headY - hr * 1.15} ${x},${headY - hr * 1.12} Q${x + hr},${headY - hr * 1.15} ${x + hr * 0.98},${headY - hr * 0.3} Q${x},${headY - hr * 0.55} ${x - hr * 0.98},${headY - hr * 0.3} Z" fill="${V(o.cap, 0.2, 0.25)}"/>`;
   if (o.bandage) hd += `<path d="M${x - hr * 0.95},${headY - hr * 0.35} Q${x},${headY - hr * 0.75} ${x + hr * 0.95},${headY - hr * 0.35}" stroke="#f0ece2" stroke-width="${22 * s}" fill="none"/><circle cx="${x + hr * 0.3}" cy="${headY - hr * 0.55}" r="${8 * s}" fill="#a3302a" opacity="0.8"/>`;
   hd += phoneArm;
   const tr = [];

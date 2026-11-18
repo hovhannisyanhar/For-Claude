@@ -2,6 +2,7 @@
   "title": "Жизнь прекрасна (1997): о чём фильм — без спойлеров",
   "style": "cinema",
   "accent": "#d9a441",
+  "art": "vector",
   "tts": {
     "voiceId": "6A9D8WSMm4rFsg2DWFeE",
     "model": "eleven_v4",
