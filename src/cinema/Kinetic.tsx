@@ -18,6 +18,7 @@ export const FONT_PRESETS = {
 	modern: {script: 'Great Vibes', serif: 'Jost', caps: 'Tenor Sans', serifWeight: 400, italic: false, capsWeight: 400},
 	display: {script: 'Marck Script', serif: 'Yeseva One', caps: 'Jost', serifWeight: 400, italic: false, capsWeight: 400},
 	hand: {script: 'Caveat', serif: 'Cormorant Garamond', caps: 'Tenor Sans', capsWeight: 400},
+	futura: {script: 'Great Vibes', serif: 'Jost', caps: 'Jost', serifWeight: 700, italic: false, capsWeight: 400},
 } satisfies Record<string, KineticFonts>;
 export type FontPreset = keyof typeof FONT_PRESETS;
 /** Текущая тройка (на весь рендер одна — задаётся из пропсов CinemaVideo) */
