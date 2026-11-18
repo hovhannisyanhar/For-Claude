@@ -1,0 +1,7 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#000;overflow:hidden}svg{display:block}</style>
+</head><body><div id="root"></div><script type="module">
+const film = new URLSearchParams(location.search).get('film') || 'the-covenant';
+import(`/scenes2d/${film}.js`);
+</script></body></html>

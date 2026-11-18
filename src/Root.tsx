@@ -43,7 +43,7 @@ export const RemotionRoot: React.FC = () => (
 			fps={FPS}
 			durationInFrames={300}
 			defaultProps={cinemaSample as unknown as CinemaProps}
-			calculateMetadata={({props}) => ({durationInFrames: cinemaTotal(props.scenes, Boolean(props.poster))})}
+			calculateMetadata={({props}) => ({durationInFrames: cinemaTotal(props.scenes, props.poster)})}
 		/>
 		<Composition
 			id="CinemaCover"

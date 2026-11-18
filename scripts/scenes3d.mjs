@@ -1,4 +1,4 @@
-// 3D-сцены фильма (scenes3d/<slug>.js) → видеоклипы public/generated/<slug>/clips/scene-N.mp4
+// 3D-сцены фильма (scenes3d/<slug>.js) или 2D-вектор (scenes2d/<slug>.js, если в сценарии "art": "vector") → видеоклипы public/generated/<slug>/clips/scene-N.mp4
 // Длина клипа = длина сцены в ролике (озвучка + паузы + растворение), берётся из manifest.json.
 //   npm run scenes3d -- <slug> [--only=1,3] [--w=1080 --h=1920] [--fps=30]
 //   npm run scenes3d -- <slug> --stills [--at=0.5] [--w=540 --h=960]  → out/<slug>/scenes3d/scene-N.png (черновые кадры)
@@ -22,12 +22,13 @@ const at = +flag('at', 0.55);
 const only = String(flag('only', '')).split(',').filter(Boolean).map(Number);
 // те же константы, что в src/cinema/CinemaVideo.tsx и src/timing.ts
 const AUDIO_DELAY = 4, DISSOLVE = 24, TAIL = 10;
+const flat = script.art === 'vector'; // 2D-вектор: scenes2d/<slug>.js (SVG), рендерится быстро без видеокарты
 const gpu = process.env.SCENES3D_GPU === '1' || process.platform === 'darwin';
-const args = gpu ? ['--ignore-gpu-blocklist', '--enable-gpu-rasterization'] : ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
+const args = flat ? ['--disable-gpu'] : gpu ? ['--ignore-gpu-blocklist', '--enable-gpu-rasterization'] : ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 const types = {'.js': 'text/javascript', '.html': 'text/html', '.png': 'image/png', '.jpg': 'image/jpeg'};
 
 const clipsDir = path.join(P.genDir, 'clips');
-const stillsDir = path.join(P.outDir, 'scenes3d');
+const stillsDir = path.join(P.outDir, flat ? 'scenes2d' : 'scenes3d');
 fs.mkdirSync(stills ? stillsDir : clipsDir, {recursive: true});
 const browser = await chromium.launch({args, headless: true});
 for (const [i, sc] of script.scenes.entries()) {
@@ -44,7 +45,7 @@ for (const [i, sc] of script.scenes.entries()) {
 		r.fulfill({body: fs.readFileSync(p), contentType: types[path.extname(p)] || 'application/octet-stream'});
 	});
 	const t0 = Date.now();
-	await page.goto(`http://local/scenes3d/index.html?film=${slug}&shot=${sc.set}&dur=${T}&w=${W}&h=${H}&t=${stills ? T * at : 0}`);
+	await page.goto(`http://local/${flat ? 'scenes2d' : 'scenes3d'}/index.html?film=${slug}&shot=${sc.set}&dur=${T}&w=${W}&h=${H}&t=${stills ? T * at : 0}`);
 	await page.waitForFunction(() => window.__done === true, null, {timeout: 600000});
 	if (stills) {
 		const f = path.join(stillsDir, `scene-${i + 1}.png`);
