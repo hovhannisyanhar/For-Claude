@@ -70,7 +70,7 @@ export type CinemaProps = {
 	accent?: string;
 	scenes: CinemaShot[];
 	/** Финальный кадр: официальная обложка + название (рус/англ) и год */
-	poster?: {src: string; titleRu: string; titleEn: string; year: string; /** Плашка-призыв под названием: «Подпишись» */ cta?: string} | null;
+	poster?: {src: string; titleRu: string; titleEn: string; year: string; /** Плашка-призыв под названием: «Подпишись» */ cta?: string; /** Длительность кадра с постером, с (по умолчанию 4,5) */ seconds?: number} | null;
 	music?: string;
 	musicVolume?: number;
 	showCaptions?: boolean;

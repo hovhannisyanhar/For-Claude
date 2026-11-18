@@ -30,8 +30,9 @@ const LAST_TAIL = 90;
 export const POSTER_FRAMES = 135;
 export const shotFrames = (s: CinemaShot, isLast: boolean, poster = false) =>
 	AUDIO_DELAY + Math.ceil((s.duration ?? estimateDuration(s.voice)) * FPS) + (s.pause ?? TAIL) + (isLast && !poster ? LAST_TAIL : 0);
-export const cinemaTotal = (scenes: CinemaShot[], poster = false) =>
-	scenes.reduce((a, s, i) => a + shotFrames(s, i === scenes.length - 1, poster), 0) + (poster ? POSTER_FRAMES : 0);
+export const posterFrames = (poster?: CinemaProps['poster']) => (poster?.seconds ? Math.round(poster.seconds * 30) : POSTER_FRAMES);
+export const cinemaTotal = (scenes: CinemaShot[], poster?: CinemaProps['poster']) =>
+	scenes.reduce((a, s, i) => a + shotFrames(s, i === scenes.length - 1, Boolean(poster)), 0) + (poster ? posterFrames(poster) : 0);
 
 const F_SANS = 'Manrope';
 
@@ -39,7 +40,7 @@ const F_SANS = 'Manrope';
 const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>; accent: string}> = ({poster, accent}) => {
 	const frame = useCurrentFrame();
 	const inP = interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
-	const zoom = interpolate(frame, [0, POSTER_FRAMES], [1, 1.04]);
+	const zoom = interpolate(frame, [0, posterFrames(poster)], [1, 1.04]);
 	const t1 = interpolate(frame, [18, 36], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	const t2 = interpolate(frame, [28, 46], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
 	const t3 = interpolate(frame, [44, 62], [0, 1], {...clamp, easing: Easing.out(Easing.back(1.6))});
@@ -357,7 +358,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 				))}
 			</GateWeave>
 			{poster && (
-				<Sequence from={scenesEnd} durationInFrames={POSTER_FRAMES} name="обложка">
+				<Sequence from={scenesEnd} durationInFrames={posterFrames(poster)} name="обложка">
 					<PosterCard poster={poster} accent={accent} />
 				</Sequence>
 			)}
