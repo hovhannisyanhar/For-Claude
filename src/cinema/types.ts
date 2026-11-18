@@ -17,6 +17,8 @@ export type CinemaSet =
 	| 'liner' // лайнер в порту, Том поднимается по трапу
 	| 'atrani' // Атрани: городок у моря
 	| 'terrace' // терраса: Дики, Мардж, Том
+	// «Жизнь прекрасна»
+	| 'camp' | 'wedding' | 'greenhorse' | 'shop' | 'train' | 'barrack' | 'hide' | 'father' | 'sunrise'
 	| 'wardrobe' // Том в рубашке Дики у зеркала
 	| 'boat' // лодка на закате
 	| 'stairs' // ночная лестница, тень

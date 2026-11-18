@@ -24,6 +24,8 @@ const props = {
 	accent: script.accent,
 	handle: script.handle,
 	poster: script.poster ?? null,
+	fonts: script.fonts,
+	film: script.film,
 	theme: script.theme || 'midnight',
 	music: script.musicSeparate ? null : (sound?.music ?? script.music ?? null),
 	musicVolume: script.musicVolume,
