@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#000;overflow:hidden}svg{display:block}</style>
+</head><body><div id="root"></div>
+<script>
+// Пробные кадры «Переводчика» в 2D-векторе: ?shot=base|cart&w=&h=
+const P = new URLSearchParams(location.search);
+const SHOT = P.get('shot') || 'base';
+const W = +(P.get('w') || 1080), H = +(P.get('h') || 1920);
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function shade(hex, k) {
+  const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const t = k > 0 ? 255 : 0, a = Math.abs(k);
+  r = Math.round(r + (t - r) * a); g = Math.round(g + (t - g) * a); b = Math.round(b + (t - b) * a);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+const defs = [];
+let gid = 0;
+// вертикальный градиент: светлее сверху
+function V(c, k = 0.18, d = 0.28) { const id = 'v' + gid++; defs.push(`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(c, k)}"/><stop offset="1" stop-color="${shade(c, -d)}"/></linearGradient>`); return `url(#${id})`; }
+function R(c, k = 0.2, d = 0.3) { const id = 'r' + gid++; defs.push(`<radialGradient id="${id}" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="${shade(c, k)}"/><stop offset="0.6" stop-color="${c}"/><stop offset="1" stop-color="${shade(c, -d)}"/></radialGradient>`); return `url(#${id})`; }
+function glow(cx, cy, r, c, op = 1) { const id = 'g' + gid++; defs.push(`<radialGradient id="${id}"><stop offset="0" stop-color="${c}" stop-opacity="${op}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`); return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${id})"/>`; }
+defs.push(`<filter id="blur8"><feGaussianBlur stdDeviation="8"/></filter><filter id="blur20"><feGaussianBlur stdDeviation="20"/></filter><filter id="soft"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/></filter>`);
+
+// ---- солдат / переводчик ----
+// x,y — середина низа фигуры; s — масштаб (голова r=90*s)
+function soldier(x, y, s, o) {
+  const hr = 90 * s, skin = o.skin || '#d9a07a', sh = o.shirt, pants = o.pants || shade(sh, -0.2);
+  const hairC = o.hair || '#1e1814';
+  let b = '';
+  // ноги
+  b += `<rect x="${x - 64 * s}" y="${y - 220 * s}" width="${56 * s}" height="${210 * s}" rx="${20 * s}" fill="${V(pants)}"/><rect x="${x + 8 * s}" y="${y - 220 * s}" width="${56 * s}" height="${210 * s}" rx="${20 * s}" fill="${V(pants)}"/>`;
+  b += `<ellipse cx="${x - 36 * s}" cy="${y - 8 * s}" rx="${42 * s}" ry="${18 * s}" fill="#3a2a1c"/><ellipse cx="${x + 36 * s}" cy="${y - 8 * s}" rx="${42 * s}" ry="${18 * s}" fill="#3a2a1c"/>`;
+  // торс
+  const ty = y - 210 * s, top = y - 420 * s;
+  b += `<path d="M${x - 98 * s},${ty} L${x - 108 * s},${top + 30 * s} Q${x},${top - 10 * s} ${x + 108 * s},${top + 30 * s} L${x + 98 * s},${ty} Z" fill="${V(sh, 0.25, 0.2)}"/>`;
+  if (o.vest) {
+    b += `<path d="M${x - 92 * s},${ty + 10 * s} L${x - 98 * s},${top + 55 * s} L${x + 98 * s},${top + 55 * s} L${x + 92 * s},${ty + 10 * s} Z" fill="${V(o.vest, 0.15, 0.25)}"/>`;
+    [-60, 0, 60].forEach(dx => b += `<rect x="${x + (dx - 24) * s}" y="${ty - 95 * s}" width="${48 * s}" height="${62 * s}" rx="${8 * s}" fill="${V(shade(o.vest, 0.08), 0.2, 0.2)}" stroke="${shade(o.vest, -0.3)}" stroke-width="${2 * s}"/>`);
+    b += `<rect x="${x - 70 * s}" y="${top + 72 * s}" width="${40 * s}" height="${26 * s}" rx="${4 * s}" fill="#5c5a48"/>`;
+  }
+  // руки
+  const arm = (side) => {
+    const sx = x + side * 108 * s, sy = top + 40 * s;
+    let hx = x + side * 128 * s, hy = sy + 230 * s;
+    if (o.arms === 'pull') { hx = x + side * 150 * s; hy = sy + 190 * s; }
+    if (o.arms === 'rifle') { hx = side < 0 ? x - 60 * s : x + 30 * s; hy = side < 0 ? sy + 190 * s : sy + 130 * s; }
+    return `<path d="M${sx},${sy} L${hx},${hy}" stroke="${V(sh, 0.25, 0.2)}" stroke-width="${62 * s}" stroke-linecap="round"/><circle cx="${hx}" cy="${hy + 20 * s}" r="${27 * s}" fill="${R(skin)}"/>`;
+  };
+  b += arm(-1) + arm(1);
+  if (o.arms === 'rifle') b += `<g transform="rotate(-28 ${x} ${top + 210 * s})"><rect x="${x - 190 * s}" y="${top + 195 * s}" width="${380 * s}" height="${28 * s}" rx="${8 * s}" fill="#1c1d1c"/><rect x="${x - 20 * s}" y="${top + 215 * s}" width="${28 * s}" height="${70 * s}" rx="4" fill="#1c1d1c"/><rect x="${x + 40 * s}" y="${top + 172 * s}" width="${70 * s}" height="${24 * s}" rx="5" fill="#2a2c2a"/></g><circle cx="${x + 30 * s}" cy="${top + 190 * s}" r="${27 * s}" fill="${R(skin)}"/><circle cx="${x - 60 * s}" cy="${top + 250 * s}" r="${27 * s}" fill="${R(skin)}"/>`;
+  if (o.arms === 'pull') b = `<g>${b}</g>`;
+  if (o.scarf) b += `<path d="M${x - 80 * s},${top + 10 * s} Q${x},${top + 70 * s} ${x + 80 * s},${top + 10 * s} Q${x + 60 * s},${top - 30 * s} ${x},${top - 20 * s} Q${x - 60 * s},${top - 30 * s} ${x - 80 * s},${top + 10 * s} Z" fill="${V(o.scarf, 0.2, 0.2)}"/>`;
+  // голова
+  const headY = top - hr * 0.8;
+  let hd = '';
+  if (!o.helmet) hd += `<ellipse cx="${x}" cy="${headY - 18 * s}" rx="${hr * 1.02}" ry="${hr * 0.92}" fill="${hairC}"/>`;
+  hd += `<ellipse cx="${x - hr}" cy="${headY + 10 * s}" rx="${16 * s}" ry="${24 * s}" fill="${shade(skin, -0.1)}"/><ellipse cx="${x + hr}" cy="${headY + 10 * s}" rx="${16 * s}" ry="${24 * s}" fill="${shade(skin, -0.1)}"/>`;
+  hd += `<ellipse cx="${x}" cy="${headY}" rx="${hr * 0.95}" ry="${hr}" fill="${R(skin, 0.15, 0.18)}"/>`;
+  if (!o.helmet) hd += `<path d="M${x - hr * 0.95},${headY - 5 * s} Q${x - hr * 0.6},${headY - hr * 1.15} ${x + hr * 0.3},${headY - hr * 0.95} Q${x + hr * 0.95},${headY - hr * 0.7} ${x + hr * 0.95},${headY - 5 * s} Q${x + hr * 0.5},${headY - hr * 0.5} ${x},${headY - hr * 0.55} Q${x - hr * 0.6},${headY - hr * 0.5} ${x - hr * 0.95},${headY - 5 * s} Z" fill="${hairC}"/>`;
+  // борода
+  hd += `<path d="M${x - hr * 0.88},${headY + 5 * s} Q${x - hr * 0.85},${headY + hr * 1.25} ${x},${headY + hr * 1.22} Q${x + hr * 0.85},${headY + hr * 1.25} ${x + hr * 0.88},${headY + 5 * s} Q${x + hr * 0.6},${headY + hr * 0.45} ${x},${headY + hr * 0.5} Q${x - hr * 0.6},${headY + hr * 0.45} ${x - hr * 0.88},${headY + 5 * s} Z" fill="${hairC}"/>`;
+  const ey = headY + 2 * s;
+  [-1, 1].forEach(side => {
+    const ex = x + side * 34 * s + (o.look || 0) * 8 * s;
+    if (o.closed) hd += `<path d="M${ex - 14 * s},${ey + 2 * s} Q${ex},${ey + 9 * s} ${ex + 14 * s},${ey + 2 * s}" stroke="${shade(skin, -0.45)}" stroke-width="${4 * s}" fill="none" stroke-linecap="round"/>`;
+    else hd += `<ellipse cx="${ex}" cy="${ey}" rx="${17 * s}" ry="${(o.squint ? 12 : 17) * s}" fill="#fbfaf3"/><ellipse cx="${ex + (o.look || 0) * 5 * s}" cy="${ey + 2 * s}" rx="${11 * s}" ry="${(o.squint ? 9 : 12) * s}" fill="${o.iris || '#3a2414'}"/><circle cx="${ex + (o.look || 0) * 5 * s}" cy="${ey + 2 * s}" r="${6 * s}" fill="#120a06"/><circle cx="${ex + 4 * s + (o.look || 0) * 5 * s}" cy="${ey - 4 * s}" r="${3.5 * s}" fill="#fff"/>`;
+    const fr = o.frown ?? 0.3;
+    hd += `<path d="M${ex + side * 22 * s},${ey - 28 * s - fr * 15 * s} L${ex - side * 18 * s},${ey - 28 * s + fr * 15 * s}" stroke="${hairC}" stroke-width="${8 * s}" stroke-linecap="round"/>`;
+  });
+  hd += `<ellipse cx="${x}" cy="${ey + 30 * s}" rx="${10 * s}" ry="${8 * s}" fill="${shade(skin, -0.15)}"/>`;
+  hd += `<path d="M${x - 28 * s},${ey + 50 * s} Q${x},${ey + 40 * s} ${x + 28 * s},${ey + 50 * s}" stroke="${shade(hairC, 0.1)}" stroke-width="${11 * s}" fill="none" stroke-linecap="round"/>`;
+  if (o.helmet) {
+    hd += `<path d="M${x - hr * 1.18},${headY - 8 * s} Q${x - hr * 1.2},${headY - hr * 1.35} ${x},${headY - hr * 1.38} Q${x + hr * 1.2},${headY - hr * 1.35} ${x + hr * 1.18},${headY - 8 * s} L${x + hr * 1.05},${headY + 10 * s} Q${x},${headY - hr * 0.6} ${x - hr * 1.05},${headY + 10 * s} Z" fill="${V(o.helmet, 0.25, 0.3)}"/>`;
+    hd += `<rect x="${x - 22 * s}" y="${headY - hr * 1.15}" width="${44 * s}" height="${26 * s}" rx="${5 * s}" fill="#2a2a28"/>`;
+    hd += `<path d="M${x - hr * 0.95},${headY + 15 * s} L${x - hr * 0.7},${headY + hr * 0.9}" stroke="#2a2a28" stroke-width="${6 * s}"/><path d="M${x + hr * 0.95},${headY + 15 * s} L${x + hr * 0.7},${headY + hr * 0.9}" stroke="#2a2a28" stroke-width="${6 * s}"/>`;
+  }
+  const rot = o.lean ? ` transform="rotate(${o.lean} ${x} ${y})"` : '';
+  return `<g filter="url(#soft)"${rot}>${b}${hd}</g>`;
+}
+
+const out = [];
+const mtn = (pts, c, op = 1) => `<path d="M${pts}" fill="${c}" opacity="${op}"/>`;
+if (SHOT === 'base') {
+  // небо рассвета
+  defs.push(`<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f5f7a"/><stop offset="0.45" stop-color="#c39a80"/><stop offset="0.62" stop-color="#f6c48c"/><stop offset="0.7" stop-color="#ffdcaa"/></linearGradient>`);
+  out.push(`<rect width="1080" height="1250" fill="url(#sky)"/>`);
+  out.push(glow(780, 900, 520, '#fff0c8', 0.95), `<circle cx="780" cy="900" r="70" fill="#fff6dc"/>`);
+  let cl = '';
+  for (let i = 0; i < 14; i++) cl += `<ellipse cx="${rnd() * 1080}" cy="${150 + rnd() * 600}" rx="${150 + rnd() * 200}" ry="${16 + rnd() * 26}" fill="#e4a88a" opacity="0.45"/>`;
+  out.push(`<g filter="url(#blur8)">${cl}</g>`);
+  // горы в дымке
+  out.push(mtn('0,1000 L120,860 L260,930 L420,780 L560,900 L700,820 L860,940 L1000,850 L1080,900 L1080,1100 L0,1100 Z', '#c7977c', 0.85));
+  out.push(mtn('0,1060 L180,960 L340,1020 L520,930 L680,1010 L880,950 L1080,1020 L1080,1150 L0,1150 Z', '#a87a62', 0.95));
+  // вертолёт на фоне солнца
+  out.push(`<g fill="#2c2a26" transform="translate(700 760) rotate(-6)"><ellipse cx="0" cy="0" rx="70" ry="30"/><rect x="-170" y="-12" width="130" height="14" rx="6"/><rect x="-175" y="-40" width="12" height="40"/><rect x="-150" y="-36" width="300" height="5" rx="2" opacity="0.6"/><rect x="-30" y="26" width="80" height="5"/></g>`);
+  // HESCO
+  let hs = '';
+  for (let i = 0; i < 10; i++) hs += `<rect x="${i * 110 - 10}" y="1020" width="104" height="104" rx="6" fill="${V('#b39670', 0.15, 0.25)}"/><path d="M${i * 110 + 10},1030 v90 M${i * 110 + 40},1030 v90 M${i * 110 + 70},1030 v90" stroke="#8a7354" stroke-width="3" opacity="0.6"/>`;
+  out.push(hs);
+  // земля
+  out.push(`<path d="M0,1120 L1080,1120 L1080,1920 L0,1920 Z" fill="${V('#c8a272', 0.1, 0.35)}"/>`);
+  out.push(`<g fill="#a88458" opacity="0.5"><ellipse cx="220" cy="1500" rx="200" ry="14"/><ellipse cx="840" cy="1700" rx="230" ry="16"/></g>`);
+  // бронемашина слева
+  out.push(`<g filter="url(#soft)" transform="translate(-150 -40) scale(0.85)"><rect x="-60" y="900" width="470" height="260" rx="30" fill="${V('#a08a66', 0.18, 0.3)}"/><rect x="-40" y="800" width="330" height="140" rx="26" fill="${V('#a08a66', 0.25, 0.25)}"/><rect x="0" y="830" width="240" height="60" rx="10" fill="${V('#33424e', 0.3, 0.2)}"/><rect x="110" y="760" width="80" height="44" rx="10" fill="${V('#8c7858')}"/><rect x="180" y="772" width="140" height="14" rx="6" fill="#222"/><circle cx="60" cy="1170" r="78" fill="#1d1b19"/><circle cx="60" cy="1170" r="34" fill="#4a4540"/><circle cx="320" cy="1170" r="78" fill="#1d1b19"/><circle cx="320" cy="1170" r="34" fill="#4a4540"/></g>`);
+  // прожектор
+  out.push(`<rect x="930" y="640" width="12" height="440" fill="#3a3834"/><rect x="895" y="620" width="82" height="34" rx="6" fill="#3a3834"/>${glow(936, 660, 90, '#fff2cc', 0.6)}`);
+  out.push(glow(540, 1650, 520, '#ffcf90', 0.25));
+  out.push(`<ellipse cx="560" cy="1720" rx="420" ry="34" fill="#000" opacity="0.15"/>`);
+  out.push(soldier(330, 1730, 1.0, { shirt: '#8a7a5e', pants: '#7a6b52', vest: '#6b6448', helmet: '#7a6e55', skin: '#e2ae8a', hair: '#3a2a1c', iris: '#5a4430', frown: 0.15, arms: 'rifle', look: 1 }));
+  out.push(soldier(770, 1700, 0.97, { shirt: '#7c6a55', pants: '#5a4d3e', vest: '#4f4a3c', scarf: '#8f8170', skin: '#c48b62', hair: '#17110d', iris: '#2a1a10', frown: 0.4, squint: true, look: -1 }));
+} else {
+  // ночное небо
+  defs.push(`<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#04060d"/><stop offset="0.55" stop-color="#121c34"/><stop offset="0.8" stop-color="#2a3654"/></linearGradient>`);
+  out.push(`<rect width="1080" height="1300" fill="url(#sky)"/>`);
+  let st = '';
+  for (let i = 0; i < 220; i++) st += `<circle cx="${rnd() * 1080}" cy="${rnd() * 800}" r="${rnd() < 0.1 ? 2.6 : 1.3}" fill="#fff" opacity="${0.3 + rnd() * 0.7}"/>`;
+  out.push(st);
+  out.push(glow(270, 330, 300, '#c8d4ff', 0.5), `<circle cx="270" cy="330" r="62" fill="#f2f0e6"/><circle cx="250" cy="315" r="12" fill="#dcd8cc"/><circle cx="292" cy="350" r="8" fill="#dcd8cc"/>`);
+  // горы
+  out.push(mtn('0,900 L160,640 L300,760 L470,560 L640,780 L820,600 L1000,760 L1080,700 L1080,1100 L0,1100 Z', '#232b42', 1));
+  out.push(`<path d="M470,560 L520,620 L490,640 L455,600 Z M820,600 L870,660 L835,670 L800,640 Z" fill="#8a96b8" opacity="0.6"/>`);
+  out.push(`<rect y="860" width="1080" height="200" fill="#2a3654" opacity="0.45" filter="url(#blur20)"/>`);
+  // гребень с огнями преследователей
+  out.push(mtn('0,1060 L200,990 L420,1010 L640,960 L860,1000 L1080,970 L1080,1200 L0,1200 Z', '#161b2a', 1));
+  [[160, 995], [230, 990], [300, 998], [520, 985], [600, 972]].forEach(([x, y]) => out.push(glow(x, y - 30, 60, '#ffa040', 0.9), `<circle cx="${x}" cy="${y - 34}" r="6" fill="#ffd28a"/><rect x="${x + 4}" y="${y - 30}" width="12" height="30" rx="5" fill="#0b0d14"/>`));
+  // склон-тропа к зрителю
+  out.push(`<path d="M0,1180 Q540,1120 1080,1170 L1080,1920 L0,1920 Z" fill="${V('#4a4c58', 0.1, 0.45)}"/>`);
+  out.push(`<path d="M380,1180 Q520,1400 300,1920 L800,1920 Q620,1420 640,1180 Z" fill="#5a5c68" opacity="0.6"/>`);
+  out.push(`<g fill="${V('#5d5b66', 0.2, 0.35)}"><path d="M40,1500 Q90,1400 200,1420 Q260,1460 230,1530 Z"/><path d="M860,1560 Q930,1460 1040,1480 Q1090,1540 1060,1600 Z"/><path d="M120,1800 Q160,1740 240,1760 Q270,1800 250,1840 Z"/></g>`);
+  // тележка за Ахмедом
+  out.push(`<g filter="url(#soft)">
+    <rect x="320" y="1240" width="440" height="200" rx="10" fill="${V('#7a5236', 0.2, 0.3)}"/>
+    <path d="M330,1270 h420 M330,1320 h420 M330,1370 h420" stroke="#4a3020" stroke-width="5"/>
+    <rect x="360" y="1200" width="330" height="84" rx="40" fill="${V('#7a6b52', 0.2, 0.25)}"/>
+    <rect x="430" y="1196" width="200" height="60" rx="26" fill="${V('#5a5040', 0.25, 0.2)}"/>
+    <ellipse cx="680" cy="1236" rx="30" ry="22" fill="#3a2a1c"/>
+    <ellipse cx="350" cy="1205" rx="62" ry="58" fill="#3a2a1c"/>
+    <ellipse cx="352" cy="1210" rx="54" ry="54" fill="${R('#e2ae8a', 0.15, 0.2)}"/>
+    <path d="M300,1215 Q300,1272 352,1272 Q404,1272 404,1215 Q380,1245 352,1243 Q324,1245 300,1215 Z" fill="#3a2a1c"/>
+    <path d="M322,1202 q10,7 20,0 M362,1202 q10,7 20,0" stroke="#6a3a28" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M302,1180 Q352,1150 402,1180" stroke="#f0ece2" stroke-width="16" fill="none"/>
+    <circle cx="380" cy="1176" r="7" fill="#a3302a" opacity="0.8"/>
+    <circle cx="300" cy="1440" r="98" fill="none" stroke="#6a4630" stroke-width="18"/><circle cx="300" cy="1440" r="16" fill="#6a4630"/><path d="M300,1342 V1538 M202,1440 H398 M231,1371 L369,1509 M369,1371 L231,1509" stroke="#6a4630" stroke-width="8"/>
+    <circle cx="780" cy="1440" r="98" fill="none" stroke="#6a4630" stroke-width="18"/><circle cx="780" cy="1440" r="16" fill="#6a4630"/><path d="M780,1342 V1538 M682,1440 H878 M711,1371 L849,1509 M849,1371 L711,1509" stroke="#6a4630" stroke-width="8"/>
+    <path d="M380,1430 L420,1640 M700,1430 L660,1640" stroke="#7a5236" stroke-width="18" stroke-linecap="round"/>
+  </g>`);
+  out.push(glow(270, 330, 1, '#000', 0));
+  // Ахмед тянет на себя, наклонившись вперёд
+  out.push(`<ellipse cx="540" cy="1855" rx="230" ry="26" fill="#000" opacity="0.35"/>`);
+  out.push(soldier(540, 1850, 0.92, { shirt: '#6c5e4c', pants: '#4a4034', scarf: '#7f7364', skin: '#c48b62', hair: '#17110d', frown: 0.5, squint: true, arms: 'pull' }));
+  // лунный контровой свет и холодный тон
+  out.push(`<rect width="1080" height="1920" fill="#2a3a70" opacity="0.18" style="mix-blend-mode:multiply"/>`);
+  out.push(glow(540, 1500, 600, '#ffb070', 0.08));
+}
+// виньетка
+defs.push(`<radialGradient id="vig" cx="0.5" cy="0.5" r="0.75"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.55"/></radialGradient>`);
+out.push(`<rect width="1080" height="1920" fill="url(#vig)"/>`);
+document.getElementById('root').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 1080 1920"><defs>${defs.join('')}</defs>${out.join('\n')}</svg>`;
+window.__done = true;
+</script></body></html>
