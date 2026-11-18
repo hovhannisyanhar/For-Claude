@@ -1,7 +1,8 @@
 // «Жизнь прекрасна» (1997) — 9 сцен в 2D-векторе. Имя плана = set сцены в videos/life-is-beautiful/script.json.
-import { run, person, V, R, grad, glow, silFilter, mtn, stars, moon, smoke, dust, rnd, shade, lerp, ease, clamp, wave } from './core.js';
+import { run, person, setProportions, V, R, grad, glow, silFilter, mtn, stars, moon, smoke, dust, rnd, shade, lerp, ease, clamp, wave } from './core.js';
 
-// герои
+// герои: пропорции между «Переводчиком» (большие головы) и реалистичными
+setProportions({ head: 0.64, legs: 1.35, torso: 1.15, slim: 0.84, hand: 0.72 });
 const GUIDO = { shirt: '#8a6a4a', pants: '#5e4a38', scarf: '#efe6d4', skin: '#e8b998', hair: '#2a1c14', iris: '#4a2e1a', beard: false, frown: -0.2, fedora: '#7a5232' };
 const GUIDO_CAMP = { shirt: '#8a93a3', pants: '#7a8292', stripes: '#3a4256', skin: '#dcae8c', hair: '#2a1c14', iris: '#4a2e1a', beard: false, frown: 0, cap: '#5d6576' };
 const DORA = { robe: '#2a3654', shirt: '#2a3654', skin: '#f0c4a4', hair: '#8a4526', iris: '#3a2a1a', beard: false, longHair: true, frown: 0 };
