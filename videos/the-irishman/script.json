@@ -1,7 +1,7 @@
 {
   "title": "Ирландец (2019): о чём фильм",
   "style": "cinema",
-  "accent": "#e3b46a",
+  "accent": "#c8102e",
   "tts": {
     "voiceId": "1kb4Md8n0kMNktygYhDF",
     "model": "eleven_multilingual_v2",
@@ -255,42 +255,45 @@
   ],
   "musicSeparate": true,
   "poster": {
-    "src": "assets/train-dreams/poster.jpg",
-    "titleRu": "Сны поездов",
-    "titleEn": "Train Dreams",
-    "year": "2025"
+    "src": "assets/the-irishman/poster.jpg",
+    "titleRu": "Ирландец",
+    "titleEn": "The Irishman",
+    "year": "2019",
+    "cta": "Подпишись",
+    "seconds": 2.5
   },
   "instaCover": {
-    "top": "Одна жизнь",
-    "main": "Длиной\nв век",
+    "top": "Верность",
+    "main": "до\nгроба",
     "base": [
-      "#08130f",
-      "#0e2b25",
-      "#123630",
-      "#0a1a16"
+      "#0a0c10",
+      "#141a24",
+      "#1c1416",
+      "#0a0c10"
     ],
     "glows": [
       {
-        "x": 230,
-        "y": 1650,
+        "x": 250,
+        "y": 1600,
         "r": 540,
-        "color": "#d08a3a",
-        "opacity": 0.75
-      },
-      {
-        "x": 940,
-        "y": 1250,
-        "r": 420,
-        "color": "#b9925a",
+        "color": "#c8102e",
         "opacity": 0.45
       },
       {
+        "x": 900,
+        "y": 1250,
+        "r": 420,
+        "color": "#3a5a7a",
+        "opacity": 0.4
+      },
+      {
         "x": 700,
-        "y": 230,
+        "y": 260,
         "r": 440,
-        "color": "#1d5a52",
-        "opacity": 0.55
+        "color": "#2a3a5a",
+        "opacity": 0.5
       }
     ]
-  }
+  },
+  "fonts": "futura"
 }
