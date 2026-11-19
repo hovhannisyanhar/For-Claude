@@ -19,6 +19,8 @@ export type CinemaSet =
 	| 'terrace' // терраса: Дики, Мардж, Том
 	// «Жизнь прекрасна»
 	| 'camp' | 'wedding' | 'greenhorse' | 'shop' | 'train' | 'barrack' | 'hide' | 'father' | 'sunrise'
+	// «Ирландец»
+	| 'nursing' | 'truck' | 'boss' | 'meat' | 'phone' | 'blood' | 'rift' | 'daughter' | 'actors' | 'window'
 	| 'wardrobe' // Том в рубашке Дики у зеркала
 	| 'boat' // лодка на закате
 	| 'stairs' // ночная лестница, тень

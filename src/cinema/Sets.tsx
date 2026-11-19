@@ -26,6 +26,7 @@ import {
 import {Figure, chopPose, sitPose, walkPose} from './people';
 import {RIPLEY_CAMERA, RIPLEY_SETS} from './SetsRipley';
 import {LIFE_CAMERA, LIFE_SETS} from './SetsLife';
+import {IRISH_CAMERA, IRISH_SETS} from './SetsIrish';
 import type {CinemaSet} from './types';
 
 type SetProps = {frame: number; frames: number};
@@ -820,6 +821,7 @@ const SETS: Record<CinemaSet, React.FC<SetProps>> = {
 	outro: Lake,
 	...RIPLEY_SETS,
 	...LIFE_SETS,
+	...IRISH_SETS,
 };
 
 /** Кадрирование: камера ближе к действию (масштаб, точка фокуса) */
@@ -834,6 +836,7 @@ const CAMERA: Partial<Record<CinemaSet, [number, number, number]>> = {
 	dawn: [1.1, 640, 1300],
 	...RIPLEY_CAMERA,
 	...LIFE_CAMERA,
+	...IRISH_CAMERA,
 };
 
 export const SetView: React.FC<{set: CinemaSet; frame: number; frames: number}> = ({set, frame, frames}) => {

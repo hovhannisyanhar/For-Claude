@@ -90,7 +90,7 @@ if (!preview) {
 	// Лицензии изображений (CC BY / CC BY-SA требуют указать автора)
 	const creditsFile = path.join(ROOT, 'public', 'assets', slug, 'credits.json');
 	if (fs.existsSync(creditsFile)) {
-		const used = new Set(script.scenes.flatMap((s) => (s.clips ?? []).map((c) => path.basename(c.src))));
+		const used = new Set([...script.scenes.flatMap((s) => (s.clips ?? []).map((c) => path.basename(c.src))), ...(script.credits ?? [])]);
 		const credits = readJson(creditsFile);
 		const lines = Object.entries(credits)
 			.filter(([f]) => [...used].some((u) => u.startsWith(f.replace(/\.[^.]+$/, ''))))
