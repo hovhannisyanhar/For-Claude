@@ -1,0 +1,174 @@
+{
+  "title": "Паразиты (2019): о чём фильм",
+  "style": "cinema",
+  "accent": "#c9b26a",
+  "art": "vector",
+  "tts": {
+    "voiceId": "6A9D8WSMm4rFsg2DWFeE",
+    "model": "eleven_v4",
+    "speed": 1.0,
+    "settings": {
+      "stability": 0.35,
+      "similarity_boost": 0.8,
+      "style": 0.5,
+      "use_speaker_boost": true
+    },
+    "tempo": 1.2
+  },
+  "caption": "Бедная семья по одному устраивается в дом богачей, и хозяева не знают, что они родня 🏠 Название фильма в конце видео 🎬 Смотрели? 👇",
+  "hashtags": [
+    "#кино",
+    "#чтопосмотреть",
+    "#фильмы",
+    "#оскар",
+    "#триллер"
+  ],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Parasite_(2019_film)",
+    "https://www.screendaily.com/parasite-from-palme-dor-to-best-picture-oscar/5147016.article",
+    "https://thefederal.com/entertainment/parasite-and-its-director-bong-joon-ho-makes-history-with-four-oscars/",
+    "https://www.hollywoodreporter.com/features/making-parasite-how-bong-joon-hos-real-life-inspired-a-plot-twisty-tale-rich-poor-1252015",
+    "https://www.npr.org/2019/11/05/776388423/the-hit-movie-parasite-puts-basement-structures-in-structural-inequality",
+    "https://nofilmschool.com/parasite-making-house-set",
+    "https://www.slashfilm.com/862250/bong-joon-ho-spared-no-expense-putting-together-the-parasite-house"
+  ],
+  "poster": {
+    "src": "assets/parasite/poster.jpg",
+    "titleRu": "Паразиты",
+    "titleEn": "Parasite",
+    "year": "2019",
+    "cta": "Подпишись",
+    "seconds": 2.5
+  },
+  "instaCover": {
+    "top": "Все свои",
+    "main": "В чужом\nдоме",
+    "base": [
+      "#0b100d",
+      "#16201a",
+      "#24301f",
+      "#0b100d"
+    ],
+    "glows": [
+      {
+        "x": 250,
+        "y": 1600,
+        "r": 540,
+        "color": "#5f8a4a",
+        "opacity": 0.55
+      },
+      {
+        "x": 900,
+        "y": 1250,
+        "r": 420,
+        "color": "#c9b26a",
+        "opacity": 0.35
+      },
+      {
+        "x": 700,
+        "y": 260,
+        "r": 440,
+        "color": "#3a5a5a",
+        "opacity": 0.5
+      }
+    ]
+  },
+  "fonts": "futura",
+  "scenes": [
+    {
+      "set": "gate",
+      "voice": "Бедная семья по одному устраивается в дом богачей, и никто не догадывается, что они родственники.",
+      "emphasis": [
+        "богачей,",
+        "родственники."
+      ],
+      "pause": 6
+    },
+    {
+      "set": "semi-basement",
+      "voice": "Кимы живут в тесном полуподвале без денег, и вдруг сыну предлагают давать уроки девочке из богатой семьи.",
+      "emphasis": [
+        "полуподвале",
+        "уроки"
+      ],
+      "pause": 6,
+      "ttsText": "Ки́мы живут в тесном полуподвале без денег, и вдруг сыну предлагают давать уроки девочке из богатой семьи."
+    },
+    {
+      "set": "diploma",
+      "voice": "Диплома у него нет, но сестра рисует его за вечер, и парня берут.",
+      "emphasis": [
+        "Диплома",
+        "рисует"
+      ],
+      "pause": 6
+    },
+    {
+      "set": "glass-house",
+      "voice": "В доме он видит, как легко хозяева верят людям, и решает привести за собой всю семью.",
+      "emphasis": [
+        "верят",
+        "всю"
+      ],
+      "pause": 6
+    },
+    {
+      "set": "infiltrate",
+      "voice": "Скоро сестра учит младшего сына рисованию, отец возит хозяина, а мать хозяйничает на кухне.",
+      "emphasis": [
+        "рисованию,",
+        "возит",
+        "кухне."
+      ],
+      "pause": 6
+    },
+    {
+      "set": "lawn",
+      "voice": "Впервые в жизни они живут как люди, и кажется, что так будет всегда.",
+      "emphasis": [
+        "Впервые",
+        "люди,"
+      ],
+      "pause": 6
+    },
+    {
+      "set": "stairs",
+      "voice": "Но у этого дома есть секрет, о котором не знают даже хозяева.",
+      "emphasis": [
+        "секрет,",
+        "хозяева."
+      ],
+      "pause": 6,
+      "ttsText": "[serious] Но у этого дома есть секрет, о котором не знают даже хозяева."
+    },
+    {
+      "set": "director",
+      "voice": "Режиссёр Пон Джун Хо знает эту историю изнутри: в молодости он сам был репетитором в богатой семье.",
+      "emphasis": [
+        "Пон",
+        "репетитором"
+      ],
+      "pause": 6
+    },
+    {
+      "set": "oscars",
+      "voice": "Фильм взял четыре «Оскара», включая главный, и стал первым фильмом не на английском, которому это удалось.",
+      "emphasis": [
+        "четыре",
+        "главный,"
+      ],
+      "pause": 6,
+      "ttsText": "Фильм взял четыре «О́скара», включая главный, и стал первым фильмом не на английском, которому это удалось."
+    },
+    {
+      "set": "rain",
+      "voice": "Сначала смешно, потом страшно, а в конце очень больно. Ставь лайк и подписывайся, впереди ещё кино.",
+      "emphasis": [
+        "смешно,",
+        "страшно,",
+        "больно."
+      ],
+      "pause": 6
+    }
+  ]
+}
