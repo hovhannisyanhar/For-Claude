@@ -3,27 +3,23 @@
   "style": "cinema",
   "accent": "#c8102e",
   "tts": {
-    "voiceId": "1kb4Md8n0kMNktygYhDF",
-    "model": "eleven_multilingual_v2",
+    "voiceId": "6A9D8WSMm4rFsg2DWFeE",
+    "model": "eleven_v4",
     "speed": 1.0,
     "settings": {
-      "stability": 0.55,
+      "stability": 0.35,
       "similarity_boost": 0.8,
-      "style": 0.3,
+      "style": 0.5,
       "use_speaker_boost": true
-    }
+    },
+    "tempo": 1.2
   },
-  "musicVolume": 0.3,
-  "coverFrame": 185,
-  "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
+  "caption": "Тихий водитель грузовика становится человеком, которому мафия доверяет самое грязное 🎬 Название фильма в конце видео. Смотрели? 👇",
   "hashtags": [
     "#кино",
     "#чтопосмотреть",
     "#фильмы",
-    "#netflix",
-    "#сныпоездов",
-    "#traindreams",
-    "#джоэлэдгертон",
+    "#мафия",
     "#оскар"
   ],
   "sources": [
@@ -38,219 +34,105 @@
   ],
   "scenes": [
     {
-      "set": "station",
-      "voice": "Его привезли на поезде, когда ему было семь лет. Ни семьи, ни дома. Только железная дорога и бесконечный лес.",
+      "set": "nursing",
+      "voice": "Старик в доме престарелых рассказывает, как убивал. Спокойно. Будто про погоду.",
       "emphasis": [
-        "семь",
-        "бесконечный",
-        "лес."
+        "убивал.",
+        "погоду."
       ],
-      "sfx": [
-        {
-          "prompt": "old steam locomotive slowly arriving at a small wooden country station at dawn, chuffing slowing down, brakes squealing, long steam hiss",
-          "at": 0,
-          "duration": 9,
-          "volume": 0.22
-        },
-        {
-          "prompt": "cold early morning forest ambience, light wind, distant crows",
-          "at": 0,
-          "duration": 10,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6,
+      "ttsText": "[serious] Старик в доме престарелых рассказывает, как убивал. Спокойно. Будто про погоду."
     },
     {
-      "set": "valley",
-      "voice": "Так начинается «Сны поездов». История одной жизни длиной почти в целый век.",
+      "set": "truck",
+      "voice": "Пятидесятые. У водителя Фрэнка глохнет грузовик. Незнакомец в шляпе молча чинит ему мотор.",
       "emphasis": [
-        "«Сны",
-        "поездов».",
-        "век."
+        "грузовик.",
+        "Незнакомец"
       ],
-      "sfx": [
-        {
-          "prompt": "distant steam train whistle echoing across a wide night valley, then soft rumble of a far away train",
-          "at": 0.3,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "quiet night in the mountains, crickets, soft wind, an owl far away",
-          "at": 0,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 36
+      "pause": 6
     },
     {
-      "set": "logging",
-      "voice": "Роберт вырастает молчаливым лесорубом. Он валит сосны выше любого дома и строит мосты, по которым в эту глушь приходит новое время.",
+      "set": "boss",
+      "voice": "Фрэнк ещё не знает: это Рассел Буфалино, тихий босс мафии. А случайных встреч у него не бывает.",
       "emphasis": [
-        "лесорубом.",
-        "сосны",
-        "новое",
-        "время."
+        "Буфалино,",
+        "мафии."
       ],
-      "sfx": [
-        {
-          "prompt": "deep old growth forest ambience, birds singing, light breeze in tall pines",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "single heavy axe chop into a thick tree trunk, crisp wooden thunk",
-          "at": 0.9,
-          "duration": 1,
-          "volume": 0.22,
-          "repeat": {
-            "every": 1.4,
-            "count": 5
-          }
-        },
-        {
-          "prompt": "giant tree creaking and cracking then crashing down to the forest floor far away",
-          "at": 7,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "bridge",
-      "voice": "На одной из строек он видит то, что потом будет преследовать его годами.",
+      "set": "meat",
+      "voice": "Скоро Фрэнк ворует мясо из своего же кузова. Попадается. Но не сдаёт никого, и это запоминают.",
       "emphasis": [
-        "видит",
-        "годами."
+        "мясо",
+        "никого,"
       ],
-      "sfx": [
-        {
-          "prompt": "railroad bridge construction at dusk, distant hammers striking wooden beams and iron spikes, gusty wind",
-          "at": 0,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "crows cawing ominously, low wind gust, tense atmosphere",
-          "at": 1.5,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "cabin",
-      "voice": "А потом появляется Глэдис. Они ставят маленький дом у реки, и впервые у Роберта есть место, куда хочется возвращаться.",
+      "set": "street",
+      "voice": "Первое дело. Потом второе. Фрэнк не задаёт вопросов, и о нём начинают говорить.",
       "emphasis": [
-        "Глэдис.",
-        "дом",
-        "возвращаться."
+        "дело.",
+        "вопросов,"
       ],
-      "sfx": [
-        {
-          "prompt": "gentle river flowing past a cabin on a warm summer evening, crickets, soft frogs",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "crackling fireplace heard from a cabin porch, soft and cozy",
-          "at": 1,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "seasons",
-      "voice": "Но работа снова и снова уводит его в лес, на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить.",
+      "set": "phone",
+      "voice": "Однажды звонит сам Джимми Хоффа, король профсоюзов. Первая фраза: «Я слышал, ты красишь дома». Краска — это кровь на стенах.",
       "emphasis": [
-        "лес,",
-        "месяцы.",
-        "быстрее,"
+        "Хоффа,",
+        "дома».",
+        "кровь"
       ],
-      "sfx": [
-        {
-          "prompt": "footsteps crunching on autumn leaves then on snow, wind through bare trees, wind slowly turning into winter blizzard",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "campfire",
-      "voice": "Фильм снимали почти без ламп. Солнце, костры, свечи. Поэтому каждый кадр похож на старую фотографию, которая вдруг ожила.",
+      "set": "icecream",
+      "voice": "Хоффа не пьёт, обожает мороженое и не прощает опозданий. Он зовёт Фрэнка другом. Мафия — своим.",
       "emphasis": [
-        "Солнце,",
-        "костры,",
-        "свечи.",
-        "ожила."
+        "мороженое",
+        "другом.",
+        "своим."
       ],
-      "sfx": [
-        {
-          "prompt": "campfire crackling and popping at night in a pine forest, gentle",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "old film projector whirring softly",
-          "at": 6,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "lake",
-      "voice": "Здесь нет погонь и громких сцен. Есть тишина, лес и гудок поезда вдалеке. И от этого почему-то невозможно оторваться.",
+      "set": "rift",
+      "voice": "Но эти двое не уживутся. И Фрэнку придётся выбрать.",
       "emphasis": [
-        "тишина,",
-        "гудок",
-        "оторваться."
+        "выбрать."
       ],
-      "sfx": [
-        {
-          "prompt": "still lake at night in a misty forest, very quiet water lapping, loon call far away",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "lonely steam train whistle far away across a lake at night, long echo",
-          "at": 3.4,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6,
+      "ttsText": "[dramatic] Но эти двое не уживутся. И Фрэнку придётся выбрать."
     },
     {
-      "set": "dawn",
-      "voice": "Четыре номинации на «Оскар». Кино, после которого хочется выключить свет и просто посидеть в тишине.",
+      "set": "daughter",
+      "voice": "А его дочь всё видит. Молчит. И смотрит на отца так, что страшнее любого выстрела.",
       "emphasis": [
-        "«Оскар».",
-        "тишине."
+        "дочь",
+        "выстрела."
       ],
-      "sfx": [
-        {
-          "prompt": "soft dawn in the mountains, first birds waking up, gentle breeze",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
+      "pause": 6
+    },
+    {
+      "set": "actors",
+      "voice": "Скорсезе собрал Де Ниро, Пачино и Пеши. Десять номинаций на «Оскар».",
+      "emphasis": [
+        "«Оскар»."
       ],
-      "finalTitle": "Сны поездов",
-      "pause": 28
+      "pause": 6
+    },
+    {
+      "set": "window",
+      "voice": "Здесь за верность платят всю жизнь. Подписывайся, завтра новое кино.",
+      "emphasis": [
+        "верность",
+        "Подписывайся,"
+      ],
+      "pause": 6
     }
   ],
   "musicSeparate": true,
@@ -295,5 +177,6 @@
       }
     ]
   },
-  "fonts": "futura"
+  "fonts": "futura",
+  "art": "vector"
 }
