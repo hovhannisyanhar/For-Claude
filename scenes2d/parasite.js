@@ -236,6 +236,8 @@ const shots = {
       els: [
         `<rect width="1080" height="1920" fill="${V('#1e2a24', 0.1, 0.3)}"/>`,
         glow(540, 1300, 800, '#c9b26a', 0.15),
+        // три врезки подняты и чуть уменьшены: от y≈700 до ≈1530 (ниже — интерфейс соцсети и каше)
+        `<g transform="translate(540 700) scale(0.85) translate(-540 -820)">`,
         panel(820, 340, a,
           `<rect x="40" y="820" width="1000" height="340" fill="${grad([[0, '#f2ece0'], [1, '#d8cfbe']])}"/>${glow(900, 860, 300, '#fff6d8', 0.6)}` +
           easel(760, 1150, 0.6, clamp(t / 2.5)) +
@@ -251,6 +253,7 @@ const shots = {
           `<rect x="40" y="1500" width="1000" height="300" fill="${grad([[0, '#e4e8e6'], [1, '#c4c8c4']])}"/>${[0, 1, 2, 3, 4].map((i) => `<rect x="${80 + i * 200}" y="1520" width="160" height="70" rx="6" fill="#d2d6d2" stroke="#b4b8b4" stroke-width="3"/>`).join('')}` +
           stove(720, 1800, 0.6, t) +
           person(420, 1800, 0.4, { ...MOTHER, arms: 'hold', look: 1, frown: -0.1, blink: blink(t, 2.3) })),
+        `</g>`,
         topShade(820, 0.55),
       ],
     };
