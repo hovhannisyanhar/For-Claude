@@ -137,7 +137,7 @@
   },
   "instaCover": {
     "top": "Верность",
-    "main": "до\nгроба",
+    "main": "до гроба",
     "base": [
       "#0a0c10",
       "#141a24",
@@ -169,10 +169,5 @@
     ]
   },
   "fonts": "futura",
-  "art": "vector",
-  "credits": [
-    "deniro.jpg",
-    "pacino.jpg",
-    "pesci.jpg"
-  ]
+  "art": "vector"
 }

@@ -116,9 +116,9 @@ await Promise.all(Object.entries(STICKER_SRC).map(async ([k, f]) => {
 }));
 // at — секунда появления от начала плана (AUDIO_DELAY 4 кадра + время слова)
 const STICKERS = [
-  { k: 'deniro', x: 300, y: 1060, w: 400, h: 520, at: 33 / 30, tilt: -6 },
-  { k: 'pacino', x: 700, y: 1210, w: 560, h: 398, at: 50 / 30, tilt: 4 },
-  { k: 'pesci', x: 410, y: 1420, w: 430, h: 350, at: 69 / 30, tilt: -3 },
+  { k: 'deniro', x: 300, y: 1000, w: 520, h: 560, at: 33 / 30, tilt: -5 },
+  { k: 'pacino', x: 770, y: 1110, w: 480, h: 540, at: 50 / 30, tilt: 4 },
+  { k: 'pesci', x: 520, y: 1430, w: 400, h: 460, at: 69 / 30, tilt: -2 },
 ];
 const STICKER_FILTER = `<filter id="stk" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="10" result="dil"/><feFlood flood-color="#ffffff"/><feComposite in2="dil" operator="in" result="outline"/><feGaussianBlur in="dil" stdDeviation="12" result="blur"/><feOffset in="blur" dx="8" dy="16" result="sh"/><feFlood flood-color="#000" flood-opacity="0.55"/><feComposite in2="sh" operator="in" result="shadow"/><feMerge><feMergeNode in="shadow"/><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
 function sticker(s, t, i) {
