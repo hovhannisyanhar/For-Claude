@@ -119,12 +119,28 @@ function person(o) {
   if (o.mon) [-1, 1].forEach(s => add(new THREE.CircleGeometry(0.022, 24), mat(o.mon, { metal: 0.6, rough: 0.35 }), [s * 0.075, shoulderY - 0.08, 0.168], { parent: g, cast: false }));
   // руки
   const hands = o.hands || 'lap';
+  // позы рук: lap, down, spear + (для современных героев) toast, throw, point, hug, desk, collar, hold
+  const sY = shoulderY, R = {
+    toast: [0.13, sY + 0.08, 0.2], throw: [0.21, sY + 0.3, 0.1], point: [0.33, sY + 0.06, 0.22], hug: [0.4, sY + 0.02, 0.02],
+  };
+  const handAt = (s) => {
+    if (s === 1 && R[hands]) return R[hands];
+    if (hands === 'desk') return [s * 0.1, sY - 0.2, 0.26];
+    if (hands === 'collar') return [s * 0.045, sY + 0.02, 0.17];
+    if (hands === 'hold') return [s * 0.06, sY - 0.17, 0.2];
+    if (hands === 'lap' || (R[hands] && s === -1)) return [s * 0.08, sY - 0.24, 0.17];
+    if (hands === 'spear' && s === 1) return [0.17, sY - 0.16, 0.12];
+    return [s * 0.19, sY - 0.3, 0.03];
+  };
+  g.userData.hands = [];
   [-1, 1].forEach(s => {
     const sh = [s * 0.15, shoulderY - 0.03, 0];
-    const hand = hands === 'lap' ? [s * 0.08, shoulderY - 0.24, 0.17] : hands === 'spear' && s === 1 ? [0.17, shoulderY - 0.16, 0.12] : [s * 0.19, shoulderY - 0.3, 0.03];
+    const hand = handAt(s);
     limb(sh, hand, 0.06, robe, g);
     add(sphere(0.04), skin, hand, { parent: g, scale: [1, 0.85, 1.1] });
+    g.userData.hands.push(hand);
   });
+  g.userData.shoulderY = shoulderY; g.userData.skin = skin;
   // голова
   const head = new THREE.Group(); head.position.set(0, headY, 0); g.add(head);
   add(sphere(HR, 48, 32), skin, [0, 0, 0], { parent: head, scale: [1, 1.04, 0.96] });

@@ -37,8 +37,8 @@ const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 const SIZE = {script: 160, serif: 92, caps: 40};
 const STOP = new Set(['и', 'в', 'на', 'по', 'а', 'но', 'ни', 'не', 'он', 'его', 'ему', 'это', 'так', 'там', 'тут', 'чем', 'что', 'как', 'же', 'из', 'за', 'до', 'у', 'к', 'с', 'о', 'от', 'при', 'эту', 'то', 'их', 'есть', 'было', 'одной', 'почти', 'только', 'которым', 'которая', 'которую', 'после', 'просто', 'потом', 'здесь', 'этого', 'каждый', 'вокруг']);
 
-export const norm = (w: string) => w.toLowerCase().replace(/[«»"“”.,!?;:—…]/g, '');
-const clean = (w: string) => w.replace(/[.,;:!?…]+$/g, '').replace(/^—$/, '');
+export const norm = (w: string) => w.toLowerCase().replace(/\u0301/g, '').replace(/[«»"“”.,!?;:—…]/g, '');
+const clean = (w: string) => w.replace(/\u0301/g, '').replace(/[.,;:!?…]+$/g, '').replace(/^—$/, '');
 
 type Kind = 'script' | 'serif' | 'caps';
 type Phrase = {words: Word[]; start: number; end: number; breaks?: number[]};
