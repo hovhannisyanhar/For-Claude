@@ -272,17 +272,19 @@ function date(T) {
   // огоньки боке за спиной
   const bulbs = []; for (let i = 0; i < 14; i++) bulbs.push(add(sphere(0.02, 12, 8), mat('#ffd890', { emissive: '#ffb860', ei: 4 }), [-1.4 + i * 0.22, 1.55 + Math.sin(i * 1.3) * 0.06, -1.5], { cast: false }));
   const cloth = mat('#f4eee4', { physical: true, rough: 0.8, sheen: 0.6 });
-  add(new THREE.CylinderGeometry(0.3, 0.3, 0.03, 48), cloth, [0, 0.5, -0.35]);
-  add(new THREE.CylinderGeometry(0.31, 0.28, 0.5, 48, 1, true), cloth, [0, 0.25, -0.35]);
-  const carl = hero('carl', { hands: 'desk', frown: 0.45 }); carl.position.set(-0.36, -0.17, -0.35); carl.rotation.y = Math.PI / 2 - 0.2; root.add(carl);
-  const yaya = hero('yaya', { hands: 'desk', smile: true, frown: -0.2 }); yaya.position.set(0.36, -0.15, -0.35); yaya.rotation.y = -Math.PI / 2 + 0.2; root.add(yaya);
-  [carl, yaya].forEach(p => add(box(0.36, 0.5, 0.36, 0.03), mat('#2a1a14', { map: woodTex, rough: 0.6 }), [p.position.x * 1.3, 0.2, -0.35]));
+  add(new THREE.CylinderGeometry(0.3, 0.3, 0.03, 48), cloth, [0, 0.42, -0.35]);
+  add(new THREE.CylinderGeometry(0.31, 0.28, 0.42, 48, 1, true), cloth, [0, 0.21, -0.35]);
+  const carl = hero('carl', { pose: 'seiza', hands: 'desk', frown: 0.45 }); carl.position.set(-0.36, 0.2, -0.35); carl.rotation.y = Math.PI / 2 - 0.2; root.add(carl);
+  const yaya = hero('yaya', { pose: 'seiza', hands: 'desk', smile: true, frown: -0.2 }); yaya.position.set(0.36, 0.2, -0.35); yaya.rotation.y = -Math.PI / 2 + 0.2; root.add(yaya);
+  [carl, yaya].forEach(p => { const s = Math.sign(p.position.x), wm = mat('#5a2a1e', { physical: true, rough: 0.5, sheen: 0.4 }), lg = mat('#2a1a14', { map: woodTex, rough: 0.5 });
+    add(box(0.34, 0.05, 0.34, 0.02), wm, [p.position.x + s * 0.04, 0.2, -0.35]); add(box(0.05, 0.5, 0.34, 0.02), wm, [p.position.x + s * 0.22, 0.45, -0.35]);
+    [[-0.14, -0.14], [0.14, -0.14], [-0.14, 0.14], [0.14, 0.14]].forEach(([dx, dz]) => add(box(0.03, 0.18, 0.03, 0.005), lg, [p.position.x + s * 0.04 + dx, 0.09, -0.35 + dz])); });
   // тарелки, бокалы, свеча, счёт
-  [-1, 1].forEach(s => { add(new THREE.CylinderGeometry(0.1, 0.1, 0.01, 32), mat('#ffffff', { rough: 0.3 }), [s * 0.17, 0.52, -0.35]); glass(root, [s * 0.15, 0.515, -0.5], '#8a1a2a'); });
-  add(new THREE.CylinderGeometry(0.014, 0.016, 0.1, 12), mat('#f6eedc', { rough: 0.5 }), [0, 0.565, -0.55]);
-  const flame = add(sphere(0.014, 12, 8), mat('#ffd080', { emissive: '#ffb040', ei: 6 }), [0, 0.63, -0.55], { cast: false, scale: [1, 1.6, 1] });
-  const candle = shadowed(new THREE.PointLight('#ffb070', 0.8, 2.2, 1.5), 1024); candle.position.set(0, 0.7, -0.5); scene.add(candle);
-  const saucer = new THREE.Group(); saucer.position.set(0, 0.52, -0.2); root.add(saucer);
+  [-1, 1].forEach(s => { add(new THREE.CylinderGeometry(0.1, 0.1, 0.01, 32), mat('#ffffff', { rough: 0.3 }), [s * 0.17, 0.44, -0.35]); glass(root, [s * 0.15, 0.435, -0.5], '#8a1a2a'); });
+  add(new THREE.CylinderGeometry(0.014, 0.016, 0.1, 12), mat('#f6eedc', { rough: 0.5 }), [0, 0.485, -0.55]);
+  const flame = add(sphere(0.014, 12, 8), mat('#ffd080', { emissive: '#ffb040', ei: 6 }), [0, 0.55, -0.55], { cast: false, scale: [1, 1.6, 1] });
+  const candle = shadowed(new THREE.PointLight('#ffb070', 0.8, 2.2, 1.5), 1024); candle.position.set(0, 0.62, -0.5); scene.add(candle);
+  const saucer = new THREE.Group(); saucer.position.set(0, 0.44, -0.2); root.add(saucer);
   add(new THREE.CylinderGeometry(0.07, 0.06, 0.012, 32), mat('#e8e0d0', { rough: 0.3 }), [0, 0, 0], { parent: saucer });
   const bill = canvasTex(128, 256, (g, w, h) => { g.fillStyle = '#fbf8f0'; g.fillRect(0, 0, w, h); g.fillStyle = '#555'; for (let i = 0; i < 8; i++) g.fillRect(12, 20 + i * 22, 50 + (i * 37) % 50, 5); g.fillStyle = '#222'; g.fillRect(12, 210, 104, 9); });
   add(new THREE.PlaneGeometry(0.07, 0.14), mat('#ffffff', { map: bill, rough: 0.8, side: THREE.DoubleSide }), [0, 0.008, 0], { parent: saucer, rot: [-Math.PI / 2, 0, 0.3], cast: false });
@@ -290,7 +292,7 @@ function date(T) {
   const key = shadowed(new THREE.SpotLight('#ffd0a0', 1.6, 4, 0.55, 0.7, 1.3)); key.position.set(0.6, 2.0, 1.2); key.target.position.set(0, 0.5, -0.35); scene.add(key, key.target);
   const rim = new THREE.DirectionalLight('#7a8ad8', 1.0); rim.position.set(0, 1.5, -3); scene.add(rim);
   return {
-    cam: { from: [0.05, 1.05, 2.5], to: [0.03, 1.0, 2.15], lookFrom: [0, 0.95, -0.4], lookTo: [0, 0.8, -0.35], fov: 42 },
+    cam: { from: [0.05, 1.1, 3.1], to: [0.03, 1.05, 2.75], lookFrom: [0, 0.98, -0.4], lookTo: [0, 0.8, -0.35], fov: 42 },
     focus: [0, 0.65, -0.35], aperture: 0.006, bloom: 0.35,
     update(t) {
       flame.scale.y = 1.6 * flick(t); candle.intensity = 0.8 * flick(t);
@@ -539,8 +541,8 @@ function harrelson(T) {
   const y = superyacht(root, { lit: true }); y.position.set(0.3, -0.05, -6.5); y.rotation.y = 0.5;
   hemi('#3a4a7a', '#04060a', 0.5);
   const moon = new THREE.DirectionalLight('#a8c0ff', 1.6); moon.position.set(4, 4, -10); scene.add(moon);
-  const asp = WOODY ? WOODY.image.width / WOODY.image.height : 0.53, h = 1.0;
-  const card = add(new THREE.PlaneGeometry(h * asp, h), new THREE.MeshBasicMaterial({ map: WOODY, transparent: true, toneMapped: false, depthWrite: false, fog: false }), [0.0, 0.92, 0.5], { cast: false, recv: false });
+  const asp = WOODY ? WOODY.image.width / WOODY.image.height : 0.53, h = 0.66;
+  const card = add(new THREE.PlaneGeometry(h * asp, h), new THREE.MeshBasicMaterial({ map: WOODY, transparent: true, toneMapped: false, depthWrite: false, fog: false }), [0.0, 1.06, 0.5], { cast: false, recv: false });
   const at = AD + 0.8; // «Вуди»
   return {
     cam: { from: [0, 0.95, 2.4], to: [0, 0.93, 2.15], lookFrom: [0, 0.9, 0], lookTo: [0, 0.9, 0], fov: 42 },
@@ -550,7 +552,7 @@ function harrelson(T) {
       const dt = t - at; card.visible = dt >= 0; if (dt < 0) return;
       const f = dt * 30, pop = f < 6 ? 0.2 + 0.92 * f / 6 : f < 10 ? 1.12 - 0.16 * (f - 6) / 4 : f < 14 ? 0.96 + 0.04 * (f - 10) / 4 : 1;
       card.scale.setScalar(pop); card.material.opacity = Math.min(1, f / 3);
-      card.rotation.z = -0.04 + Math.sin(t * 2.0) * 0.035; card.position.y = 0.92 + Math.sin(t * 1.5) * 0.012;
+      card.rotation.z = -0.04 + Math.sin(t * 2.0) * 0.035; card.position.y = 1.06 + Math.sin(t * 1.5) * 0.012;
     },
   };
 }
