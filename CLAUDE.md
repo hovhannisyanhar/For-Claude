@@ -165,6 +165,9 @@ npm run make -- <slug>                    # = tts + render
 - Клипы: `npm run scenes3d -- <slug> [--only=2,5]` → `public/generated/<slug>/clips/scene-N.mp4`; `npm run render` сам подставляет их вместо 2D.
 - Финальные клипы — на MacBook пользователя (GPU, на macOS включается сам, иначе `SCENES3D_GPU=1`); в облаке ~13 с/кадр — только проверка. Озвучку (`public/generated/<slug>/*.mp3` + `manifest.json`) коммитить `git add -f`.
 - На Mac без Playwright: `npm install --no-save playwright@<версия>` перед `npm run scenes3d`; первый `npm run render` на новом компьютере требует интернет.
+- Рабочая папка на Mac пользователя — `~/Downloads/For-Claude-git` (клон с git; `~/Downloads/For-Claude` — старый zip без git, не использовать). Команды давать с `cd ~/Downloads/For-Claude-git` и `git pull origin claude/zen-bohr-8z10y2`, рендер — с `caffeinate -dims` (иначе Mac засыпает).
+- Сидящие герои в 3D — поза `seiza` на настоящем стуле (сиденье ~0.2, стол ~0.42), не опускать стоящую фигурку в пол: иначе «сидят под столом» («Треугольник печали»). Проверять на черновом кадре, что над столом видны плечи и руки.
+- Фото-стикер не должен попадать в зону текста (y≈290–700): ставить стикер выше/ниже или сдвигать текст сцены полем `textY` (напр. 1180 — текст под стикером, «Треугольник печали»).
 - Лаборатория стилей: `lab/styles/scene.js` (3D, `?style=pixar|diorama|…`), `lab/styles/flat.html` (2D, `?style=vector|…`); кадр — `node lab/styles/shot.cjs pixar diorama 2d-vector --w=1080 --h=1920`; анимация → mp4 — `lab/styles/frames.cjs` (`window.renderAt(t)`). 2D — Chromium с `--disable-gpu`, 3D — WebGL через SwiftShader.
 
 ## Технические заметки
