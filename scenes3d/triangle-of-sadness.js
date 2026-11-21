@@ -140,26 +140,126 @@ function lying(pos, rotY, o) { // загорающий на шезлонге
   const p = hero('guest', { ...o, hands: 'down' }); p.rotation.set(-Math.PI / 2 + 0.35, rotY, 0, 'YXZ'); p.position.set(...pos); root.add(p); return p;
 }
 
-// ---------- 1. Яхта на закате, на горизонте тучи ----------
+// ---------- детальная суперъяхта: тёмная полоса борта, иллюминаторы, леера, арка радара, тендер, огни ----------
+function superyacht(parent, o = {}) {
+  const y = new THREE.Group(); parent.add(y);
+  const white = mat('#f6f4f0', { physical: true, rough: 0.22, clearcoat: 1 });
+  const navy = mat('#16263e', { physical: true, rough: 0.2, clearcoat: 1 });
+  const glassM = mat('#0e1824', { physical: true, rough: 0.05, clearcoat: 1, metal: 0.3 });
+  const warm = mat('#ffcf8a', { emissive: '#ffb060', ei: o.lit ? 2.2 : 0, rough: 0.4 });
+  const steel = mat('#e8ecef', { metal: 0.9, rough: 0.2 });
+  const L = 3.6;
+  const hullShape = (x0, x1, w, h, yb, m, bowK = 1) => {
+    const g = new THREE.BoxGeometry(x1 - x0, h, w, 48, 8, 10);
+    const p = g.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      let x = p.getX(i), yy = p.getY(i), z = p.getZ(i); const t = Math.max(0, (yy + h / 2) / h);
+      const xr = (x + (x1 - x0) / 2) / (x1 - x0); // 0 корма → 1 нос
+      z *= 0.6 + 0.4 * Math.sqrt(t);
+      if (xr > 0.62) z *= Math.max(0.015, 1 - ((xr - 0.62) / 0.38) ** (1.5 * bowK));
+      yy += Math.max(0, xr - 0.55) * 0.35 * h * t; // седловатость к носу
+      p.setXYZ(i, x, yy, z);
+    }
+    g.computeVertexNormals();
+    return add(g, m, [(x0 + x1) / 2, yb + h / 2, 0], { parent: y });
+  };
+  hullShape(-L / 2, L / 2, 0.82, 0.34, 0.0, navy);            // тёмная нижняя часть
+  hullShape(-L / 2, L / 2, 0.84, 0.3, 0.3, white);            // белый борт
+  add(box(L * 0.95, 0.025, 0.02, 0.008), mat('#c9a24a', { metal: 0.9, rough: 0.3 }), [-0.05, 0.31, 0.405], { parent: y }); // золотая полоса
+  // иллюминаторы
+  for (let i = 0; i < 16; i++) { const x = -1.45 + i * 0.13; if (x > 1.05) break; [-1, 1].forEach(s => add(new THREE.CircleGeometry(0.018, 16), mat('#0a1420', { physical: true, rough: 0.05, clearcoat: 1, emissive: '#ffc070', ei: o.lit ? 0.9 : 0 }), [x, 0.42, s * 0.415], { parent: y, rot: [0, s > 0 ? 0 : Math.PI, 0], cast: false })); }
+  // палуба из тика и кормовая платформа
+  add(box(L * 0.82, 0.025, 0.76, 0.01), mat('#ffffff', { map: teak, rough: 0.55 }), [-0.2, 0.62, 0], { parent: y });
+  add(box(0.3, 0.04, 0.7, 0.01), mat('#ffffff', { map: teak, rough: 0.55 }), [-L / 2 - 0.1, 0.16, 0], { parent: y });
+  // надстройки: каждая с закруглённым носом, тёмным остеклением и навесом
+  const tiers = [[2.1, 0.3, 0.7, -0.35, 0.63], [1.55, 0.27, 0.6, -0.48, 0.95], [0.95, 0.24, 0.5, -0.58, 1.24]];
+  tiers.forEach(([w, h, d, x, yb], k) => {
+    add(box(w, h, d, 0.05), white, [x, yb + h / 2, 0], { parent: y });
+    add(new THREE.CylinderGeometry(d / 2, d / 2, h, 32, 1, false, 0, Math.PI), white, [x + w / 2, yb + h / 2, 0], { parent: y });
+    add(box(w * 0.92, h * 0.5, d + 0.012, 0.02), glassM, [x + 0.02, yb + h * 0.55, 0], { parent: y });
+    add(new THREE.CylinderGeometry(d / 2 + 0.006, d / 2 + 0.006, h * 0.5, 32, 1, false, 0, Math.PI), glassM, [x + w / 2, yb + h * 0.55, 0], { parent: y });
+    if (o.lit) for (let j = 0; j < 6 - k; j++) add(box(0.12, h * 0.36, 0.005, 0.004), warm, [x - w / 2 + 0.2 + j * (w - 0.3) / (6 - k), yb + h * 0.55, d / 2 + 0.012], { parent: y, cast: false });
+    add(box(w + 0.22, 0.025, d + 0.12, 0.012), white, [x - 0.08, yb + h + 0.012, 0], { parent: y }); // навес-палуба
+    // леера по краю верхней палубы
+    const yr = yb + h + 0.11, x0 = x - w / 2 - 0.18, x1 = x + w / 2 - 0.05;
+    [-1, 1].forEach(s => { limb([x0, yr, s * (d / 2 + 0.05)], [x1, yr, s * (d / 2 + 0.05)], 0.005, steel, y); for (let xx = x0; xx <= x1; xx += 0.14) add(new THREE.CylinderGeometry(0.004, 0.004, 0.1, 6), steel, [xx, yr - 0.05, s * (d / 2 + 0.05)], { parent: y, cast: false }); });
+  });
+  // леер главной палубы до носа
+  [-1, 1].forEach(s => {
+    const pts = [[-1.55, 0.36], [0.4, 0.38], [1.0, 0.3], [1.4, 0.16], [1.72, 0.02]];
+    for (let i = 0; i < pts.length - 1; i++) limb([pts[i][0], 0.74 + i * 0.012, s * pts[i][1]], [pts[i + 1][0], 0.74 + (i + 1) * 0.012, s * pts[i + 1][1]], 0.005, steel, y);
+  });
+  // арка радара, купол, мачта с флагом
+  const arch = add(new THREE.TorusGeometry(0.22, 0.03, 12, 32, Math.PI), white, [-0.75, 1.5, 0], { parent: y, rot: [0, Math.PI / 2, 0] });
+  add(sphere(0.07, 20, 14), white, [-0.65, 1.78, 0], { parent: y, scale: [1, 0.7, 1] });
+  const radar = add(box(0.26, 0.02, 0.04, 0.008), mat('#2a2a2e', { rough: 0.4 }), [-0.8, 1.76, 0], { parent: y });
+  add(new THREE.CylinderGeometry(0.008, 0.01, 0.4, 8), steel, [-0.85, 1.92, 0], { parent: y });
+  const flag = add(new THREE.PlaneGeometry(0.16, 0.1, 8, 4), mat('#c8302a', { rough: 0.8, side: THREE.DoubleSide }), [-1.85, 0.95, 0], { parent: y });
+  add(new THREE.CylinderGeometry(0.006, 0.006, 0.35, 6), steel, [-1.77, 0.82, 0], { parent: y });
+  // тендер на верхней палубе и спасательные круги
+  add(capsule(0.07, 0.3), mat('#f4f2ee', { physical: true, rough: 0.3, clearcoat: 1 }), [-0.95, 1.33, 0.0], { parent: y, rot: [0, 0, Math.PI / 2] });
+  add(capsule(0.072, 0.3), navy, [-0.95, 1.31, 0.0], { parent: y, rot: [0, 0, Math.PI / 2], scale: [1, 1, 0.6] });
+  [-1.0, 0.1].forEach(x => add(new THREE.TorusGeometry(0.04, 0.014, 8, 20), mat('#ff6a2a', { rough: 0.6 }), [x, 0.78, 0.36], { parent: y }));
+  // огоньки по краю навесов
+  const bulbs = [];
+  if (o.lit) tiers.forEach(([w, h, d, x, yb]) => { for (let xx = x - w / 2 - 0.15; xx < x + w / 2; xx += 0.11) bulbs.push(add(sphere(0.009, 8, 6), mat('#ffe0a0', { emissive: '#ffc060', ei: 4 }), [xx, yb + h - 0.005, d / 2 + 0.07], { parent: y, cast: false })); });
+  // фигурки гостей на палубах (по желанию)
+  if (o.guests) {
+    const pal = ['#f6f2ea', '#e86a7a', '#2a3a5a', '#d9a066', '#f6f2ea'];
+    [[0.85, 0.65, 0.18], [1.0, 0.65, -0.05], [0.6, 0.65, 0.22], [-0.1, 1.23, 0.24], [0.2, 1.23, 0.22]].forEach(([x, yy, z], i) => {
+      const g = new THREE.Group(); g.position.set(x, yy, z); g.scale.setScalar(0.26); y.add(g);
+      add(lathe([[0, 0], [0.16, 0], [0.15, 0.3], [0.12, 0.5], [0, 0.52]]), mat(pal[i], { rough: 0.7 }), [0, 0, 0], { parent: g });
+      add(sphere(0.13), mat('#e6b090', { rough: 0.6 }), [0, 0.66, 0], { parent: g });
+      add(sphere(0.135), mat(['#3a2218', '#e8c87a', '#c8c4bc', '#2a1c14', '#7a5a34'][i], { rough: 0.5 }), [0, 0.7, -0.02], { parent: g, scale: [1, 0.8, 1] });
+    });
+  }
+  y.userData.tick = (t) => {
+    const p = flag.geometry.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i); p.setZ(i, Math.sin(x * 30 - t * 6) * 0.012 * (x + 0.08) * 6); } p.needsUpdate = true;
+    radar.rotation.y = t * 2.5; bulbs.forEach((b, i) => b.material.emissiveIntensity = 3.5 + Math.sin(t * 3 + i) * 0.6);
+  };
+  return y;
+}
+function island(pos, s, color, haze = false) {
+  const g = jitterG(new THREE.IcosahedronGeometry(1, 3), 0.18, 1.4);
+  return add(g, mat(color, { rough: 1, emissive: haze ? color : '#000', ei: haze ? 0.35 : 1 }), pos, { scale: [s * 2.2, s * 0.55, s], cast: false });
+}
+function jitterG(geo, k, s) { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const n = Math.sin(x * s * 3.1 + y * 1.7) * Math.sin(y * s * 2.3 + z * 1.3) * Math.sin(z * s * 2.9 + x * 0.7); const d = 1 + n * k; p.setXYZ(i, x * d, Math.max(0, y) * d, z * d); } geo.computeVertexNormals(); return geo; }
+function wake(parent, n = 40, color = '#ffffff') {
+  const ps = Array.from({ length: n }, (_, i) => add(sphere(0.06, 10, 6), mat(color, { rough: 0.7, emissive: color, ei: 0.25, opacity: 0.8 }), [0, -1, 0], { parent, cast: false }));
+  return (t) => ps.forEach((p, i) => { const u = ((i / n) + t * 0.15) % 1, side = i % 2 ? 1 : -1; p.position.set(-1.9 - u * 3.5, 0.04, side * (0.3 + u * 0.9) + Math.sin(i * 7) * 0.08); p.scale.set(1.6 - u, 0.15, 0.8 - u * 0.5); p.material.opacity = 0.8 * (1 - u); });
+}
+function gullsF(n, base) {
+  return Array.from({ length: n }, (_, i) => { const g = new THREE.Group(); root.add(g); const m = mat('#2a2430', { rough: 0.9 }); [-1, 1].forEach(s => add(box(0.12, 0.006, 0.03, 0.002), m, [s * 0.06, 0, 0], { parent: g, rot: [0, 0, s * 0.3] })); return { g, i }; });
+}
+
+// ---------- 1. Яхта на закате: острова, гости на палубах, огни, кильватер; слева идут грозовые тучи ----------
 function yacht(T) {
-  scene.fog = new THREE.Fog('#e8a070', 14, 40);
-  skyPlane(skyTex([[0, '#2a2a5a'], [0.35, '#8a5a8a'], [0.62, '#f09a6a'], [0.74, '#ffd8a0'], [1, '#f0a070']], {
-    sun: [0.68, 0.74, 140, 'rgba(255,240,200,1)'],
-    clouds: [[0.18, 0.58, 160, 60, 'rgba(40,40,70,0.55)'], [0.1, 0.66, 140, 40, 'rgba(30,30,60,0.6)'], [0.32, 0.62, 120, 40, 'rgba(60,50,80,0.45)'], [0.8, 0.4, 110, 16, 'rgba(255,190,160,0.4)']],
-  }), -26);
-  const waves = sea(60, 40, -12, '#4a80a8', { cc: 1 });
-  glint(1.6, -16, '#ffd8a0', 3, 18, 0.35);
-  const y = yachtModel(root, { lit: true }); y.position.set(0, -0.08, -3.2); y.rotation.y = -0.45;
-  // силуэты гостей с бокалами
-  const sil = mat('#2a1e22', { rough: 0.9 });
-  [[-0.9, 0.18], [-0.75, 0.12], [-0.55, 0.2], [0.2, 0.18]].forEach(([x, z]) => { add(capsule(0.035, 0.09), sil, [x, 0.65, z], { parent: y }); add(sphere(0.03), sil, [x, 0.75, z], { parent: y }); });
+  scene.fog = new THREE.Fog('#e8a070', 16, 46);
+  skyPlane(skyTex([[0, '#262650'], [0.3, '#7a4a7a'], [0.58, '#e88a62'], [0.72, '#ffd8a0'], [0.78, '#ffe8c0'], [1, '#f0a070']], {
+    sun: [0.7, 0.74, 150, 'rgba(255,240,200,1)'],
+    clouds: [[0.12, 0.5, 200, 90, 'rgba(30,28,60,0.7)'], [0.05, 0.62, 170, 60, 'rgba(24,22,50,0.75)'], [0.28, 0.58, 140, 50, 'rgba(50,40,80,0.55)'], [0.18, 0.4, 150, 50, 'rgba(40,36,70,0.5)'],
+      [0.82, 0.42, 120, 14, 'rgba(255,200,170,0.5)'], [0.62, 0.36, 90, 10, 'rgba(255,190,170,0.4)'], [0.9, 0.6, 80, 10, 'rgba(255,220,190,0.5)']],
+  }), -30, 50, 60, 10);
+  // молнии внутри туч слева
+  const bolt = add(new THREE.PlaneGeometry(6, 6), new THREE.MeshBasicMaterial({ map: softTex, color: '#c8d0ff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, fog: false }), [-6.5, 7.5, -29], { cast: false, recv: false });
+  const waves = sea(70, 50, -14, '#4a80a8', { cc: 1 });
+  glint(2.6, -20, '#ffd8a0', 3.5, 22, 0.45);
+  island([7, 0, -24], 2.4, '#8a5a7a', true); island([10.5, 0, -27], 3, '#9a6a80', true); island([-9, 0, -26], 2.6, '#5a4a6a', true);
+  const y = superyacht(root, { lit: true, guests: true }); y.position.set(0, -0.06, -3.2); y.rotation.y = -1.0;
+  const wk = wake(y);
+  const gulls = gullsF(3);
   hemi('#ffc8a0', '#2a3a5a', 0.9);
-  const sun = shadowed(new THREE.DirectionalLight('#ffc890', 2.6)); sun.position.set(4, 3, -10); sun.target.position.set(0, 0, -3); Object.assign(sun.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 30 }); scene.add(sun, sun.target);
-  const fill = new THREE.DirectionalLight('#8aa0d8', 0.8); fill.position.set(-3, 2, 4); scene.add(fill);
+  const sun = shadowed(new THREE.DirectionalLight('#ffc890', 2.8)); sun.position.set(5, 3, -10); sun.target.position.set(0, 0, -3); Object.assign(sun.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 30 }); scene.add(sun, sun.target);
+  const fill = new THREE.DirectionalLight('#8aa0d8', 0.9); fill.position.set(-3, 2, 4); scene.add(fill);
   return {
-    cam: { from: [-0.3, 0.95, 5.4], to: [-0.1, 0.9, 4.7], lookFrom: [0.1, 1.6, -3.2], lookTo: [0.1, 1.55, -3.2], fov: 42 },
-    focus: [0, 0.6, -3.2], aperture: 0.002, bloom: 0.5, env: 0.1,
-    update(t) { waves(t); y.position.y = -0.08 + Math.sin(t * 1.1) * 0.02; y.rotation.z = Math.sin(t * 0.9) * 0.012; },
+    cam: { from: [-0.5, 0.95, 4.6], to: [-0.3, 0.9, 3.9], lookFrom: [0.1, 1.55, -3.2], lookTo: [0.15, 1.5, -3.2], fov: 42 },
+    focus: [0, 0.8, -3.0], aperture: 0.0015, bloom: 0.55, env: 0.12,
+    update(t) {
+      waves(t); wk(t); y.userData.tick(t);
+      y.position.y = -0.06 + Math.sin(t * 1.1) * 0.02; y.rotation.z = Math.sin(t * 0.9) * 0.012;
+      const a = t % 2.4; bolt.material.opacity = (a > 1.6 && a < 1.66) || (a > 1.72 && a < 1.76) ? 0.9 : 0;
+      gulls.forEach(({ g, i }) => { g.position.set(1.4 - t * 0.2 - i * 0.3, 2.9 + i * 0.12 + Math.sin(t * 2 + i) * 0.04, -4.5 - i * 0.5); g.children.forEach((w, k) => w.rotation.z = (k ? 1 : -1) * (0.3 + Math.sin(t * 6 + i) * 0.35)); });
+    },
   };
 }
 
@@ -384,21 +484,21 @@ function stormDinner(T) {
   // иллюминаторы со вспышками молний
   const ports = [-1.2, 0, 1.2].map(x => { rm(new THREE.TorusGeometry(0.2, 0.03, 12, 40), mat('#c9a24a', { metal: 0.9, rough: 0.3 }), [x, 1.5, -2.18]); return rm(new THREE.CircleGeometry(0.19, 40), new THREE.MeshBasicMaterial({ color: '#0a1428', toneMapped: false }), [x, 1.5, -2.19], { cast: false }); });
   const cloth = mat('#d8d0c0', { physical: true, rough: 0.8, sheen: 0.3 });
-  rm(box(2.4, 0.04, 0.8, 0.01), cloth, [0, 0.5, -0.9]); rm(box(2.42, 0.45, 0.82, 0.01), cloth, [0, 0.27, -0.9]);
+  rm(box(2.4, 0.04, 0.8, 0.01), cloth, [0, 0.38, -0.9]); rm(box(2.42, 0.34, 0.82, 0.01), cloth, [0, 0.2, -0.9]);
   // гости вдоль дальней стороны стола, лица бледно-зелёные
   const sick = '#c8d0a0';
   const people = [
     hero('oligarch', { hands: 'desk', frown: 0.4, skin: sick }), hero('lady', { hands: 'desk', frown: 0.5, skin: '#d8dcb0' }), hero('carl', { hands: 'desk', frown: 0.5, skin: '#d0d8a8' }),
     hero('yaya', { hands: 'desk', frown: 0.5, skin: '#d4d4a8' }), hero('oldman', { hands: 'desk', frown: 0.3, skin: '#d8dcb8' }), hero('oldlady', { hands: 'desk', frown: 0.3, skin: '#dcdcbc' }),
   ];
-  people.forEach((p, i) => { p.position.set(-1.0 + i * 0.4, -0.2, -1.35); room.add(p); });
-  const cap = hero('captain', { hands: 'toast', smile: true, frown: -0.2 }); cap.position.set(0.05, 0.02, -1.85); cap.rotation.y = 0; room.add(cap); holdGlass(cap, '#f0d070');
+  people.forEach((p, i) => { p.position.set(-1.0 + i * 0.4, -0.06, -1.42); room.add(p); rm(box(0.3, 0.5, 0.06, 0.02), mat('#6a2a20', { physical: true, rough: 0.6, sheen: 0.4 }), [-1.0 + i * 0.4, 0.55, -1.62]); });
+  const cap = hero('captain', { hands: 'toast', smile: true, frown: -0.2 }); cap.position.set(0.0, 0.05, -1.85); cap.rotation.y = 0; room.add(cap); holdGlass(cap, '#f0d070');
   // скользящие бокалы и тарелки
   const slide = [];
   for (let i = 0; i < 6; i++) {
     const x = -1.0 + i * 0.4;
-    rm(new THREE.CylinderGeometry(0.1, 0.1, 0.01, 32), mat('#ffffff', { rough: 0.3 }), [x, 0.525, -0.95]);
-    const gl = glass(room, [x + 0.12, 0.52, -0.78], i % 2 ? '#8a1a2a' : '#f0d070'); slide.push({ gl, x: x + 0.12, k: 0.7 + (i % 3) * 0.2 });
+    rm(new THREE.CylinderGeometry(0.1, 0.1, 0.01, 32), mat('#ffffff', { rough: 0.3 }), [x, 0.405, -0.95]);
+    const gl = glass(room, [x + 0.12, 0.4, -0.78], i % 2 ? '#8a1a2a' : '#f0d070'); slide.push({ gl, x: x + 0.12, k: 0.7 + (i % 3) * 0.2 });
   }
   // люстра
   const ch = new THREE.Group(); ch.position.set(0, 2.2, -0.9); root.add(ch);
@@ -436,7 +536,7 @@ function harrelson(T) {
   skyPlane(skyTex([[0, '#03050c'], [0.5, '#0a1428'], [0.75, '#1a2a48'], [1, '#0a1424']], { stars: true, sun: [0.75, 0.3, 50, 'rgba(230,240,255,0.9)'], clouds: [[0.3, 0.5, 140, 30, 'rgba(10,16,30,0.7)']] }), -24);
   const waves = sea(60, 40, -12, '#0e2236', { cc: 1, amp: 1.8, speed: 1.4 });
   glint(2.2, -16, '#a8c0ff', 2.5, 16, 0.25);
-  const y = yachtModel(root, { lit: true }); y.position.set(0.3, -0.05, -6.5); y.rotation.y = 0.5;
+  const y = superyacht(root, { lit: true }); y.position.set(0.3, -0.05, -6.5); y.rotation.y = 0.5;
   hemi('#3a4a7a', '#04060a', 0.5);
   const moon = new THREE.DirectionalLight('#a8c0ff', 1.6); moon.position.set(4, 4, -10); scene.add(moon);
   const asp = WOODY ? WOODY.image.width / WOODY.image.height : 0.53, h = 1.0;
@@ -502,27 +602,41 @@ function awards(T) {
   };
 }
 
-// ---------- 10. Рассвет после шторма: яхта одна на спокойном море, палуба пуста ----------
+// ---------- 10. Рассвет после шторма: яхта одна на спокойном море, шезлонги опрокинуты, на воде качается бутылка ----------
 function dawn(T) {
-  scene.fog = new THREE.Fog('#f0c0b0', 20, 70);
-  skyPlane(skyTex([[0, '#4a5a90'], [0.45, '#c890a8'], [0.68, '#f8c8a8'], [0.76, '#fff0d0'], [1, '#e8b0a0']], {
-    sun: [0.35, 0.76, 120, 'rgba(255,244,220,1)'], clouds: [[0.75, 0.55, 120, 18, 'rgba(160,110,140,0.45)'], [0.2, 0.45, 100, 12, 'rgba(200,140,160,0.4)']],
-  }), -26);
-  const waves = sea(60, 40, -12, '#6a80c0', { cc: 1, amp: 0.35, speed: 0.6, glow: 0.2 });
-  glint(-1.0, -16, '#ffe8c8', 3, 18, 0.4);
-  const y = yachtModel(root, {}); y.position.set(0.25, -0.06, -4.2); y.rotation.y = 0.35;
-  hemi('#ffd8c8', '#4a4a6a', 0.9);
-  const sun = shadowed(new THREE.DirectionalLight('#ffd8b0', 2.2)); sun.position.set(-5, 2, -12); sun.target.position.set(0, 0, -4); Object.assign(sun.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 30 }); scene.add(sun, sun.target);
-  const fill = new THREE.DirectionalLight('#a8b0e0', 0.8); fill.position.set(3, 2, 4); scene.add(fill);
-  const gulls = [0, 1, 2].map(i => { const g = new THREE.Group(); root.add(g); const m = mat('#2a2430', { rough: 0.9 }); [-1, 1].forEach(s => add(box(0.12, 0.006, 0.03, 0.002), m, [s * 0.06, 0, 0], { parent: g, rot: [0, 0, s * 0.3] })); return g; });
+  scene.fog = new THREE.Fog('#f0c8b8', 14, 60);
+  skyPlane(skyTex([[0, '#3a4a88'], [0.38, '#b888a8'], [0.62, '#f8c0a0'], [0.73, '#fff0d0'], [0.78, '#ffe0c0'], [1, '#e8b0a0']], {
+    sun: [0.33, 0.75, 130, 'rgba(255,246,224,1)'],
+    clouds: [[0.75, 0.52, 150, 22, 'rgba(150,100,140,0.5)'], [0.2, 0.42, 120, 14, 'rgba(200,140,160,0.45)'], [0.55, 0.3, 160, 18, 'rgba(120,100,150,0.35)'], [0.9, 0.65, 90, 10, 'rgba(255,210,200,0.5)']],
+  }), -30, 50, 60, 10);
+  const waves = sea(70, 50, -14, '#6a80c0', { cc: 1, amp: 0.3, speed: 0.6, glow: 0.25 });
+  glint(-1.6, -20, '#ffe8c8', 3.5, 22, 0.5);
+  island([-8, 0, -25], 2.6, '#9a7a9a', true); island([-11, 0, -28], 3.2, '#a88aa8', true); island([9, 0, -27], 2.2, '#8a7a9a', true);
+  // утренняя дымка над водой
+  const mist = [0, 1, 2].map(i => add(new THREE.PlaneGeometry(30, 1.2), new THREE.MeshBasicMaterial({ map: softTex, color: '#ffe8e0', transparent: true, opacity: 0.25, depthWrite: false, fog: false }), [0, 0.3 + i * 0.25, -9 - i * 4], { cast: false, recv: false }));
+  const y = superyacht(root, {}); y.position.set(0.1, -0.06, -3.6); y.rotation.y = 0.95;
+  // опрокинутые шезлонги и бокал на палубе — следы ночи
+  const wood = mat('#8a5a34', { map: woodTex, rough: 0.5 }), cush = mat('#f4f0e6', { rough: 0.8 });
+  [[1.0, 0.68, 0.15, 1.4, 0.4], [0.7, 0.68, -0.15, -1.2, 1.3]].forEach(([x, yy, z, rz, ry]) => { const g = new THREE.Group(); g.position.set(x, yy, z); g.rotation.set(0, ry, rz); g.scale.setScalar(0.3); y.add(g); add(box(0.36, 0.05, 0.9, 0.01), wood, [0, 0, 0], { parent: g }); add(box(0.34, 0.06, 0.7, 0.03), cush, [0, 0.05, 0], { parent: g }); });
+  // бутылка шампанского качается на воде на переднем плане
+  const bottle = new THREE.Group(); root.add(bottle);
+  add(lathe([[0, 0], [0.05, 0], [0.052, 0.17], [0.022, 0.23], [0.017, 0.3], [0, 0.3]], 24), mat('#1e3a22', { physical: true, rough: 0.05, clearcoat: 1 }), [0, 0, 0], { parent: bottle, rot: [0, 0, Math.PI / 2 - 0.2] });
+  add(new THREE.CylinderGeometry(0.019, 0.019, 0.05, 16), mat('#d9b45a', { metal: 0.9, rough: 0.3 }), [-0.27, 0.06, 0], { parent: bottle, rot: [0, 0, Math.PI / 2 - 0.2] });
+  const gulls = gullsF(3);
+  hemi('#ffd8c8', '#4a4a6a', 0.95);
+  const sun = shadowed(new THREE.DirectionalLight('#ffd8b0', 2.4)); sun.position.set(-5, 2.2, -12); sun.target.position.set(0, 0, -3.5); Object.assign(sun.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4, near: 1, far: 30 }); scene.add(sun, sun.target);
+  const fill = new THREE.DirectionalLight('#a8b0e0', 0.9); fill.position.set(3, 2, 4); scene.add(fill);
   return {
-    cam: { from: [0.0, 0.8, 4.6], to: [0.0, 0.95, 6.0], lookFrom: [0.1, 1.45, -4.5], lookTo: [0.1, 1.55, -4.5], fov: 42 },
-    focus: [0, 0.6, -4.2], aperture: 0.0015, bloom: 0.5, env: 0.1,
+    cam: { from: [0.3, 0.65, 3.4], to: [0.1, 0.9, 4.6], lookFrom: [0.0, 1.45, -3.6], lookTo: [0.0, 1.6, -3.6], fov: 42 },
+    focus: [0, 0.7, -3.4], aperture: 0.0015, bloom: 0.5, env: 0.12,
     update(t) {
-      waves(t); y.position.y = -0.06 + Math.sin(t * 0.7) * 0.01;
-      gulls.forEach((g, i) => { g.position.set(-1.5 + t * 0.25 + i * 0.35, 1.9 + i * 0.15 + Math.sin(t * 2 + i) * 0.03, -5 - i * 0.6); g.children.forEach((w, k) => w.rotation.z = (k ? 1 : -1) * (0.3 + Math.sin(t * 6 + i) * 0.3)); });
+      waves(t); y.userData.tick(t * 0.3); y.position.y = -0.06 + Math.sin(t * 0.7) * 0.01;
+      bottle.position.set(0.3 + t * 0.02, 0.05 + Math.sin(t * 1.2) * 0.03, 0.4); bottle.rotation.set(Math.sin(t * 0.9) * 0.2, t * 0.1, Math.sin(t * 1.1) * 0.15);
+      mist.forEach((m, i) => { m.position.x = Math.sin(t * 0.1 + i) * 1.5; });
+      gulls.forEach(({ g, i }) => { g.position.set(-1.8 + t * 0.25 + i * 0.35, 2.4 + i * 0.15 + Math.sin(t * 2 + i) * 0.03, -4.5 - i * 0.6); g.children.forEach((w, k) => w.rotation.z = (k ? 1 : -1) * (0.3 + Math.sin(t * 6 + i) * 0.3)); });
     },
   };
 }
+
 
 run({ yacht, date, deck, guests, swim, cabin, 'storm-dinner': stormDinner, harrelson, awards, dawn }[SHOT]);
