@@ -167,5 +167,6 @@
       "onPoster": true,
       "pause": 6
     }
-  ]
+  ],
+  "textStyle": "pop"
 }
