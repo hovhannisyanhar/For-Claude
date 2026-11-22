@@ -201,6 +201,40 @@ export const KineticM: React.FC<{
 		const next = blocks[i + 1];
 		return t >= b.start - 0.12 && (next ? t < next.start - 0.06 : frame < lastEnd);
 	});
+	if (variant === 'pop') {
+		// уходящий блок плавно уплывает вверх и растворяется (10 кадров), пока новый уже выпрыгивает на его месте
+		const EXIT = 10;
+		const endOf = (i: number) => (blocks[i + 1] ? AUDIO_DELAY + (blocks[i + 1].start - 0.06) * fps : lastEnd - EXIT);
+		const mk = (bl: Phrase) =>
+			bl.words
+				.map((w, i) => {
+					const n = norm(w.text);
+					const kind: Kind = emph.has(n) ? 'key' : STOP.has(n) || n.length <= 2 ? 'stop' : 'main';
+					return {w, text: clean(w.text), kind, i, st: AUDIO_DELAY + (w.start - 0.06) * fps};
+				})
+				.filter((x) => x.text);
+		const shown = blocks
+			.map((bl, i) => ({bl, i, s: AUDIO_DELAY + (bl.start - 0.12) * fps, e: endOf(i)}))
+			.filter(({s: st, e}) => frame >= st && frame < e + EXIT);
+		return (
+			<>
+				{shown.map(({bl, i, e}) => {
+					const x = interpolate(frame, [e, e + EXIT], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+					const its = mk(bl);
+					return (
+						<div
+							key={i}
+							style={{position: 'absolute', top: top + 120, left: 189, right: 189, fontFamily: F, color: CREAM, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'baseline', columnGap: 26, lineHeight: 1.0, textAlign: 'center', opacity: 1 - x, filter: `blur(${x * 8}px)`, transform: `translateY(${-x * 60}px) scale(${1 - x * 0.08})`, textShadow: '0 8px 0 rgba(0,0,0,0.55), 0 10px 40px rgba(0,0,0,0.7)'}}
+						>
+							{its.map((it, k) => (
+								<PopWord key={it.i} it={it} accent={accent} next={its[k + 1]?.st ?? (x > 0 ? -1 : undefined)} />
+							))}
+						</div>
+					);
+				})}
+			</>
+		);
+	}
 	if (idx < 0) return null;
 	const b = blocks[idx];
 	const next = blocks[idx + 1];
@@ -213,7 +247,7 @@ export const KineticM: React.FC<{
 			return {w, text: clean(w.text), kind, i, st: AUDIO_DELAY + (w.start - 0.06) * fps};
 		})
 		.filter((x) => x.text);
-	const exitLen = variant === 'pop' ? 4 : variant === 'title' ? 14 : 10;
+	const exitLen = variant === 'title' ? 14 : 10;
 	const out = interpolate(frame, [endF - exitLen, endF], [1, 0], {...clamp, easing: Easing.in(Easing.quad)});
 	const life = interpolate(frame, [startF, endF], [0, 1], clamp);
 	const base: React.CSSProperties = {position: 'absolute', top, left: SIDE_L, right: SIDE_R, fontFamily: F, color: CREAM, textShadow: SHADOW};
@@ -237,15 +271,6 @@ export const KineticM: React.FC<{
 						<SlideWord key={it.i} it={it} accent={accent} />
 					))}
 				</div>
-			</div>
-		);
-	}
-	if (variant === 'pop') {
-		return (
-			<div style={{...base, top: top + 120, left: 189, right: 189, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'baseline', columnGap: 26, lineHeight: 1.0, textAlign: 'center', transform: `scale(${0.6 + 0.4 * out})`, opacity: out, textShadow: '0 8px 0 rgba(0,0,0,0.55), 0 10px 40px rgba(0,0,0,0.7)'}}>
-				{items.map((it, k) => (
-					<PopWord key={it.i} it={it} accent={accent} next={items[k + 1]?.st} />
-				))}
 			</div>
 		);
 	}
