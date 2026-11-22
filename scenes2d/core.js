@@ -53,7 +53,7 @@ export function dust(t, n = 30, c = '#fff1d0', y0 = 600, y1 = 1600) { let o = ''
 // ---- персонаж: солдат / переводчик / женщина ----
 // x,y — середина низа фигуры; s — масштаб (голова r=90*s)
 // o: shirt, pants, vest, helmet, scarf, skin, hair, iris, frown, squint, closed, look (-1..1), beard (true),
-//    arms: down|rifle|pull|raise|phone|hold|point, pose: stand|crouch|sit, veil, robe (длинная одежда), blink
+//    arms: down|rifle|pull|raise|phone|hold|point|salute, pose: stand|crouch|sit, veil, robe (длинная одежда), blink
 // пропорции по умолчанию для всех person() фильма: {head, legs, torso, slim} (1 — как в «Переводчике»)
 let PROP = {};
 export const setProportions = (p) => { PROP = p || {}; };
@@ -97,8 +97,10 @@ export function person(x, y, s, o) {
     if (mode === 'hold') { hx = x + side * 40 * s; hy = sy + 170 * s; ex = x + side * 130 * s; ey = sy + 140 * s; }
     if ((mode === 'raise' || mode === 'point') && side === 1) { hx = x + 210 * s; hy = sy - (mode === 'raise' ? 230 : 40) * s; ex = x + 190 * s; ey = sy - (mode === 'raise' ? 60 : 10) * s; }
     if (mode === 'phone' && side === 1) { hx = x + 95 * s; hy = top - hr * 0.7; ex = x + 190 * s; ey = sy + 60 * s; }
+    if (mode === 'salute' && side === 1) { hx = x + hr * 0.92; hy = top - hr * 1.25; ex = x + 215 * s; ey = sy - 10 * s; }
     if (mode === 'table') { hx = x + side * 70 * s; hy = sy + 175 * s; ex = x + side * 150 * s; ey = sy + 130 * s; }
     let r = sleeve(sx, ex, ey, hx, hy) + hand(hx, hy);
+    if (mode === 'salute' && side === 1) { phoneArm = r; return ''; } // рука у виска — поверх головы
     if (mode === 'phone' && side === 1) { phoneArm = r + `<rect x="${hx - 34 * s}" y="${hy - 70 * s}" width="${36 * s}" height="${84 * s}" rx="${8 * s}" fill="#151515"/>` + hand(hx, hy); return ''; }
     return r;
   };
