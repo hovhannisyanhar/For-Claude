@@ -33,6 +33,7 @@ fs.mkdirSync(stills ? stillsDir : clipsDir, {recursive: true});
 const browser = await chromium.launch({args, headless: true});
 for (const [i, sc] of script.scenes.entries()) {
 	if (only.length && !only.includes(i + 1)) continue;
+	if (sc.onPoster) continue; // идёт поверх постера, клип не нужен
 	const dur = man.scenes[i]?.duration ?? 5;
 	const frames = AUDIO_DELAY + Math.ceil(dur * FPS) + (sc.pause ?? TAIL) + DISSOLVE;
 	const T = frames / FPS;
