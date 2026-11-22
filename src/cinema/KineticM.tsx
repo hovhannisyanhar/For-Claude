@@ -111,7 +111,8 @@ const PopWord: React.FC<{it: Item; accent: string; next?: number}> = ({it, accen
 				opacity: f < it.st ? 0 : 1,
 				fontVariationSettings: `'wght' ${key ? 900 : 800}`,
 				fontWeight: key ? 900 : 800,
-				fontSize: key ? 132 : 104,
+				// не шире ~75% кадра: длинное слово уменьшается (Montserrat 800 капслок ≈ 0,78 em на букву)
+				fontSize: Math.min(key ? 96 : 78, 780 / ([...it.text].length * 0.78)),
 				fontStyle: key ? 'italic' : 'normal',
 				textTransform: 'uppercase',
 				letterSpacing: '-0.02em',
@@ -241,7 +242,7 @@ export const KineticM: React.FC<{
 	}
 	if (variant === 'pop') {
 		return (
-			<div style={{...base, top: top + 120, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'baseline', columnGap: 26, lineHeight: 1.0, textAlign: 'center', transform: `scale(${0.6 + 0.4 * out})`, opacity: out, textShadow: '0 8px 0 rgba(0,0,0,0.55), 0 10px 40px rgba(0,0,0,0.7)'}}>
+			<div style={{...base, top: top + 120, left: 150, right: 150, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'baseline', columnGap: 30, lineHeight: 1.0, textAlign: 'center', transform: `scale(${0.6 + 0.4 * out})`, opacity: out, textShadow: '0 8px 0 rgba(0,0,0,0.55), 0 10px 40px rgba(0,0,0,0.7)'}}>
 				{items.map((it, k) => (
 					<PopWord key={it.i} it={it} accent={accent} next={items[k + 1]?.st} />
 				))}
