@@ -72,3 +72,4 @@
 - Этап 5: озвучка сгенерирована (💳 потрачено 229 кредитов, осталось 28906 из 37904); tempo 1.2 + tighten → 50,6 с речи, склейка с паузами 53,2 с (out/the-father/the-father-voice.mp3); с постером ≈ 55 с. Ждём одобрения голоса.
 - Этап 6: scenes2d/the-father.js — 8 планов (stranger, carer, kitchen, watch, corridor, rooms + мелькающие кадры в конце, award + стикер Хопкинса, window); стикер public/assets/the-father/hopkins-cut.png (rembg, по пояс). Обложка: top «Это моя», main «Квартира». Черновики → out/the-father/the-father-drafts.jpg, ждём одобрения.
 - Этап 7: клипы scenes2d (облако) + render → out/the-father/the-father.mp4, 55,3 с, textStyle pop; ждём одобрения.
+- Правка этапа 7: из сцены 6 убраны мелькающие кадры (пустая комната, листва, часы) — пользователь: «непонятные»; правило дописано в CLAUDE.md. Перерендер 55,3 с.

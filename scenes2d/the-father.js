@@ -309,23 +309,10 @@ const shots = {
     };
   },
 
-  // 6. Гостиная «плывёт»: стены меняют цвет, мебель сдвигается, лица на фото размыты; в конце мелькают кадры без контекста
+  // 6. Гостиная «плывёт»: стены меняют цвет, мебель сдвигается, лица на фото размыты (мелькающие кадры убраны — пользователь: «непонятные»)
   rooms(t, T) {
     const k = ease(t / T);
-    const cutAt = T - 2.1;
-    if (t >= cutAt) {
-      const c = Math.min(2, Math.floor((t - cutAt) / 0.7));
-      const frames = [
-        // пустая комната: только прямоугольники от снятых картин на стене
-        () => [room({ wall: '#8a9a98', floor: '#9a8a70' }), `<rect x="200" y="560" width="220" height="280" fill="#a8b8b4"/><rect x="620" y="620" width="260" height="200" fill="#a8b8b4"/>`, sashWindow(380, 900, 320, 360, { curtain: '#d8d4c8' }), grade('#e0f0ff', 0.3)],
-        // окно в листве
-        () => [`<rect width="1080" height="1920" fill="#e8ece4"/>`, `<rect x="140" y="420" width="800" height="1100" fill="${grad([[0, '#a8c890'], [1, '#4a7a4a']])}"/>`, ...[...Array(26)].map((_, i) => { reseed(40 + i); return `<circle cx="${140 + rnd() * 800}" cy="${420 + rnd() * 1100}" r="${60 + rnd() * 90}" fill="${['#3a6a3a', '#5a8a4a', '#7aa860'][i % 3]}" opacity="0.8" filter="url(#blur8)"/>`; }), `<rect x="140" y="420" width="800" height="1100" fill="none" stroke="#f4f4ee" stroke-width="40"/><rect x="530" y="420" width="20" height="1100" fill="#f4f4ee"/><rect x="140" y="960" width="800" height="20" fill="#f4f4ee"/>`, glow(540, 800, 600, '#fffbe0', 0.4)],
-        // часы без стрелок крупно
-        () => [`<rect width="1080" height="1920" fill="#1a2a2e"/>`, glow(540, 1100, 500, '#e8d8b0', 0.25), `<circle cx="540" cy="1100" r="300" fill="${R('#f0e8d4', 0.1, 0.2)}" stroke="#b8944a" stroke-width="26"/>`, ...[...Array(12)].map((_, i) => { const a = i / 12 * Math.PI * 2; return `<rect x="${540 + Math.sin(a) * 250 - 5}" y="${1100 - Math.cos(a) * 250 - 20}" width="10" height="40" fill="#2a2a2a" transform="rotate(${i * 30} ${540 + Math.sin(a) * 250} ${1100 - Math.cos(a) * 250})"/>`; }), `<circle cx="540" cy="1100" r="14" fill="#2a2a2a"/>`],
-      ];
-      return { cam: { z: 1.04 + 0.05 * ((t - cutAt) % 0.7) }, els: [...frames[c](), topShade(900, 0.5)] };
-    }
-    const m = ease(clamp(t / cutAt));
+    const m = ease(clamp(t / (T * 0.85)));
     const wallA = '#2f5a5a', wallB = '#6a3a44';
     const mix = (a, b, f) => '#' + [1, 3, 5].map((i) => Math.round(lerp(parseInt(a.substr(i, 2), 16), parseInt(b.substr(i, 2), 16), f)).toString(16).padStart(2, '0')).join('');
     const wob = (i) => wave(t, 0.4, i) * 30 * m;
