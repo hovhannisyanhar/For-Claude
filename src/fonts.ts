@@ -47,6 +47,16 @@ export const loadFonts = () => {
 			loads.push(face.load());
 		}
 	}
+	// Montserrat переменной толщины (ось wght 100–900): кинетика стиля «Кино» анимирует толщину
+	for (const st of ['normal', 'italic'] as const)
+		for (const [subset, range] of [
+			['latin', LATIN],
+			['cyrillic', CYRILLIC],
+		] as const) {
+			const face = new FontFace('Montserrat Var', `url(${staticFile(`fonts/montserrat-var-${subset}-${st}.woff2`)}) format('woff2')`, {weight: '100 900', style: st, unicodeRange: range});
+			document.fonts.add(face);
+			loads.push(face.load());
+		}
 	Promise.all(loads)
 		.catch((e) => console.error('Font load failed', e))
 		.finally(() => continueRender(handle));

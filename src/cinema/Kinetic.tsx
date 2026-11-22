@@ -35,16 +35,16 @@ const MAX_W = 1080 - SIDE_L - SIDE_R;
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
 
 const SIZE = {script: 160, serif: 92, caps: 40};
-const STOP = new Set(['и', 'в', 'на', 'по', 'а', 'но', 'ни', 'не', 'он', 'его', 'ему', 'это', 'так', 'там', 'тут', 'чем', 'что', 'как', 'же', 'из', 'за', 'до', 'у', 'к', 'с', 'о', 'от', 'при', 'эту', 'то', 'их', 'есть', 'было', 'одной', 'почти', 'только', 'которым', 'которая', 'которую', 'после', 'просто', 'потом', 'здесь', 'этого', 'каждый', 'вокруг']);
+export const STOP = new Set(['и', 'в', 'на', 'по', 'а', 'но', 'ни', 'не', 'он', 'его', 'ему', 'это', 'так', 'там', 'тут', 'чем', 'что', 'как', 'же', 'из', 'за', 'до', 'у', 'к', 'с', 'о', 'от', 'при', 'эту', 'то', 'их', 'есть', 'было', 'одной', 'почти', 'только', 'которым', 'которая', 'которую', 'после', 'просто', 'потом', 'здесь', 'этого', 'каждый', 'вокруг']);
 
 export const norm = (w: string) => w.toLowerCase().replace(/\u0301/g, '').replace(/[«»"“”.,!?;:—…]/g, '');
 const clean = (w: string) => w.replace(/\u0301/g, '').replace(/[.,;:!?…]+$/g, '').replace(/^—$/, '');
 
 type Kind = 'script' | 'serif' | 'caps';
-type Phrase = {words: Word[]; start: number; end: number; breaks?: number[]};
+export type Phrase = {words: Word[]; start: number; end: number; breaks?: number[]};
 
 /** Слова озвучки → фразы: по знакам препинания, до 5 слов / ~28 символов */
-const toPhrases = (words: Word[]): Phrase[] => {
+export const toPhrases = (words: Word[]): Phrase[] => {
 	const out: Phrase[] = [];
 	let cur: Word[] = [];
 	const flush = () => {

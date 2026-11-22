@@ -25,6 +25,7 @@ const props = {
 	handle: script.handle,
 	poster: script.poster ?? null,
 	fonts: script.fonts,
+	textStyle: script.textStyle,
 	film: script.film,
 	theme: script.theme || 'midnight',
 	music: script.musicSeparate ? null : (sound?.music ?? script.music ?? null),

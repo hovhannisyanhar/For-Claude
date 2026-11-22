@@ -17,6 +17,7 @@ import {AUDIO_DELAY, FPS, chunkWords, estimateDuration, estimateWords} from '../
 import type {Word} from '../types';
 import {SetView} from './Sets';
 import {FinalTitle, KineticText, setKineticFonts} from './Kinetic';
+import {KineticM} from './KineticM';
 import type {CinemaProps, CinemaSet, CinemaShot} from './types';
 
 loadFonts();
@@ -305,7 +306,7 @@ const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first
 	);
 };
 
-export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false}) => {
+export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, textStyle}) => {
 	setKineticFonts(fonts);
 	const {durationInFrames} = useVideoConfig();
 	const timeline = useMemo(() => {
@@ -348,7 +349,8 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 				{timeline.map(({shot, from, frames, words, isLast}, i) => (
 					<Sequence key={`t${i}`} from={from} durationInFrames={frames} name={`${i + 1}. текст`}>
 						{(shot.title || shot.stat || shot.credits) && <Titles shot={shot} frames={frames} accent={accent} isLast={isLast} />}
-						{showCaptions && !(shot.onPoster && poster) && <KineticText words={words} emphasis={shot.emphasis ?? []} accent={accent} frames={frames} top={shot.textY ?? 290} finalTitle={Boolean(shot.finalTitle) && !poster} seed={`k${i}`} />}
+						{showCaptions && !(shot.onPoster && poster) && textStyle && <KineticM words={words} emphasis={shot.emphasis ?? []} accent={accent} frames={frames} top={shot.textY ?? 290} seed={`k${i}`} variant={textStyle} />}
+						{showCaptions && !(shot.onPoster && poster) && !textStyle && <KineticText words={words} emphasis={shot.emphasis ?? []} accent={accent} frames={frames} top={shot.textY ?? 290} finalTitle={Boolean(shot.finalTitle) && !poster} seed={`k${i}`} />}
 						{shot.finalTitle && !poster && (
 							<FinalTitle text={shot.finalTitle} accent={accent} start={AUDIO_DELAY + Math.ceil((shot.words?.[shot.words.length - 1]?.end ?? shot.duration ?? estimateDuration(shot.voice)) * FPS) + 14} />
 						)}

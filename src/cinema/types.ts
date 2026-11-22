@@ -80,6 +80,8 @@ export type CinemaProps = {
 	showCaptions?: boolean;
 	/** Шрифты кинетического текста: пресет (classic · noir · modern · display · hand) или своя тройка. Менять от ролика к ролику */
 	fonts?: import('./Kinetic').FontPreset | import('./Kinetic').KineticFonts;
+	/** Кинетика на Montserrat: weight | slide | pop | title | stack (без поля — старая KineticText) */
+	textStyle?: import('./KineticM').TextStyle;
 	/** Старый «плёночный» вид: мерцание яркости, дрожание кадра, пылинки, живое зерно. По умолчанию выключен */
 	film?: boolean;
 };
