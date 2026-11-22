@@ -85,6 +85,7 @@ export function person(x, y, s, o) {
     [-60, 0, 60].forEach(dx => b += `<rect x="${x + (dx - 24) * s}" y="${ty - 95 * s}" width="${48 * s}" height="${62 * s}" rx="${8 * s}" fill="${V(shade(o.vest, 0.08), 0.2, 0.2)}" stroke="${shade(o.vest, -0.3)}" stroke-width="${2 * s}"/>`);
     b += `<rect x="${x - 70 * s}" y="${top + 72 * s}" width="${40 * s}" height="${26 * s}" rx="${4 * s}" fill="#5c5a48"/>`;
   }
+  if (o.overlay) b += o.overlay; // одежда фильма поверх торса, под руками и головой
   // руки
   const sy = top + 40 * s;
   const hand = (hx, hy) => `<circle cx="${hx}" cy="${hy}" r="${27 * s * (o.hand ?? 1)}" fill="${R(skin)}"/>`;
