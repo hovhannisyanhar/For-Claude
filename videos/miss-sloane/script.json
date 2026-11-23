@@ -1,31 +1,71 @@
 {
-  "title": "Сны поездов (2025): о чём фильм — без спойлеров",
+  "title": "Опасная игра Слоун (2016): о чём фильм",
   "style": "cinema",
-  "accent": "#e3b46a",
+  "art": "vector",
+  "accent": "#d23a3a",
+  "fonts": "futura",
+  "textStyle": "pop",
   "tts": {
-    "voiceId": "1kb4Md8n0kMNktygYhDF",
-    "model": "eleven_multilingual_v2",
+    "voiceId": "6A9D8WSMm4rFsg2DWFeE",
+    "model": "eleven_v4",
     "speed": 1.0,
     "settings": {
-      "stability": 0.55,
+      "stability": 0.35,
       "similarity_boost": 0.8,
-      "style": 0.3,
+      "style": 0.5,
       "use_speaker_boost": true
-    }
+    },
+    "tempo": 1.2
   },
-  "musicVolume": 0.3,
-  "coverFrame": 185,
-  "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
+  "caption": "Самая сильная лоббистка Вашингтона отказывает оружейному лобби и переходит на сторону, где у неё почти нет шансов ♟️ Название фильма в конце видео 🎬 Смотрели? 👇",
   "hashtags": [
     "#кино",
     "#чтопосмотреть",
     "#фильмы",
-    "#netflix",
-    "#сныпоездов",
-    "#traindreams",
-    "#джоэлэдгертон",
-    "#оскар"
+    "#триллер",
+    "#политическийтриллер"
   ],
+  "poster": {
+    "src": "assets/miss-sloane/poster.jpg",
+    "titleRu": "Опасная игра Слоун",
+    "titleEn": "Miss Sloane",
+    "year": "2016",
+    "cta": "Отправь другу",
+    "seconds": 1.5
+  },
+  "instaCover": {
+    "top": "Самая",
+    "main": "Опасная",
+    "base": [
+      "#0a0d14",
+      "#141b2a",
+      "#1f2a3d",
+      "#0a0d14"
+    ],
+    "glows": [
+      {
+        "x": 230,
+        "y": 1650,
+        "r": 540,
+        "color": "#b3262e",
+        "opacity": 0.5
+      },
+      {
+        "x": 930,
+        "y": 1300,
+        "r": 420,
+        "color": "#3a5a8a",
+        "opacity": 0.45
+      },
+      {
+        "x": 720,
+        "y": 230,
+        "r": 440,
+        "color": "#c8742a",
+        "opacity": 0.35
+      }
+    ]
+  },
   "sources": [
     "https://en.wikipedia.org/wiki/Miss_Sloane",
     "https://www.imdb.com/title/tt4540710/",
@@ -39,259 +79,99 @@
   ],
   "scenes": [
     {
-      "set": "station",
-      "voice": "Его привезли на поезде, когда ему было семь лет. Ни семьи, ни дома. Только железная дорога и бесконечный лес.",
+      "set": "hearing",
+      "voice": "Самую опасную женщину Вашингтона вызывают в Сенат, и одно её слово может закончить всё.",
+      "ttsText": "[serious] Самую опасную женщину Вашингтона вызывают в Сенат, и одно её слово может закончить всё.",
       "emphasis": [
-        "семь",
-        "бесконечный",
-        "лес."
+        "опасную",
+        "Сенат,",
+        "слово"
       ],
-      "sfx": [
-        {
-          "prompt": "old steam locomotive slowly arriving at a small wooden country station at dawn, chuffing slowing down, brakes squealing, long steam hiss",
-          "at": 0,
-          "duration": 9,
-          "volume": 0.22
-        },
-        {
-          "prompt": "cold early morning forest ambience, light wind, distant crows",
-          "at": 0,
-          "duration": 10,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "valley",
-      "voice": "Так начинается «Сны поездов». История одной жизни длиной почти в целый век.",
+      "set": "office-night",
+      "voice": "Элизабет Слоун — лоббистка, которая почти не спит, не знает поражений и выигрывает там, где другие сдаются.",
+      "ttsText": "Элизабет Слоу́н — ло́ббистка, которая почти не спит, не знает поражений и выигрывает там, где другие сдаются.",
       "emphasis": [
-        "«Сны",
-        "поездов».",
-        "век."
+        "не",
+        "спит,",
+        "поражений"
       ],
-      "sfx": [
-        {
-          "prompt": "distant steam train whistle echoing across a wide night valley, then soft rumble of a far away train",
-          "at": 0.3,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "quiet night in the mountains, crickets, soft wind, an owl far away",
-          "at": 0,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 36
+      "pause": 6
     },
     {
-      "set": "logging",
-      "voice": "Роберт вырастает молчаливым лесорубом. Он валит сосны выше любого дома и строит мосты, по которым в эту глушь приходит новое время.",
+      "set": "lobby-offer",
+      "voice": "Но однажды оружейное лобби просит её сорвать закон о проверке покупателей оружия,",
+      "ttsText": "Но однажды оружейное ло́бби просит её сорвать закон о проверке покупателей оружия,",
       "emphasis": [
-        "лесорубом.",
-        "сосны",
-        "новое",
-        "время."
+        "оружейное",
+        "лобби",
+        "сорвать"
       ],
-      "sfx": [
-        {
-          "prompt": "deep old growth forest ambience, birds singing, light breeze in tall pines",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "single heavy axe chop into a thick tree trunk, crisp wooden thunk",
-          "at": 0.9,
-          "duration": 1,
-          "volume": 0.22,
-          "repeat": {
-            "every": 1.4,
-            "count": 5
-          }
-        },
-        {
-          "prompt": "giant tree creaking and cracking then crashing down to the forest floor far away",
-          "at": 7,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "bridge",
-      "voice": "На одной из строек он видит то, что потом будет преследовать его годами.",
+      "set": "walkout",
+      "voice": "а она смеётся им в лицо и переходит на другую сторону.",
+      "ttsText": "[laughs] а она смеётся им в лицо и переходит на другую сторону.",
       "emphasis": [
-        "видит",
-        "годами."
+        "смеётся",
+        "другую",
+        "сторону."
       ],
-      "sfx": [
-        {
-          "prompt": "railroad bridge construction at dusk, distant hammers striking wooden beams and iron spikes, gusty wind",
-          "at": 0,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "crows cawing ominously, low wind gust, tense atmosphere",
-          "at": 1.5,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "cabin",
-      "voice": "А потом появляется Глэдис. Они ставят маленький дом у реки, и впервые у Роберта есть место, куда хочется возвращаться.",
+      "set": "capitol",
+      "voice": "Против неё теперь бывшие коллеги, огромные деньги и сенаторы, которых не переубедить, а голосов катастрофически не хватает.",
       "emphasis": [
-        "Глэдис.",
-        "дом",
-        "возвращаться."
+        "бывшие",
+        "коллеги,",
+        "деньги",
+        "не",
+        "хватает."
       ],
-      "sfx": [
-        {
-          "prompt": "gentle river flowing past a cabin on a warm summer evening, crickets, soft frogs",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "crackling fireplace heard from a cabin porch, soft and cozy",
-          "at": 1,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "seasons",
-      "voice": "Но работа снова и снова уводит его в лес, на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить.",
+      "set": "dirty-war",
+      "voice": "И чем ближе голосование, тем грязнее приёмы, и уже непонятно, где кончается её игра и начинается чужая.",
       "emphasis": [
-        "лес,",
-        "месяцы.",
-        "быстрее,"
+        "грязнее",
+        "игра",
+        "чужая."
       ],
-      "sfx": [
-        {
-          "prompt": "footsteps crunching on autumn leaves then on snow, wind through bare trees, wind slowly turning into winter blizzard",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "campfire",
-      "voice": "Фильм снимали почти без ламп. Солнце, костры, свечи. Поэтому каждый кадр похож на старую фотографию, которая вдруг ожила.",
+      "set": "chess",
+      "voice": "Каждый её ход сначала выглядит ошибкой, пока не становится ясно, что она просчитала всё заранее.",
       "emphasis": [
-        "Солнце,",
-        "костры,",
-        "свечи.",
-        "ожила."
+        "ошибкой,",
+        "просчитала",
+        "заранее."
       ],
-      "sfx": [
-        {
-          "prompt": "campfire crackling and popping at night in a pine forest, gentle",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "old film projector whirring softly",
-          "at": 6,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "lake",
-      "voice": "Здесь нет погонь и громких сцен. Есть тишина, лес и гудок поезда вдалеке. И от этого почему-то невозможно оторваться.",
+      "set": "steps",
+      "voice": "Она всегда на шаг впереди, но что, если в этот раз впереди кто-то другой?",
+      "ttsText": "Она всегда на шаг впереди, но что, если в этот раз впереди кто-то друго́й?",
       "emphasis": [
-        "тишина,",
-        "гудок",
-        "оторваться."
+        "шаг",
+        "впереди,",
+        "кто-то",
+        "другой?"
       ],
-      "sfx": [
-        {
-          "prompt": "still lake at night in a misty forest, very quiet water lapping, loon call far away",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "lonely steam train whistle far away across a lake at night, long echo",
-          "at": 3.4,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "dawn",
-      "voice": "Четыре номинации на «Оскар». Кино, после которого хочется выключить свет и просто посидеть в тишине.",
-      "emphasis": [
-        "«Оскар».",
-        "тишине."
-      ],
-      "sfx": [
-        {
-          "prompt": "soft dawn in the mountains, first birds waking up, gentle breeze",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "finalTitle": "Сны поездов",
-      "pause": 28
+      "set": "poster",
+      "voice": "Фильм «Опасная игра Слоун», две тысячи шестнадцатый год. Отправь тому, кто всегда просчитывает на три хода вперёд, и подпишись, здесь каждый день новый фильм.",
+      "ttsText": "Фильм «Опасная игра Слоу́н», две тысячи шестнадцатый год. Отправь тому, кто всегда просчитывает на три хода вперёд, и подпишись, здесь каждый день новый фильм.",
+      "onPoster": true,
+      "pause": 6
     }
-  ],
-  "musicSeparate": true,
-  "poster": {
-    "src": "assets/train-dreams/poster.jpg",
-    "titleRu": "Сны поездов",
-    "titleEn": "Train Dreams",
-    "year": "2025"
-  },
-  "instaCover": {
-    "top": "Одна жизнь",
-    "main": "Длиной\nв век",
-    "base": [
-      "#08130f",
-      "#0e2b25",
-      "#123630",
-      "#0a1a16"
-    ],
-    "glows": [
-      {
-        "x": 230,
-        "y": 1650,
-        "r": 540,
-        "color": "#d08a3a",
-        "opacity": 0.75
-      },
-      {
-        "x": 940,
-        "y": 1250,
-        "r": 420,
-        "color": "#b9925a",
-        "opacity": 0.45
-      },
-      {
-        "x": 700,
-        "y": 230,
-        "r": 440,
-        "color": "#1d5a52",
-        "opacity": 0.55
-      }
-    ]
-  }
+  ]
 }
