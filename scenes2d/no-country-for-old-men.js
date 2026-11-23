@@ -9,7 +9,7 @@ setProportions(PROPS);
 // Мосс: усы, тёмные волосы, голубая рубашка на кнопках, джинсы, сапоги
 const MOSS = { shirt: '#7f9bb4', pants: '#3e5878', skin: '#c98e64', hair: '#2a1c14', iris: '#3a2414', beard: false, moustache: true, frown: 0.35, snaps: true, belt: true, boots: true };
 // Чигур: каре с чёлкой, тёмная джинсовая куртка, коричневая рубашка, бледная кожа
-const CHIGURH = { shirt: '#2a3342', pants: '#1a1d24', skin: '#d8b49a', hair: '#1a1410', iris: '#120a06', beard: false, frown: 0.25, bob: true, denim: true, boots: true };
+const CHIGURH = { shirt: '#2a3342', pants: '#1a1d24', skin: '#d8b49a', hair: '#1a1410', iris: '#120a06', beard: false, frown: 0.45, worried: true, bob: true, denim: true, boots: true };
 // Шериф Белл: светлая шляпа, бежевая рубашка, звезда, седые виски
 const BELL = { shirt: '#b8a27a', pants: '#5a4a38', skin: '#d4a07c', hair: '#9a948a', iris: '#4a3a2a', beard: false, frown: 0.45, hat: '#d8c8a2', star: true, belt: true, boots: true, grey: true };
 
@@ -70,7 +70,8 @@ function dress(x, y, s, o) {
   if (o.belt) b += `<rect x="${x - 98 * s}" y="${ty - 40 * s}" width="${196 * s}" height="${20 * s}" fill="${V('#4a2e1a', 0.2, 0.25)}"/><rect x="${x - 22 * s}" y="${ty - 46 * s}" width="${44 * s}" height="${32 * s}" rx="${8 * s}" fill="${V('#d8c48a', 0.35, 0.25)}" stroke="#7a5a2a" stroke-width="${2 * s}"/>`;
   if (o.bob) {
     // каре: волосы до челюсти, прямая чёлка над бровями
-    front += `<path d="M${x - hr * 1.02},${headY + hr * 0.5} Q${x - hr * 1.06},${headY - hr * 1.16} ${x},${headY - hr * 1.14} Q${x + hr * 1.06},${headY - hr * 1.12} ${x + hr * 1.02},${headY + hr * 0.5} L${x + hr * 0.8},${headY + hr * 0.52} L${x + hr * 0.8},${headY - hr * 0.36} L${x - hr * 0.8},${headY - hr * 0.36} L${x - hr * 0.8},${headY + hr * 0.52} Z" fill="${V(o.hair, 0.22, 0.2)}"/>`;
+    front += `<path d="M${x - hr * 1.14},${headY + hr * 0.62} L${x - hr * 1.14},${headY - hr * 0.3} Q${x - hr * 1.08},${headY - hr * 1.12} ${x},${headY - hr * 1.12} Q${x + hr * 1.08},${headY - hr * 1.12} ${x + hr * 1.14},${headY - hr * 0.3} L${x + hr * 1.14},${headY + hr * 0.62} L${x + hr * 0.78},${headY + hr * 0.62} L${x + hr * 0.84},${headY - hr * 0.2} Q${x + hr * 0.7},${headY - hr * 0.42} ${x + hr * 0.4},${headY - hr * 0.4} L${x - hr * 0.4},${headY - hr * 0.4} Q${x - hr * 0.7},${headY - hr * 0.42} ${x - hr * 0.84},${headY - hr * 0.2} L${x - hr * 0.78},${headY + hr * 0.62} Z" fill="${V(o.hair, 0.22, 0.2)}"/>`;
+    front += [-0.5, -0.15, 0.2, 0.55].map((k) => `<path d="M${x + hr * k},${headY - hr * 1.0} L${x + hr * (k + 0.02)},${headY - hr * 0.44}" stroke="#000" stroke-width="${hr * 0.03}" opacity="0.25"/>`).join('');
     front += `<path d="M${x - hr * 0.6},${headY - hr * 0.9} Q${x},${headY - hr * 1.02} ${x + hr * 0.5},${headY - hr * 0.88}" stroke="#fff" stroke-width="${hr * 0.05}" fill="none" opacity="0.18"/>`;
   }
   if (o.grey) front += [-1, 1].map((sd) => `<path d="M${x + sd * hr * 0.98},${headY - hr * 0.5} L${x + sd * hr * 0.9},${headY + hr * 0.15}" stroke="#d8d4cc" stroke-width="${hr * 0.12}" stroke-linecap="round"/>`).join('') + `<path d="M${x - hr * 0.5},${headY + hr * 0.28} q${hr * 0.1},${hr * 0.08} ${hr * 0.22},0 M${x + hr * 0.28},${headY + hr * 0.28} q${hr * 0.1},${hr * 0.08} ${hr * 0.22},0" stroke="${shade(o.skin, -0.3)}" stroke-width="${hr * 0.025}" fill="none"/>`;
@@ -115,6 +116,10 @@ function pickup(x, y, s, o = {}) {
   g += `<path d="M-290,-120 L-60,-120" stroke="${shade(c, 0.25)}" stroke-width="6"/><rect x="-290" y="-80" width="590" height="10" fill="${shade(c, 0.3)}" opacity="0.5"/>`;
   g += `<rect x="-306" y="-52" width="24" height="26" rx="4" fill="#c8ccd0"/><rect x="286" y="-56" width="26" height="30" rx="4" fill="#c8ccd0"/><rect x="284" y="-108" width="14" height="40" fill="#d8d8c8"/><circle cx="292" cy="-96" r="9" fill="#fff8d8"/>`;
   g += `<path d="M-60,-120 L-60,-40 M150,-120 L150,-40" stroke="${dk}" stroke-width="4"/><rect x="100" y="-108" width="30" height="8" rx="3" fill="#c8ccd0"/>`;
+  g += `<rect x="-290" y="-96" width="590" height="5" fill="#e0e4e8" opacity="0.8"/><rect x="-282" y="-112" width="6" height="70" fill="${dk}"/><path d="M-268,-108 L-268,-50" stroke="${dk}" stroke-width="2"/>`;
+  g += `<rect x="-30" y="-170" width="10" height="26" fill="#2a2a2a"/><rect x="-46" y="-176" width="22" height="30" rx="4" fill="#c8ccd0"/>`;
+  g += `<path d="M270,-104 L270,-44 M278,-104 L278,-44 M286,-104 L286,-44" stroke="#9a9ea2" stroke-width="2"/><rect x="180" y="-150" width="90" height="6" rx="3" fill="${shade(c, 0.25)}" opacity="0.6"/>`;
+  [-180, 190].forEach((wx) => { g += `<path d="M${wx - 86},-40 A86,86 0 0 1 ${wx + 86},-40" stroke="${shade(c, 0.2)}" stroke-width="6" fill="none"/>`; });
   [-180, 190].forEach((wx) => { g += `<path d="M${wx - 80},-40 A80,80 0 0 1 ${wx + 80},-40 Z" fill="#1a1612"/><circle cx="${wx}" cy="-30" r="62" fill="#18181a"/><circle cx="${wx}" cy="-30" r="34" fill="${V('#b8bcc0', 0.3, 0.3)}"/><circle cx="${wx}" cy="-30" r="10" fill="#6a6e72"/>`; });
   if (o.holes) { reseed(o.holes); for (let i = 0; i < 14; i++) g += `<circle cx="${-260 + rnd() * 520}" cy="${-190 + rnd() * 140}" r="${4 + rnd() * 3}" fill="#120c08"/>`; g += `<path d="M10,-180 l30,40 l-20,10 l40,30 M60,-160 l-30,20" stroke="#f0f4f4" stroke-width="2" fill="none" opacity="0.8"/>`; }
   if (o.door) g += `<path d="M-60,-120 L-130,-150 L-130,-50 L-60,-40 Z" fill="${V(c, 0.1, 0.35)}"/>`;
@@ -144,7 +149,10 @@ function mesas(y, c, op = 1, sd = 1) {
     else p += ` Q${x + w * 0.5},${y - h * 0.8} ${x + w},${y}`;
     x += w + rnd() * 60; p += ` L${x},${y}`;
   }
-  return `<path d="${p} L1100,${y + 40} L-20,${y + 40} Z" fill="${c}" opacity="${op}"/>`;
+  def(`<clipPath id="ms${sd}"><path d="${p} L1100,${y + 40} L-20,${y + 40} Z"/></clipPath>`);
+  let st = '';
+  for (let k = 1; k < 6; k++) st += `<rect x="-20" y="${y - k * 28}" width="1120" height="6" fill="#fff" opacity="0.07"/><rect x="-20" y="${y - k * 28 + 8}" width="1120" height="4" fill="#000" opacity="0.08"/>`;
+  return `<g opacity="${op}"><path d="${p} L1100,${y + 40} L-20,${y + 40} Z" fill="${V(c, 0.12, 0.2)}"/><g clip-path="url(#ms${sd})">${st}</g></g>`;
 }
 function creosote(x, y, s, c = '#5a6a3a') {
   let g = '';
@@ -158,6 +166,38 @@ function yucca(x, y, s) {
 }
 function scrub(y0, y1, n, sd = 4, c = '#5a6a3a') { reseed(sd); let g = ''; for (let i = 0; i < n; i++) { const y = y0 + rnd() * (y1 - y0), k = (y - y0) / (y1 - y0); g += creosote(rnd() * 1080, y, 0.3 + k * 1.1, c); } return g; }
 function stones(y0, y1, n, sd = 8, c = '#8a6a4a') { reseed(sd); let g = ''; for (let i = 0; i < n; i++) { const y = y0 + rnd() * (y1 - y0), k = 0.3 + ((y - y0) / (y1 - y0)) * 1.4; g += `<ellipse cx="${rnd() * 1080}" cy="${y}" rx="${(6 + rnd() * 14) * k}" ry="${(3 + rnd() * 6) * k}" fill="${shade(c, rnd() * 0.2 - 0.1)}"/>`; } return g; }
+// облака: размытые пласты
+function clouds(y, h, c1, c2, t = 0, n = 10, sd = 31) {
+  reseed(sd);
+  def('<filter id="cl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>');
+  let g = '';
+  for (let i = 0; i < n; i++) {
+    const cx = ((rnd() * 1500 + t * (5 + rnd() * 6)) % 1500) - 210, cy = y + rnd() * h, rx = 200 + rnd() * 260, ry = 26 + rnd() * 40;
+    g += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${c2}" opacity="0.5"/><ellipse cx="${cx - 30}" cy="${cy - ry * 0.5}" rx="${rx * 0.7}" ry="${ry * 0.5}" fill="${c1}" opacity="0.55"/>`;
+  }
+  return `<g filter="url(#cl)">${g}</g>`;
+}
+// опунция: лепёшки с колючками и цветами
+function pear(x, y, s, c = '#6a8a4a') {
+  const pads = [[0, -50, 40, 52, 0], [-44, -110, 32, 42, -25], [40, -116, 34, 44, 22], [6, -170, 28, 36, 5], [-70, -50, 30, 38, -40]];
+  let g = '';
+  pads.forEach(([dx, dy, rx, ry, r], i) => {
+    const cx = x + dx * s, cy = y + dy * s;
+    g += `<ellipse cx="${cx}" cy="${cy}" rx="${rx * s}" ry="${ry * s}" transform="rotate(${r} ${cx} ${cy})" fill="${V(shade(c, i * 0.04), 0.2, 0.3)}"/>`;
+    for (let k = 0; k < 5; k++) g += `<circle cx="${cx + Math.cos(k * 1.7 + i) * rx * 0.55 * s}" cy="${cy + Math.sin(k * 1.7 + i) * ry * 0.55 * s}" r="${2 * s}" fill="#e8e0b0"/>`;
+  });
+  g += `<circle cx="${x + 6 * s}" cy="${y - 208 * s}" r="${9 * s}" fill="#e8c040"/><circle cx="${x + 62 * s}" cy="${y - 152 * s}" r="${8 * s}" fill="#d84a5a"/>`;
+  return `<g filter="url(#soft)">${g}</g>`;
+}
+// валун с бликом и трещинами
+function boulder(x, y, w, c = '#9a6a48') {
+  const h = w * 0.6;
+  return `<g filter="url(#soft)"><path d="M${x - w / 2},${y} Q${x - w * 0.55},${y - h * 0.8} ${x - w * 0.1},${y - h} Q${x + w * 0.4},${y - h * 1.05} ${x + w / 2},${y - h * 0.3} L${x + w / 2},${y} Z" fill="${V(c, 0.2, 0.35)}"/><path d="M${x - w * 0.3},${y - h * 0.75} Q${x},${y - h * 0.95} ${x + w * 0.25},${y - h * 0.8}" stroke="${shade(c, 0.3)}" stroke-width="${w * 0.03}" fill="none" opacity="0.6"/><path d="M${x + w * 0.05},${y - h * 0.9} l${-w * 0.06},${h * 0.3} l${w * 0.08},${h * 0.2}" stroke="${shade(c, -0.35)}" stroke-width="${w * 0.015}" fill="none"/></g>`;
+}
+// дорожный щит трассы
+function routeSign(x, y, s, txt = '90') {
+  return `<g filter="url(#soft)"><rect x="${x - 4 * s}" y="${y - 160 * s}" width="${8 * s}" height="${160 * s}" fill="#7a7a7a"/><path d="M${x - 40 * s},${y - 200 * s} L${x + 40 * s},${y - 200 * s} L${x + 40 * s},${y - 150 * s} Q${x},${y - 120 * s} ${x - 40 * s},${y - 150 * s} Z" fill="#f4f0e4" stroke="#1a1a1a" stroke-width="${3 * s}"/><text x="${x}" y="${y - 158 * s}" font-family="Arial Black,Arial" font-weight="900" font-size="${34 * s}" text-anchor="middle" fill="#1a1a1a">${txt}</text><text x="${x}" y="${y - 186 * s}" font-family="Arial" font-weight="700" font-size="${11 * s}" text-anchor="middle" fill="#1a1a1a">TEXAS</text></g>`;
+}
 // столбы с колючей проволокой
 function fence(pts, c = '#3a2a1c') {
   let g = '';
@@ -229,8 +269,8 @@ const popScale = (f) => (f < 6 ? lerp(0.2, 1.12, f / 6) : f < 10 ? lerp(1.12, 0.
 // at — секунда появления от начала плана (AUDIO_DELAY 4 кадра + время слова)
 const D = 4 / 30;
 const STICKERS = [
-  { k: 'bardem', x: 300, y: 1010, w: 450, h: 540, at: D + 0.0, tilt: -5 },
-  { k: 'chigurh', x: 790, y: 1020, w: 360, h: 640, at: D + 0.73, tilt: 4 },
+  { k: 'bardem', x: 300, y: 950, w: 400, h: 470, at: D + 0.0, tilt: -5 },
+  { k: 'chigurh', x: 780, y: 960, w: 290, h: 520, at: D + 0.73, tilt: 4 },
 ];
 function sticker(s, t, i) {
   const dt = t - s.at;
@@ -241,10 +281,10 @@ function sticker(s, t, i) {
 }
 // четыре статуэтки под «четыре статуэтки, включая главную»: последняя — крупнее, с сиянием
 const AWARDS = [
-  { x: 170, y: 1500, h: 300, at: D + 4.9, tilt: -6 },
-  { x: 405, y: 1510, h: 310, at: D + 5.25, tilt: -2 },
-  { x: 650, y: 1510, h: 310, at: D + 5.6, tilt: 2 },
-  { x: 895, y: 1500, h: 380, at: D + 6.27, tilt: 6, main: true },
+  { x: 210, y: 1490, h: 250, at: D + 4.9, tilt: -4 },
+  { x: 420, y: 1490, h: 250, at: D + 5.25, tilt: -1 },
+  { x: 630, y: 1490, h: 250, at: D + 5.6, tilt: 1 },
+  { x: 840, y: 1490, h: 250, at: D + 6.27, tilt: 4, main: true },
 ];
 
 const DESERT_NOON = [[0, '#6a9ac8'], [0.55, '#b8d0e0'], [1, '#f0e4c8']];
@@ -259,6 +299,7 @@ const shots = {
       els: [
         sky(DESERT_NOON, 1300),
         glow(860, 300, 360, '#fffbe8', 0.8), `<circle cx="860" cy="300" r="60" fill="#fffdf2"/>`,
+        clouds(700, 300, '#ffffff', '#c8d8e8', t, 8, 41),
         mesas(1130, '#b88a6a', 0.55, 2),
         mesas(1170, '#a86a48', 0.85, 5),
         `<rect x="0" y="1160" width="1080" height="760" fill="${V('#d0a874', 0.06, 0.4)}"/>`,
@@ -272,7 +313,10 @@ const shots = {
         `<g opacity="${near}" transform="translate(${630 + wave(t, 0.7) * 3} 0)"><g filter="url(#blur4)">${man(0, 1210, 0.16 + 0.05 * k, { ...CHIGURH, arms: 'down', sil: silFilter('#1a1410') })}</g></g>`,
         heat(t, 1150, 90, 0.35),
         stones(1300, 1900, 50, 9),
+        routeSign(880, 1420, 1.1),
         yucca(140, 1720, 1.6),
+        boulder(960, 1800, 260),
+        pear(70, 1900, 1.3),
         // Мосс
         glow(470, 1500, 520, '#fff4d8', 0.18),
         man(470, 2150, 1.7, { ...MOSS, arms: 'hold', look: 1, frown: 0.65, worried: true, blink: blink(t, 0.9), sweat: (t * 0.6) % 1 }),
@@ -293,6 +337,7 @@ const shots = {
         sky(DESERT_DUSK, 1300),
         glow(300, 1100, 420, '#ffe0a0', 0.9), `<circle cx="300" cy="1110" r="80" fill="#fff0c8"/>`,
         `<g opacity="0.7">${[0, 1, 2].map((i) => `<ellipse cx="${200 + i * 320}" cy="${420 + i * 110}" rx="${260}" ry="18" fill="#f0a070" opacity="0.5"/>`).join('')}</g>`,
+        clouds(560, 380, '#ffc890', '#a85a5a', t, 9, 43),
         mesas(1130, '#7a3a3a', 0.8, 7),
         `<rect x="0" y="1120" width="1080" height="800" fill="${V('#a8643a', 0.05, 0.45)}"/>`,
         ...[[180, 1190, 0.36, 0], [260, 1200, 0.4, 1], [330, 1186, 0.32, 2], [420, 1196, 0.36, 3]].map(([x, y, s, ph]) => antelope(x, y, s, t, ph, '#8a5030')),
@@ -304,6 +349,8 @@ const shots = {
         // скала на переднем плане
         `<path d="M380,1920 L420,1700 Q520,1620 700,1640 Q900,1600 1100,1680 L1100,1920 Z" fill="${V('#6a3424', 0.15, 0.45)}"/><path d="M460,1720 Q600,1680 760,1700 M820,1660 Q940,1650 1080,1700" stroke="#8a4a30" stroke-width="6" fill="none" opacity="0.6"/>`,
         creosote(440, 1720, 1.2, '#4a4a2a'),
+        pear(1010, 1820, 1.0, '#4a6a3a'),
+        boulder(170, 1880, 300, '#7a3a28'),
         shadow(800, 1690, 150, 0.35),
         man(800, 1690, 0.95, { ...MOSS, arms: 'rifle', look: -1, frown: 0.3, blink: blink(t, 1.3) }),
         grade('#ffb070', 0.3),
@@ -321,6 +368,7 @@ const shots = {
         sky(DESERT_NOON, 1300),
         glow(200, 280, 300, '#fffbe8', 0.7),
         ...[0, 1, 2].map((i) => vulture(560 + i * 150 + Math.cos(t * 0.6 + i * 2) * 90, 380 + i * 50 + Math.sin(t * 0.6 + i * 2) * 30, 0.8 - i * 0.15, t, i)),
+        clouds(640, 300, '#ffffff', '#c8d8e8', t, 7, 47),
         mesas(1120, '#b88a6a', 0.6, 9),
         `<rect x="0" y="1110" width="1080" height="810" fill="${V('#c89c68', 0.06, 0.42)}"/>`,
         scrub(1120, 1300, 16, 11),
@@ -332,7 +380,8 @@ const shots = {
         fallen(540, 1360, 0.6, 8), fallen(330, 1400, 0.55, -12), fallen(760, 1420, 0.65, 4),
         dog(980, 1460, 0.6),
         stones(1300, 1900, 60, 12),
-        creosote(80, 1780, 1.5), creosote(1010, 1840, 1.7),
+        creosote(80, 1780, 1.5), pear(1000, 1880, 1.2), boulder(240, 1900, 220),
+        ...[[380, 1500], [620, 1460], [700, 1560], [450, 1600]].map(([x, y]) => `<g fill="#c8a040">${[0, 1, 2].map((i) => `<rect x="${x + i * 12}" y="${y + (i % 2) * 6}" width="5" height="12" rx="2" transform="rotate(${i * 40} ${x + i * 12} ${y})"/>`).join('')}</g>`),
         shadow(560, 1880, 170, 0.35),
         man(560, 1880, 1.12, { ...MOSS, arms: 'rifle', look: -0.6, frown: 0.6, worried: true, step: wave(t, 0.6) * 0.6, blink: blink(t, 2.1) }),
         grade('#ffd8a0', 0.25),
@@ -368,6 +417,7 @@ const shots = {
         sky(DESERT_DUSK, 1300),
         glow(760, 1080, 460, '#ffe0a0', 0.9), `<circle cx="760" cy="1090" r="90" fill="#fff0c8"/>`,
         ...[0, 1, 2, 3].map((i) => vulture(300 + i * 160 + Math.cos(t * 0.5 + i * 2) * 70, 360 + i * 40 + Math.sin(t * 0.5 + i) * 30, 0.7 - i * 0.1, t, i)),
+        clouds(600, 360, '#ffb878', '#8a4a4a', t, 8, 53),
         mesas(1120, '#5a2a2a', 0.9, 9),
         `<rect x="0" y="1110" width="1080" height="810" fill="${V('#8a4a2a', 0.04, 0.5)}"/>`,
         pickup(260, 1230, 0.3, { c: '#2a1a14', holes: 2, door: true }), pickup(500, 1236, 0.3, { c: '#2a1a14', flip: true }),
@@ -375,6 +425,7 @@ const shots = {
         `<path d="M${560 + 300 * k},1880 L${640 + 400 * k},1880" stroke="#000" stroke-width="0"/>`,
         `<path d="M480,1900 L1080,1500 L1080,1560 L560,1920 Z" fill="#000" opacity="0.25"/>`,
         stones(1400, 1900, 30, 15, '#6a3a22'),
+        yucca(150, 1760, 1.4), pear(980, 1900, 1.1, '#4a5a32'),
         shadow(lerp(520, 640, k), 1840, 150, 0.35),
         man(lerp(520, 640, k), 1840, 1.05, { ...MOSS, arms: 'down', step: wave(t, 1.1), look: -1, frown: 0.5, worried: true, blink: blink(t, 0.4) }),
         (() => { const [hx, hy] = handPos(lerp(520, 640, k), 1840, 1.05, 1); return satchel(hx + 10, hy + 80, 170, { rot: 4 }); })(),
@@ -404,10 +455,13 @@ const shots = {
         ...[540, 720].map((x) => `<g filter="url(#soft)"><rect x="${x - 30}" y="1090" width="60" height="140" rx="8" fill="${V('#c8d0c8', 0.25, 0.35)}"/><rect x="${x - 22}" y="1104" width="44" height="34" fill="#2a2a2a"/><rect x="${x - 18}" y="1150" width="36" height="20" fill="#8a2a22"/></g>`),
         `<g><rect x="880" y="760" width="12" height="480" fill="#2a2a2a"/><rect x="820" y="700" width="140" height="100" rx="8" fill="#a8322a"/><text x="890" y="768" font-family="Arial Black,Arial" font-weight="900" font-size="44" fill="#fff4d8" text-anchor="middle">GAS</text></g>`,
         glow(890, 750, 160, '#ff6a50', 0.3),
+        `<g filter="url(#soft)"><rect x="300" y="1150" width="110" height="80" rx="6" fill="${V('#e8e8e0', 0.2, 0.35)}"/><text x="355" y="1200" font-family="Arial Black,Arial" font-size="30" text-anchor="middle" fill="#3a6aa8">ICE</text>${[0, 1, 2].map((i) => `<rect x="${430 + i * 26}" y="1196" width="22" height="34" rx="3" fill="${['#a8322a', '#3a5a8a', '#c8a040'][i]}"/>`).join('')}</g>`,
+        ...[0, 1, 2, 3].map((i) => `<circle cx="${890 + Math.cos(t * 3 + i * 1.6) * 40}" cy="${740 + Math.sin(t * 4 + i) * 30}" r="3" fill="#fff4d8" opacity="0.8"/>`),
+        poles([[1060, 1260, 300], [960, 1190, 140]], '#0a0a0e'),
         stones(1260, 1900, 30, 31, '#3a3230'),
         // Чигур
         shadow(540, 1900, 190, 0.45),
-        man(540, 1900, 1.3, { ...CHIGURH, arms: 'down', look: 0, frown: 0.2, blink: blink(t, 2.2) }),
+        man(540, 1900, 1.3, { ...CHIGURH, arms: 'down', look: 0, frown: 0.5, blink: blink(t, 2.2) }),
         airTank(hx - 10, 1890, 1.1, hx + 340, hy - 10),
         boltGun(hx + 320, hy - 40, 0.9),
         glow(560, 1300, 420, '#ffc870', 0.12),
@@ -434,7 +488,9 @@ const shots = {
           `<rect x="520" y="600" width="480" height="640" fill="${grad([[0, '#ffe8b0', 0], [Math.max(0, sweep - 0.15), '#ffe8b0', 0], [sweep, '#ffe8b0', 0.75], [Math.min(1, sweep + 0.15), '#ffe8b0', 0], [1, '#ffe8b0', 0]], false)}"/>`,
           `<path d="M520,600 Q560,900 540,1240 L700,1240 Q720,900 680,600 Z" fill="${V('#8a6a3a', 0.15, 0.35)}"/><path d="M1000,600 Q960,900 990,1240 L900,1240 Q860,900 880,600 Z" fill="${V('#8a6a3a', 0.15, 0.35)}"/>`,
           glow(800, 900, 240, '#ffe8b0', 0.4 * (sweep > 0.3 && sweep < 0.7 ? 1 : 0.3)),
-          `<rect x="0" y="1480" width="1080" height="440" fill="${V('#4a3a2a', 0.08, 0.45)}"/>`,
+          `<g transform="rotate(-2 230 760)" filter="url(#soft)"><rect x="110" y="660" width="260" height="190" fill="${V('#6a4a2a', 0.2, 0.3)}"/><rect x="126" y="676" width="228" height="158" fill="${grad([[0, '#e8a060'], [1, '#8a4a3a']])}"/><path d="M126,800 L190,740 L240,780 L300,720 L354,790 L354,834 L126,834 Z" fill="#5a2a2a"/></g>`,
+          `<rect x="700" y="1260" width="180" height="110" rx="8" fill="${V('#b8b4a8', 0.2, 0.35)}"/>${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="712" y="${1274 + i * 14}" width="156" height="5" fill="#6a6a60"/>`).join('')}`,
+          `<rect x="0" y="1480" width="1080" height="440" fill="${V('#4a3a2a', 0.08, 0.45)}"/>${[...Array(9)].map((_, i) => `<path d="M${i * 140 - 60},1920 L${300 + i * 60},1480" stroke="#3a2a1c" stroke-width="2" opacity="0.6"/>`).join('')}`,
           // кровать, сумка, лампа на тумбочке
           `<g filter="url(#soft)"><rect x="-40" y="1360" width="520" height="200" rx="20" fill="${V('#7a5a4a', 0.2, 0.35)}"/><rect x="-40" y="1340" width="520" height="60" rx="20" fill="${V('#c8b8a0', 0.2, 0.3)}"/><rect x="-40" y="1280" width="40" height="300" fill="#4a3424"/></g>`,
           satchel(260, 1330, 200, { rot: -8 }),
@@ -450,6 +506,7 @@ const shots = {
       cam: { z: lerp(1.04, 1.12, k), y: lerp(0, -30, k) },
       els: [
         sky([[0, '#3a4a7a'], [0.5, '#c88a7a'], [0.85, '#f0c090'], [1, '#f8e0b0']], 1300),
+        clouds(620, 360, '#ffd8b8', '#8a7090', t, 8, 59),
         glow(800, 1140, 400, '#ffe8b8', 0.8),
         mesas(1140, '#5a4a5a', 0.85, 13),
         `<rect x="0" y="1130" width="1080" height="790" fill="${V('#b08a68', 0.06, 0.42)}"/>`,
@@ -460,8 +517,10 @@ const shots = {
         scrub(1140, 1400, 18, 22),
         `<g filter="url(#soft)">${pickup(880, 1260, 0.4, { c: '#e8e4d8', flip: true })}</g><rect x="${880 - 30}" y="${1260 - 92}" width="60" height="14" rx="4" fill="#a8322a"/><rect x="${880 - 30}" y="${1260 - 92}" width="30" height="14" rx="4" fill="#3a5aa8"/>`,
         stones(1300, 1900, 40, 23),
-        shadow(520, 1900, 200, 0.35),
-        man(520, 1900, 1.6, { ...BELL, pose: 'crouch', arms: 'hold', look: 0.5, frown: 0.55, blink: blink(t, 1.4) }),
+        routeSign(140, 1500, 0.9),
+        boulder(930, 1900, 240), creosote(80, 1860, 1.4),
+        shadow(500, 1900, 180, 0.35),
+        man(500, 1900, 1.25, { ...BELL, arms: 'down', look: 0.6, frown: 0.55, nod: 1, blink: blink(t, 1.4) }),
         grade('#ffd0a0', 0.25),
         topShade(900, 0.55),
       ],
@@ -482,7 +541,7 @@ const shots = {
         AWARDS.map((a, i) => {
           const dt = t - a.at; if (dt < 0) return '';
           const f = dt * 30, wob = wave(t, 0.4, i) * 2;
-          return (a.main ? glow(a.x, a.y - a.h * 0.5, 260, '#ffe08a', 0.5 * clamp(f / 6)) : '') + `<g transform="translate(${a.x} ${a.y}) scale(${popScale(f)}) translate(${-a.x} ${-a.y})" opacity="${clamp(f / 3)}">${statuette(a.x, a.y, a.h, a.tilt + wob)}</g>`;
+          return (a.main ? glow(a.x, a.y - a.h * 0.5, 180, '#ffe08a', 0.35 * clamp(f / 6)) : '') + `<g transform="translate(${a.x} ${a.y}) scale(${popScale(f)}) translate(${-a.x} ${-a.y})" opacity="${clamp(f / 3)}">${statuette(a.x, a.y, a.h, a.tilt + wob)}</g>`;
         }).join(''),
         topShade(900, 0.5),
       ],
