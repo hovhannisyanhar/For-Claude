@@ -270,7 +270,7 @@ const shots = {
   // 1. Хук: полицейская машина подъезжает к больнице, Макмёрфи в наручниках выходит и идёт на нас с ухмылкой; за спиной закрываются ворота
   arrival(t, T) {
     const k = sine(t / T);
-    const car = io(t / 1.1), door = at(t, 0.2, 0.5), walk = io((t - D - 0.4) / 3.2), shut = at(t, 4.5, 0.9);
+    const car = io(t / 0.7), door = io(t / 0.6), walk = io(t / 3.0), shut = at(t, 4.5, 0.9);
     const camX = lerp(40, -30, k);
     return {
       cam: { z: lerp(1.0, 1.12, k), y: lerp(10, -40, k) },
@@ -285,8 +285,8 @@ const shots = {
         // охранник у машины
         par(camX * 0.7, 0, `<g opacity="${car}">${figure(lerp(1300, 940, car), 1440, 0.5, { shirt: '#2a3446', pants: '#1e2632', skin: '#d8a888', hair: '#3a2a1a', beard: false, cap: '#1e2632', frown: 0.6, blink: blink(t, 1) })}</g>`),
         // Макмёрфи идёт на камеру
-        par(camX, 0, shadow(lerp(700, 520, walk), lerp(1480, 1960, walk), lerp(90, 240, walk), 0.3) +
-          mac(lerp(720, 520, walk), lerp(1480, 2280, walk), lerp(0.5, 1.6, walk), { arms: 'hold', cuffs: true, grin: t > D + 0.6, look: lerp(-0.6, 0.2, walk), wink: t > D + 1.0 && t < D + 1.35, step: wave(t, 1.1) * (1 - walk * 0.7), nod: wave(t, 2.2) * 0.6, blink: blink(t, 0.3) })),
+        par(camX, 0, shadow(lerp(640, 520, walk), lerp(1800, 1960, walk), lerp(160, 240, walk), 0.3) +
+          mac(lerp(640, 520, walk), lerp(1900, 2280, walk), lerp(1.05, 1.6, walk), { arms: 'hold', cuffs: true, grin: t > D + 0.6, look: lerp(-0.6, 0.2, walk), wink: t > D + 1.0 && t < D + 1.35, step: wave(t, 1.1) * (1 - walk * 0.7), nod: wave(t, 2.2) * 0.6, blink: blink(t, 0.3) })),
         par(camX * 1.3, 0, rain(t, 50, 0.18)),
         grade('#a8c0d0', 0.25),
         topShade(800, 0.55),
