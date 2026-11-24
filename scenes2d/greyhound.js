@@ -29,9 +29,9 @@ function sticker(s, t, i) {
   if (dt < 0 || !IMG[s.k]) return '';
   const f = dt * 30;
   const pop = f < 6 ? lerp(0.2, 1.12, f / 6) : f < 10 ? lerp(1.12, 0.96, (f - 6) / 4) : f < 14 ? lerp(0.96, 1, (f - 10) / 4) : 1;
-  const out = s.out != null ? 1 - io((t - s.out) / 0.5) : 1;
+  const out = s.out != null ? 1 - sine((t - s.out) / 0.9) : 1;
   const wob = wave(t, 0.35, i * 2) * 2.4, bob = wave(t, 0.25, i * 1.3) * 7;
-  return `<defs>${STICKER_FILTER}</defs><g transform="translate(${s.x - (1 - out) * 700} ${s.y + bob}) rotate(${s.tilt + wob}) scale(${pop})" opacity="${clamp(f / 3) * clamp(out * 1.5)}"><image href="${IMG[s.k]}" x="${-s.w / 2}" y="${-s.h / 2}" width="${s.w}" height="${s.h}" preserveAspectRatio="xMidYMid meet" filter="url(#stk)"/></g>`;
+  return `<defs>${STICKER_FILTER}</defs><g transform="translate(${s.x - (1 - out) * 120} ${s.y + bob}) rotate(${s.tilt + wob}) scale(${pop})" opacity="${clamp(f / 3) * clamp(out * 1.5)}"><image href="${IMG[s.k]}" x="${-s.w / 2}" y="${-s.h / 2}" width="${s.w}" height="${s.h}" preserveAspectRatio="xMidYMid meet" filter="url(#stk)"/></g>`;
 }
 
 // ---------- персонажи ----------
@@ -181,11 +181,11 @@ const shots = {
   // 1. Ночной мостик в красном свете: крупно Краузе, рядом радист; из рации идут волны на «враг», лицо мрачнеет к «не доживут»
   radio(t, T) {
     const k = sine(t / T);
-    const camX = lerp(30, -30, k);
+    const camX = lerp(12, -12, k);
     const call = at(t, 1.7, 0.4), enemy = at(t, 2.5, 0.3), doom = at(t, 4.6, 0.5);
     const ring = (i) => { const p = ((t - D - 2.5) * 0.9 + i / 3) % 1; return t - D < 2.5 ? '' : `<circle cx="210" cy="1060" r="${40 + p * 260}" fill="none" stroke="#ff6a4a" stroke-width="${6 - p * 4}" opacity="${0.6 * (1 - p) * enemy}"/>`; };
     return {
-      cam: { z: lerp(1.0, 1.14, k), y: lerp(0, -50, k) },
+      cam: { z: lerp(1.0, 1.07, k), y: lerp(0, -25, k) },
       els: [
         `<rect width="1080" height="1920" fill="#07090e"/>`,
         // за стеклом: чёрный океан, луч прожектора со снегом
@@ -208,12 +208,12 @@ const shots = {
   // 2. Утро: Краузе на крыле мостика; камера отъезжает, за кормой открываются колонны транспортов до горизонта
   convoy(t, T) {
     const k = sine(t / T), reveal = io((t - D - 1.6) / 3.6);
-    const camX = lerp(-20, 30, k);
+    const camX = lerp(-10, 15, k);
     let ships = '';
     const rows = [[860, 0.16, 6, 0.3], [930, 0.24, 5, 0.18], [1030, 0.36, 4, 0.05]];
     rows.forEach(([y, s, n, fade], ri) => { for (let i = 0; i < n; i++) ships += `<g opacity="${clamp(reveal * 1.6 - i * 0.12)}">${freighter(-60 + i * (1200 / n) + ri * 70 + t * 6, y, s, t, ['#4a3a34', '#3a4248', '#5a4a3a', '#44403a'][(i + ri) % 4], i + ri * 7)}</g>`; ships += `<rect x="-300" y="${y - 260 * s}" width="1680" height="${300 * s}" fill="#b8c4cc" opacity="${fade}"/>`; });
     return {
-      cam: { z: lerp(1.45, 1.0, io((t - D) / (T * 0.85))), y: lerp(-260, 0, io((t - D) / (T * 0.85))), x: lerp(60, 0, k) },
+      cam: { z: lerp(1.2, 1.0, sine((t - D) / (T * 0.95))), y: lerp(-120, 0, sine((t - D) / (T * 0.95))), x: lerp(30, 0, k) },
       els: [
         sky('#7a8a98', '#aab6c0', '#c4ccd2') + clouds(t, 160, '#e2e8ec', 0.7, 10, 14),
         glow(820, 520, 360, '#fff4e0', 0.35),
@@ -232,7 +232,7 @@ const shots = {
   // 3. Штурманский стол: на карте посреди океана растекается «Чёрная яма», пять отметок суток; потом последний самолёт качает крыльями и уходит
   gap(t, T) {
     const k = sine(t / T);
-    const pit = at(t, 0.6, 1.0), days = (i) => at(t, 1.8 + i * 0.12, 0.25), sw = io((t - D - 2.7) / 0.7);
+    const pit = at(t, 0.6, 1.0), days = (i) => at(t, 1.8 + i * 0.12, 0.25), sw = sine((t - D - 2.5) / 1.3);
     const route = clamp((t - D) / 2.6);
     // карта
     let map = `<rect x="80" y="760" width="920" height="1060" rx="6" fill="${V('#d8ccaa', 0.1, 0.25)}"/>`;
@@ -255,13 +255,13 @@ const shots = {
     map += `<g transform="rotate(${ca} 700 900)"><path d="M700,900 L640,1180 M700,900 L760,1170" stroke="#9aa0a6" stroke-width="7" stroke-linecap="round"/><circle cx="700" cy="900" r="14" fill="#c8a860"/></g>`;
     const table = `<rect x="-200" y="560" width="1480" height="1500" fill="${V('#4a3020', 0.1, 0.35)}"/>` + map + glow(540, 1050, 700, '#ffcf80', 0.25) + `<path d="M540,0 L540,560" stroke="#222" stroke-width="6"/><path d="M430,600 Q540,520 650,600 Z" fill="#2a3a2e"/>`;
     // небо с самолётом
-    const pl = clamp((t - D - 2.8) / 3.0), wag = Math.sin((t - D - 2.8) * 6) * 16 * clamp(1 - Math.abs(pl - 0.45) * 3);
+    const pl = clamp((t - D - 2.8) / 3.0), wag = Math.sin((t - D - 2.8) * 4) * 10 * clamp(1 - Math.abs(pl - 0.45) * 3);
     const px2 = lerp(1250, -250, sine(pl)), py2 = lerp(1050, 820, pl) - Math.sin(pl * Math.PI) * 90;
     const skyG = sky('#5a6876', '#8a98a4', '#a8b2ba') + clouds(t, 600, '#d8dfe4', 0.6, 9, 20, 9) + sea(t, 1300, '#3a4a58', '#dde6ec', 0.9) +
       [0, 1, 2, 3].map((i) => freighter(140 + i * 250 + (i % 2) * 40, 1370 + (i % 2) * 70, 0.17 + (i % 2) * 0.05, t, '#3a3a3a', i)).join('') +
       plane(px2, py2, 1.05, wag + pl * 12);
     return {
-      cam: { z: lerp(1.05, 1.15, k), y: lerp(20, -30, k) },
+      cam: { z: lerp(1.03, 1.09, k), y: lerp(10, -15, k) },
       els: [
         `<g opacity="${1 - sw}" transform="translate(0 ${-sw * 120})">${table}</g>`,
         `<g opacity="${sw}">${skyG}</g>`,
@@ -273,7 +273,7 @@ const shots = {
 
   // 4. Под водой: под днищами конвоя скользят подлодки; на «бьют» — ночная поверхность, перископ, след торпеды; на «исчезают» перископ уходит
   wolves(t, T) {
-    const sw = io((t - D - 1.45) / 0.45);
+    const sw = sine((t - D - 1.1) / 1.0);
     const k = sine(t / T);
     // подводный мир
     let under = `<rect x="-200" y="-100" width="1480" height="2200" fill="${grad([[0, '#2a5a5a'], [0.35, '#123232'], [1, '#040c0e']])}"/>`;
@@ -291,7 +291,7 @@ const shots = {
     surf += `<path d="M${lerp(300, 700, torp * 0.9)},${lerp(1500, 1060, torp * 0.9)} L300,1500" stroke="#e8f2f8" stroke-width="${lerp(14, 6, torp)}" opacity="${0.75 * clamp(torp * 4) * (1 - clamp((torp - 0.85) * 6))}" stroke-linecap="round"/>`;
     surf += periscope(300, 1500, 280 * up * (1 - down), t, clamp(up * 3) * (1 - down * 0.8));
     return {
-      cam: { z: lerp(1.0, 1.1, k), y: lerp(0, -40, k), x: lerp(20, -20, k) },
+      cam: { z: lerp(1.0, 1.06, k), y: lerp(0, -20, k), x: lerp(10, -10, k) },
       els: [
         `<g opacity="${1 - sw}">${under}</g>`,
         `<g opacity="${sw}">${surf}</g>`,
@@ -302,11 +302,11 @@ const shots = {
 
   // 5. Мостик днём в шторм: офицеры ждут приказа, брызги в стекло, кофе стынет; на «команда» Краузе указывает, камера подходит
   bridge(t, T) {
-    const k = sine(t / T), roll = wave(t, 0.12) * 3.5;
+    const k = sine(t / T), roll = wave(t, 0.1) * 1.5;
     const cmd = at(t, 2.3, 0.5), push = io((t - D - 3.0) / 2.2), err = at(t, 4.4, 0.4);
     const spray = (seed) => { reseed(seed); let g = ''; for (let i = 0; i < 26; i++) { const x = rnd() * 1080, y = 560 + rnd() * 560, r = 3 + rnd() * 10; g += `<circle cx="${x}" cy="${y + ((t * 30 * rnd()) % 80)}" r="${r}" fill="#dfe8ee" opacity="${0.18 + rnd() * 0.2}"/>`; } return g; };
     return {
-      cam: { z: lerp(1.0, 1.28, push), y: lerp(0, -170, push), x: lerp(-20, 0, k) },
+      cam: { z: lerp(1.0, 1.12, push), y: lerp(0, -80, push), x: lerp(-10, 0, k) },
       els: [
         `<rect width="1080" height="1920" fill="#1a1f26"/>`,
         // за стеклом: шторм, горизонт плавно качается
@@ -332,14 +332,14 @@ const shots = {
 
   // 6. Выбор: экран гидролокатора с отметкой → плот с людьми в ледяной воде → вид в перископ: эсминец в перекрестье
   dilemma(t, T) {
-    const pan = io((t - D - 1.2) / 0.6), scope = io((t - D - 3.4) / 0.6);
-    const sweep = ((t - D) * 2.2) % (Math.PI * 2);
+    const pan = sine((t - D - 0.9) / 1.2), scope = sine((t - D - 3.1) / 1.1);
+    const sweep = ((t - D) * 1.4) % (Math.PI * 2);
     // гидролокатор
     let sonar = `<rect x="-400" y="-200" width="1480" height="2300" fill="#0a0e0c"/><circle cx="540" cy="1100" r="400" fill="${R('#0e3a24', 0.15, 0.4)}"/>`;
     for (let r = 100; r <= 400; r += 100) sonar += `<circle cx="540" cy="1100" r="${r}" fill="none" stroke="#3aff9a" stroke-width="2" opacity="0.25"/>`;
     sonar += `<path d="M540,1100 L${540 + Math.cos(sweep) * 400},${1100 + Math.sin(sweep) * 400}" stroke="#7affc0" stroke-width="5" opacity="0.8"/>`;
     sonar += `<path d="M540,1100 L${540 + Math.cos(sweep) * 400},${1100 + Math.sin(sweep) * 400} A400,400 0 0 0 ${540 + Math.cos(sweep - 0.6) * 400},${1100 + Math.sin(sweep - 0.6) * 400} Z" fill="#3aff9a" opacity="0.18"/>`;
-    const blip = 0.5 + 0.5 * Math.sin((t - D) * 6);
+    const blip = 0.5 + 0.5 * Math.sin((t - D) * 3.5);
     sonar += glow(700, 930, 60, '#7affc0', 0.9 * blip) + `<circle cx="700" cy="930" r="12" fill="#c8ffe4" opacity="${0.6 + 0.4 * blip}"/>`;
     sonar += `<rect x="130" y="680" width="820" height="840" rx="40" fill="none" stroke="${V('#3a403c', 0.2, 0.3)}" stroke-width="40"/>`;
     // плот в ледяной воде
@@ -365,9 +365,9 @@ const shots = {
 
   // 7. Музейный эсминец у причала на реке, флаги расцвечивания; фото-стикер Хэнкса под имя; на «настоящем эсминце» камера идёт вдоль борта
   real(t, T) {
-    const k = sine(t / T), glide = io((t - D - 2.3) / 3.8);
+    const k = sine(t / T), glide = sine((t - D - 2.0) / 4.4);
     return {
-      cam: { z: lerp(1.0, 1.3, glide), x: lerp(0, -260, glide), y: lerp(0, -40, glide) },
+      cam: { z: lerp(1.0, 1.15, glide), x: lerp(0, -140, glide), y: lerp(0, -20, glide) },
       els: [
         sky('#5a8ac0', '#9ec2e0', '#d8e6ee') + clouds(t, 220, '#ffffff', 0.7, 8, 10, 12),
         glow(880, 360, 300, '#fff6d8', 0.6),
@@ -377,7 +377,7 @@ const shots = {
         par(lerp(0, 60, k), 0, `<rect x="-300" y="1120" width="1680" height="900" fill="${grad([[0, '#6a7a70'], [1, '#3a4a44']])}"/>` + [0, 1, 2, 3, 4, 5, 6].map((i) => `<path d="M${-200 + ((i * 230 + t * 30) % 1500)},${1180 + i * 70} l${120 + i * 20},0" stroke="#c8d4d0" stroke-width="4" opacity="0.3"/>`).join('')),
         // эсминец-музей и причал
         par(lerp(0, 120, k), 0, destroyer(600, 1330, 1.25, t, { num: '661', flags: true }) + `<rect x="-300" y="1380" width="1680" height="40" fill="${V('#8a7a66', 0.2, 0.3)}"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `<rect x="${-260 + i * 200}" y="1400" width="22" height="200" fill="#5a4a3a"/>`).join('') + `<rect x="-300" y="1600" width="1680" height="400" fill="${grad([[0, '#5a6a64'], [1, '#2a3632']])}"/>`),
-        sticker({ k: 'hanks', at: D + 1.2, out: D + 2.4, x: 330, y: 1240, w: 470, h: 540, tilt: -4 }, t, 0),
+        sticker({ k: 'hanks', at: D + 1.2, out: D + 3.0, x: 330, y: 1240, w: 470, h: 540, tilt: -4 }, t, 0),
         grade('#ffd8a0', 0.15),
         topShade(760, 0.45),
       ],
@@ -388,13 +388,13 @@ const shots = {
   dawn(t, T) {
     const k = sine(t / T);
     return {
-      cam: { z: lerp(1.0, 1.15, k), y: lerp(0, -80, k), x: lerp(-30, 10, k) },
+      cam: { z: lerp(1.0, 1.07, k), y: lerp(0, -40, k), x: lerp(-15, 5, k) },
       els: [
         sky('#2a3448', '#8a7a88', '#e8a878'),
         glow(780, 1000, 520, '#ffc890', 0.55),
         clouds(t, 380, '#5a5a70', 0.6, 9, 8, 21),
         par(lerp(-20, 20, k), 0, sea(t * 0.8, 1000, '#3a4658', '#f0d0b0', 0.7) + [0, 1, 2, 3, 4].map((i) => freighter(80 + i * 220, 1010 + (i % 2) * 10, 0.1, t, '#2a2a30', i + 3)).join('')),
-        par(lerp(-40, 40, k), 0, krause(400, 2560, 2.3, { look: lerp(0.6, 0.15, at(t, 1.5, 1.2)), frown: 0.6, worried: true, snow: true, blink: blink(t, 1.1), nod: wave(t, 0.35) * 0.6 + 0.5, tired: 1 }) + railing(1640, '#5a646e', 300)),
+        par(lerp(-15, 15, k), 0, krause(400, 2560, 2.3, { look: lerp(0.6, 0.15, at(t, 1.5, 1.2)), frown: 0.6, worried: true, snow: true, blink: blink(t, 1.1), nod: wave(t, 0.35) * 0.6 + 0.5, tired: 1 }) + railing(1640, '#5a646e', 300)),
         `<g opacity="0.9">${snow(t, 80, 0.7, 0.6, 29)}</g>`,
         grade('#ffb080', 0.25),
         topShade(780, 0.5),
