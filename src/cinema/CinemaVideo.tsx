@@ -38,7 +38,7 @@ export const cinemaTotal = (scenes: CinemaShot[], poster?: CinemaProps['poster']
 const F_SANS = 'Manrope';
 
 /** Финальный кадр: обложка фильма, название на русском и английском, год */
-const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>; accent: string; frames?: number}> = ({poster, accent, frames}) => {
+const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>; accent: string; frames?: number; brand?: string}> = ({poster, accent, frames, brand}) => {
 	const frame = useCurrentFrame();
 	const inP = interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
 	const zoom = interpolate(frame, [0, frames ?? posterFrames(poster)], [1, 1.04]);
@@ -65,8 +65,29 @@ const PosterCard: React.FC<{poster: NonNullable<CinemaProps['poster']>; accent: 
 						<span style={{fontSize: 36, transform: `scale(${1 + 0.18 * Math.max(0, Math.sin((frame - 60) / 5)) * (frame > 60 && frame < 80 ? 1 : 0)})`}}>❤</span>
 					</div>
 				)}
+				{brand && (
+					<div style={{marginTop: 26, fontFamily: "'Montserrat Var', Montserrat", fontWeight: 600, fontSize: 30, letterSpacing: 3, opacity: 0.6 * t3}}>{brand}</div>
+				)}
 			</div>
 		</AbsoluteFill>
+	);
+};
+
+
+/** Подпись канала: небольшая полупрозрачная надпись, в каждой сцене на новом месте внутри картинки
+ * (полоса y≈770–950 между текстом и персонажами: не в углах, не у правого края) — её не срезать кадрированием.
+ * Если в сцене место занято — `brandAt: [x, y]` в сцене сценария */
+const BRAND_SPOTS: [number, number][] = [[540, 800], [330, 900], [700, 840], [420, 950], [640, 770], [320, 820], [560, 920]];
+const BrandMark: React.FC<{text: string; index: number; frames: number; at?: [number, number]}> = ({text, index, frames, at}) => {
+	const frame = useCurrentFrame();
+	const [x, y] = at ?? BRAND_SPOTS[index % BRAND_SPOTS.length];
+	const op = interpolate(frame, [DISSOLVE * 0.5, DISSOLVE, frames - 6, frames + DISSOLVE * 0.5], [0, 1, 1, 0], clamp);
+	const dx = Math.sin(frame / 70 + index) * 10;
+	const dy = Math.cos(frame / 90 + index * 2) * 6;
+	return (
+		<div style={{position: 'absolute', left: x + dx, top: y + dy, transform: 'translate(-50%, -50%)', opacity: 0.34 * op, color: '#fff', fontFamily: "'Montserrat Var', Montserrat", fontWeight: 600, fontSize: 30, letterSpacing: 3, whiteSpace: 'nowrap', textShadow: '0 1px 6px rgba(0,0,0,0.6)'}}>
+			{text}
+		</div>
 	);
 };
 
@@ -306,7 +327,7 @@ const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first
 	);
 };
 
-export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, textStyle}) => {
+export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, textStyle, brand}) => {
 	setKineticFonts(fonts);
 	const {durationInFrames} = useVideoConfig();
 	const timeline = useMemo(() => {
@@ -354,6 +375,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 						{shot.finalTitle && !poster && (
 							<FinalTitle text={shot.finalTitle} accent={accent} start={AUDIO_DELAY + Math.ceil((shot.words?.[shot.words.length - 1]?.end ?? shot.duration ?? estimateDuration(shot.voice)) * FPS) + 14} />
 						)}
+						{brand && !(shot.onPoster && poster) && <BrandMark text={brand} index={i} frames={frames} at={shot.brandAt} />}
 						{shot.audio && (
 							<Sequence from={AUDIO_DELAY}>
 								<Audio src={staticFile(shot.audio)} />
@@ -364,7 +386,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 			</GateWeave>
 			{poster && (
 				<Sequence from={posterFrom} durationInFrames={scenesEnd - posterFrom + posterFrames(poster)} name="обложка">
-					<PosterCard poster={poster} accent={accent} frames={scenesEnd - posterFrom + posterFrames(poster)} />
+					<PosterCard poster={poster} accent={accent} frames={scenesEnd - posterFrom + posterFrames(poster)} brand={brand} />
 				</Sequence>
 			)}
 			{timeline.flatMap(({shot, from}, i) =>
