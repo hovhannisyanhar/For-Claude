@@ -28,6 +28,7 @@ const props = {
 	textStyle: script.textStyle,
 	brand: script.brand,
 	film: script.film,
+	grain: script.grain,
 	theme: script.theme || 'midnight',
 	music: script.musicSeparate ? null : (sound?.music ?? script.music ?? null),
 	musicVolume: script.musicVolume,

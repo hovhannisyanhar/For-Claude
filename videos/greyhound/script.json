@@ -173,5 +173,6 @@
   },
   "art": "vector",
   "fonts": "futura",
-  "textStyle": "pop"
+  "textStyle": "pop",
+  "grain": false
 }

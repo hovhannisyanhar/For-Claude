@@ -261,7 +261,7 @@ const Titles: React.FC<{shot: CinemaShot; frames: number; accent: string; isLast
 };
 
 /** Плёнка: зерно, виньетка, мерцание, пылинки, каше */
-const FilmLook: React.FC<{film?: boolean}> = ({film = false}) => {
+const FilmLook: React.FC<{film?: boolean; grain?: boolean}> = ({film = false, grain = true}) => {
 	const frame = useCurrentFrame();
 	const {durationInFrames} = useVideoConfig();
 	// чистый режим: неподвижное лёгкое зерно, без мерцания яркости и пылинок
@@ -278,13 +278,13 @@ const FilmLook: React.FC<{film?: boolean}> = ({film = false}) => {
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse 75% 60% at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.72) 100%)'}} />
 			<AbsoluteFill style={{background: flicker > 0 ? `rgba(255,240,210,${flicker})` : `rgba(0,0,0,${-flicker})`}} />
 			{/* зерно (в половинном разрешении — крупнее и быстрее) */}
-			<svg width={540} height={960} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, opacity: film ? 0.13 : 0.07, mixBlendMode: 'overlay'}}>
+			{(grain || film) && <svg width={540} height={960} style={{position: 'absolute', inset: 0, width: 1080, height: 1920, opacity: film ? 0.13 : 0.07, mixBlendMode: 'overlay'}}>
 				<filter id={`grain${seed}`}>
 					<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves={2} seed={seed} stitchTiles="stitch" />
 					<feColorMatrix type="saturate" values="0" />
 				</filter>
 				<rect width="100%" height="100%" filter={`url(#grain${seed})`} />
-			</svg>
+			</svg>}
 			{specks.map((_, i) => (
 				<div
 					key={i}
@@ -327,7 +327,7 @@ const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first
 	);
 };
 
-export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, textStyle, brand}) => {
+export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, grain = true, textStyle, brand}) => {
 	setKineticFonts(fonts);
 	const {durationInFrames} = useVideoConfig();
 	const timeline = useMemo(() => {
@@ -402,7 +402,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 					);
 				}),
 			)}
-			<FilmLook film={film} />
+			<FilmLook film={film} grain={grain} />
 			{music && (
 				<Audio
 					src={staticFile(music)}
