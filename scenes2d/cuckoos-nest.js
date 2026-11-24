@@ -100,7 +100,20 @@ function dress(x, y, s, o) {
   if (o.braids) front += [-1, 1].map((sd) => `<path d="M${x + sd * hr * 0.9},${headY} Q${x + sd * hr * 1.05},${headY + hr * 1.2} ${x + sd * hr * 0.8},${headY + hr * 2.1}" stroke="${o.hair}" stroke-width="${hr * 0.22}" fill="none" stroke-linecap="round"/>`).join('');
   return { b, front };
 }
+// ноги сидящего анфас: колени к нам, голени до пола, ботинки (иначе сидящие выглядят безногими)
+function seatedLegs(x, y, s, floor, pants) {
+  const sl = PROPS.slim;
+  let g = `<g filter="url(#soft)">`;
+  [-1, 1].forEach((sd) => {
+    const kx = x + sd * 40 * s * sl;
+    g += `<rect x="${kx - 27 * s}" y="${y}" width="${54 * s}" height="${Math.max(10, floor - y - 14 * s)}" rx="${18 * s}" fill="${V(pants, 0.1, 0.3)}"/>`;
+    g += `<ellipse cx="${kx}" cy="${y + 16 * s}" rx="${36 * s}" ry="${32 * s}" fill="${R(shade(pants, 0.08), 0.15, 0.25)}"/>`;
+    g += `<ellipse cx="${kx + sd * 6 * s}" cy="${floor - 10 * s}" rx="${38 * s}" ry="${16 * s}" fill="#2a1e16"/>`;
+  });
+  return g + `</g>`;
+}
 function figure(x, y, s, o) {
+  if (o.pose === 'sit' && o.floor) return seatedLegs(x, y, s, o.floor, o.pants || shade(o.shirt, -0.2)) + figure(x, y, s, { ...o, floor: 0 });
   const { b, front } = dress(x, y, s, o);
   const body = person(x, y, s, { ...o, overlay: b, smile: o.smile && !o.nurse && !o.grin, robe: o.nurse ? undefined : o.robe });
   if (!front || o.sil) return body;
@@ -309,9 +322,9 @@ const shots = {
         par(camX * 0.45, 0, tv(950, 1180, 0.8, 1, t) + plant(120, 1240, 0.9, t)),
         par(camX * 0.5, 0, `<rect x="-200" y="1300" width="1480" height="1200" fill="${V('#8a9a8a', 0.05, 0.35)}"/>` + [0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="-200" y="${1330 + i * 90}" width="1480" height="3" fill="#000" opacity="0.08"/>`).join('')),
         // пациенты за столом
-        par(camX * 0.6, 0, [[230, 1590, 0], [380, 1600, 1], [700, 1600, 2], [860, 1590, 3]].map(([x, y, i]) => pat(i, x, y, 0.62, { pose: 'sit', arms: 'table', look: (540 - x) / 400, nod: wave(t, 0.6, i) * 0.8, blink: blink(t, i * 0.7), smile: t > D + 4.4 && i % 2 === 0 })).join('')),
+        par(camX * 0.6, 0, [[230, 1590, 0], [380, 1600, 1], [700, 1600, 2], [860, 1590, 3]].map(([x, y, i]) => pat(i, x, y, 0.62, { pose: 'sit', floor: 1830, arms: 'table', look: (540 - x) / 400, nod: wave(t, 0.6, i) * 0.8, blink: blink(t, i * 0.7), smile: t > D + 4.4 && i % 2 === 0 })).join('')),
         // Макмёрфи качается на стуле
-        par(camX * 0.65, 0, `<g transform="rotate(${-4 + wave(t, 0.5) * 3 - relax * 3} 540 1800)">${chair(540, 1700, 0.95, '#6a5a4a')}${mac(540, 1605, 0.78, { pose: 'sit', arms: relax > 0.5 ? 'salute' : 'table', grin: true, look: wave(t, 0.25) * 0.5, closed: relax > 0.7, blink: blink(t, 0.2), nod: wave(t, 1) })}</g>`),
+        par(camX * 0.65, 0, `<g transform="rotate(${-4 + wave(t, 0.5) * 3 - relax * 3} 540 1800)">${chair(540, 1700, 0.95, '#6a5a4a')}${mac(540, 1605, 0.78, { pose: 'sit', floor: 1830, arms: relax > 0.5 ? 'salute' : 'table', grin: true, look: wave(t, 0.25) * 0.5, closed: relax > 0.7, blink: blink(t, 0.2), nod: wave(t, 1) })}</g>`),
         par(camX * 0.7, 0, table(540, 1520, 980) + label(680, 1512, 'kinoplot.film', 10, '#5a4030', 0.45) +
           cigs(330, 1515, 4, 0.8) + cigs(790, 1515, 3, 0.8) +
           `<g transform="translate(640 1505)"><rect x="-40" y="-26" width="80" height="26" rx="3" fill="#a8282a"/>${label(0, -9, 'kinoplot.film', 9, '#f0d8c8', 0.55)}</g>`),
@@ -359,13 +372,13 @@ const shots = {
         par(camX + drift * 0.3, 0, wardWall(0, 1350)),
         par(camX + 1080 + drift * 0.5, 0, wardWall(0, 1350)),
         // окошко выдачи: рука Рэтчед двигает стаканчики
-        par(camX + drift * 0.7, 0, `<rect x="660" y="700" width="380" height="520" fill="${V('#d8e8e0', 0.1, 0.3)}" stroke="#e8e4da" stroke-width="22"/>` + `<g opacity="0.95">${ratched(860, 1500, 0.62, { arms: 'table', look: -1, blink: blink(t, 0.6) })}</g>` + `<rect x="640" y="1140" width="420" height="40" fill="${V('#e0dcd0', 0.2, 0.3)}"/>` + [0, 1, 2].map((i) => paperCup(lerp(980, 780 - i * 70, io(((t + i * 0.6) % 1.8) / 0.8)), 1142, 0.9, 2 + (i % 2))).join('') + turntable(980, 1140, 0.6, t) + glow(900, 1050, 260, '#ffffff', 0.15)),
+        par(camX + drift * 0.7, 0, `<rect x="660" y="700" width="380" height="520" fill="${V('#d8e8e0', 0.1, 0.3)}" stroke="#e8e4da" stroke-width="22"/>` + `<g opacity="0.95">${ratched(860, 1370, 0.62, { arms: 'table', look: -1, blink: blink(t, 0.6) })}</g>` + `<rect x="640" y="1140" width="420" height="40" fill="${V('#e0dcd0', 0.2, 0.3)}"/>` + [0, 1, 2].map((i) => paperCup(lerp(980, 780 - i * 70, io(((t + i * 0.6) % 1.8) / 0.8)), 1142, 0.9, 2 + (i % 2))).join('') + turntable(980, 1140, 0.6, t) + glow(900, 1050, 260, '#ffffff', 0.15)),
         // очередь пациентов, шаг вперёд
         par(camX + drift * 0.8, 0, `<rect x="-200" y="1350" width="2600" height="600" fill="${V('#8a9a8c', 0.05, 0.35)}"/>` + [0, 1, 2, 3].map((i) => { const x = 520 - i * 150 + step(i) * 26; return pat(i, x, 1820 - i * 10, 0.82 - i * 0.04, { arms: i === 0 ? 'hold' : 'down', look: 1, nod: -1 + wave(t, 0.5, i) * 0.5, step: wave(t, 0.9, i) * 0.6, worried: true, blink: blink(t, i) }); }).reverse().join('')),
         // крупный стаканчик на «таблетками»
         `<g opacity="${at(t, 2.7, 0.3) * (1 - pan)}">${paperCup(lerp(420, 400, k), 1260, 2.4, 3)}</g>`,
         // круг стульев на собрании (справа)
-        par(camX + 1080 + drift * 0.5, 0, chair(160, 1500, 0.9, '#7a8a90') + [[300, 1620, 0], [540, 1660, 1], [780, 1620, 2], [940, 1500, 3]].map(([x, y, i]) => chair(x, y, 1.0, '#7a8a90') + pat(i, x, y - 80, 0.66, { pose: 'sit', arms: 'down', look: (160 - x) / 600, nod: lerp(0, -1.5, at(t, 4.1, 0.6)), worried: true, blink: blink(t, i + 1) })).join('') +
+        par(camX + 1080 + drift * 0.5, 0, chair(160, 1500, 0.9, '#7a8a90') + [[300, 1620, 0], [540, 1660, 1], [780, 1620, 2], [940, 1500, 3]].map(([x, y, i]) => chair(x, y, 1.0, '#7a8a90') + pat(i, x, y - 80, 0.66, { pose: 'sit', floor: y, arms: 'down', look: (160 - x) / 600, nod: lerp(0, -1.5, at(t, 4.1, 0.6)), worried: true, blink: blink(t, i + 1) })).join('') +
           ratched(160, 1560, 0.72, { arms: 'hold', look: 1, smile: true, blink: blink(t, 2.1) }) + `<rect x="150" y="1300" width="80" height="100" rx="4" fill="#3a2a1c" transform="rotate(-10 190 1350)"/>`),
         grade('#bfe0d8', 0.25),
         topShade(820, 0.55),
@@ -384,8 +397,8 @@ const shots = {
         // пост медсестёр вдали, в нём Рэтчед; подсвечивается на кивок
         par(camX * 0.35, 0, `<rect x="700" y="560" width="340" height="460" fill="${V('#d8ece4', 0.1, 0.3)}" stroke="#e8e4da" stroke-width="16"/>` + ratched(870, 1160, 0.42, { arms: 'table', look: -1, blink: blink(t, 0.9) }) + glow(870, 800, 260, '#ffffff', 0.15 + 0.4 * nodTo)),
         par(camX * 0.5, 0, `<rect x="-200" y="1300" width="1480" height="1200" fill="${V('#8a9a8a', 0.05, 0.35)}"/>`),
-        par(camX * 0.6, 0, pat(1, 200, 1660, 0.8, { pose: 'sit', arms: 'table', look: 1, smile: laugh, nod: wave(t, 0.7) * 0.6, blink: blink(t, 0.4) }) + pat(2, 880, 1665, 0.8, { pose: 'sit', arms: 'table', look: -1, worried: !laugh, smile: laugh, nod: wave(t, 0.8, 1) * 0.6, blink: blink(t, 1.5) })),
-        par(camX * 0.65, 0, mac(540, 1740, 1.1, { pose: 'sit', arms: 'table', grin: !laugh, smile: laugh, closed: laugh && t < D + 5.1, wink: t > D + 5.2, look: lerp(0, 1, nodTo), nod: laugh ? wave(t, 3) * 1.2 : nodTo * -2, blink: blink(t, 2.2) })),
+        par(camX * 0.6, 0, pat(1, 200, 1660, 0.8, { pose: 'sit', floor: 1874, arms: 'table', look: 1, smile: laugh, nod: wave(t, 0.7) * 0.6, blink: blink(t, 0.4) }) + pat(2, 880, 1665, 0.8, { pose: 'sit', floor: 1874, arms: 'table', look: -1, worried: !laugh, smile: laugh, nod: wave(t, 0.8, 1) * 0.6, blink: blink(t, 1.5) })),
+        par(camX * 0.65, 0, mac(540, 1740, 1.1, { pose: 'sit', floor: 1920, arms: 'table', grin: !laugh, smile: laugh, closed: laugh && t < D + 5.1, wink: t > D + 5.2, look: lerp(0, 1, nodTo), nod: laugh ? wave(t, 3) * 1.2 : nodTo * -2, blink: blink(t, 2.2) })),
         par(camX * 0.75, 0, table(540, 1560, 1100, '#7a5a3c') +
           // ставки
           cigs(520, 1560 - (1 - pile) * 160, Math.round(2 + 7 * pile), 1.0) + [0, 1, 2, 3].map((i) => `<circle cx="${620 + i * 22}" cy="${1548 - (1 - at(t, 1.7 + i * 0.12, 0.35)) * 200}" r="14" fill="${R('#c8c8c0', 0.3, 0.3)}" opacity="${at(t, 1.7 + i * 0.12, 0.1)}"/>`).join('') +
