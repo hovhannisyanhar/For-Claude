@@ -168,7 +168,8 @@
         "color": "#f0dcc0",
         "opacity": 0.2
       }
-    ]
+    ],
+    "mainSize": 128
   },
   "art": "vector",
   "fonts": "futura",
