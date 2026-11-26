@@ -1,295 +1,181 @@
 {
-  "title": "Сны поездов (2025): о чём фильм — без спойлеров",
+  "title": "Территория зла (2023): о чём фильм — без спойлеров",
   "style": "cinema",
   "brand": "kinoplot.film",
-  "accent": "#e3b46a",
+  "accent": "#f08a3c",
   "tts": {
-    "voiceId": "1kb4Md8n0kMNktygYhDF",
-    "model": "eleven_multilingual_v2",
+    "voiceId": "6A9D8WSMm4rFsg2DWFeE",
+    "model": "eleven_v4",
     "speed": 1.0,
     "settings": {
-      "stability": 0.55,
+      "stability": 0.35,
       "similarity_boost": 0.8,
-      "style": 0.3,
+      "style": 0.5,
       "use_speaker_boost": true
-    }
+    },
+    "tempo": 1.2
   },
-  "musicVolume": 0.3,
-  "coverFrame": 185,
-  "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
+  "caption": "Он один в чужих джунглях, а его единственная надежда сидит в кресле на другом конце света 🎬 Название фильма в конце видео. Смотрели? 👇",
   "hashtags": [
     "#кино",
     "#чтопосмотреть",
     "#фильмы",
-    "#netflix",
-    "#сныпоездов",
-    "#traindreams",
-    "#джоэлэдгертон",
-    "#оскар"
+    "#боевик",
+    "#расселкроу",
+    "#лиамхемсворт"
   ],
   "sources": [
-    "https://en.wikipedia.org/wiki/Train_Dreams_(film)",
-    "https://www.whats-on-netflix.com/news/train-dreams-netflix-movie-release-date-cast/",
-    "https://blackbearpictures.com/film-and-tv/train-dreams",
-    "https://www.screendaily.com/features/how-depression-era-photography-inspired-the-oscar-nominated-visuals-for-train-dreams/5213736.article",
-    "https://www.motionpictures.org/2026/03/train-dreams-behind-the-majestic-visuals-of-joel-edgertons-pacific-northwest-epic-2/",
-    "https://en.wikipedia.org/wiki/Adolpho_Veloso"
+    "https://www.kinopoisk.ru/film/4947994/",
+    "https://en.wikipedia.org/wiki/Land_of_Bad",
+    "https://www.imdb.com/title/tt19864802",
+    "https://www.boxofficemojo.com/title/tt19864802",
+    "https://www.ivi.tv/watch/territoriya-zla",
+    "https://www.sandboxx.us/?p=105267",
+    "https://www.netflix.com/tudum/articles/land-of-bad-release-date-news",
+    "https://screenqueensland.com.au/made-in-queensland/landofbad/",
+    "https://www.rottentomatoes.com/m/land_of_bad"
   ],
   "scenes": [
     {
-      "set": "station",
-      "voice": "Его привезли на поезде, когда ему было семь лет. Ни семьи, ни дома. Только железная дорога и бесконечный лес.",
+      "set": "hook",
+      "voice": "Представь, что на твоих глазах гибнет человек, а между вами полмира и экран монитора.",
+      "ttsText": "Представь, что на твоих глазах гибнет человек, а между вами полмира и экран монитора.",
       "emphasis": [
-        "семь",
-        "бесконечный",
-        "лес."
+        "гибнет",
+        "полмира"
       ],
-      "sfx": [
-        {
-          "prompt": "old steam locomotive slowly arriving at a small wooden country station at dawn, chuffing slowing down, brakes squealing, long steam hiss",
-          "at": 0,
-          "duration": 9,
-          "volume": 0.22
-        },
-        {
-          "prompt": "cold early morning forest ambience, light wind, distant crows",
-          "at": 0,
-          "duration": 10,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "valley",
-      "voice": "Так начинается «Сны поездов». История одной жизни длиной почти в целый век.",
+      "set": "reaper",
+      "voice": "Капитан Эдди Гримм, позывной Жнец, воюет из кресла в Неваде, управляет боевым дроном, и для него это просто очередная смена.",
+      "ttsText": "Капитан Эдди Гримм, позывной Жнец, воюет из кресла в Нева́де, управляет боевым дро́ном, и для него это просто очередная смена.",
       "emphasis": [
-        "«Сны",
-        "поездов».",
-        "век."
+        "Жнец,",
+        "очередная",
+        "смена."
       ],
-      "sfx": [
-        {
-          "prompt": "distant steam train whistle echoing across a wide night valley, then soft rumble of a far away train",
-          "at": 0.3,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "quiet night in the mountains, crickets, soft wind, an owl far away",
-          "at": 0,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 36
+      "pause": 6
     },
     {
-      "set": "logging",
-      "voice": "Роберт вырастает молчаливым лесорубом. Он валит сосны выше любого дома и строит мосты, по которым в эту глушь приходит новое время.",
+      "set": "team",
+      "voice": "Но в этот раз внизу, в джунглях Филиппин, отряд «Дельты» идёт спасать пленного агента ЦРУ, а с ними молодой сержант Кинни с рацией.",
+      "ttsText": "Но в этот раз внизу, в джунглях Филиппи́н, отряд «Де́льты» идёт спасать пленного агента Цэ-Эр-У́, а с ними молодой сержант Ки́нни с рацией.",
       "emphasis": [
-        "лесорубом.",
-        "сосны",
-        "новое",
-        "время."
+        "«Дельты»",
+        "ЦРУ,",
+        "Кинни"
       ],
-      "sfx": [
-        {
-          "prompt": "deep old growth forest ambience, birds singing, light breeze in tall pines",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "single heavy axe chop into a thick tree trunk, crisp wooden thunk",
-          "at": 0.9,
-          "duration": 1,
-          "volume": 0.22,
-          "repeat": {
-            "every": 1.4,
-            "count": 5
-          }
-        },
-        {
-          "prompt": "giant tree creaking and cracking then crashing down to the forest floor far away",
-          "at": 7,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "bridge",
-      "voice": "На одной из строек он видит то, что потом будет преследовать его годами.",
+      "set": "link",
+      "voice": "Кинни их связь с небом: он говорит, куда бить, а Жнец бьёт.",
+      "ttsText": "Ки́нни их связь с небом: он говорит, куда бить, а Жнец бьёт.",
       "emphasis": [
-        "видит",
-        "годами."
+        "куда",
+        "бить,",
+        "бьёт."
       ],
-      "sfx": [
-        {
-          "prompt": "railroad bridge construction at dusk, distant hammers striking wooden beams and iron spikes, gusty wind",
-          "at": 0,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "crows cawing ominously, low wind gust, tense atmosphere",
-          "at": 1.5,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "cabin",
-      "voice": "А потом появляется Глэдис. Они ставят маленький дом у реки, и впервые у Роберта есть место, куда хочется возвращаться.",
+      "set": "ambush",
+      "voice": "И тут засада. Отряда больше нет.",
+      "ttsText": "[tense] И тут засада. Отряда больше нет.",
       "emphasis": [
-        "Глэдис.",
-        "дом",
-        "возвращаться."
+        "засада.",
+        "больше",
+        "нет."
       ],
-      "sfx": [
-        {
-          "prompt": "gentle river flowing past a cabin on a warm summer evening, crickets, soft frogs",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "crackling fireplace heard from a cabin porch, soft and cozy",
-          "at": 1,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "seasons",
-      "voice": "Но работа снова и снова уводит его в лес, на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить.",
+      "set": "alone",
+      "voice": "Кинни один, боевики идут по его следу, а единственный, кто знает выход, сидит на другом конце света и видит его точкой на экране.",
+      "ttsText": "Ки́нни один, боевики идут по его следу, а единственный, кто знает выход, сидит на другом конце света и видит его точкой на экране.",
       "emphasis": [
-        "лес,",
-        "месяцы.",
-        "быстрее,"
+        "один,",
+        "другом",
+        "конце",
+        "света",
+        "точкой"
       ],
-      "sfx": [
-        {
-          "prompt": "footsteps crunching on autumn leaves then on snow, wind through bare trees, wind slowly turning into winter blizzard",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "campfire",
-      "voice": "Фильм снимали почти без ламп. Солнце, костры, свечи. Поэтому каждый кадр похож на старую фотографию, которая вдруг ожила.",
+      "set": "actors",
+      "voice": "Кроу и Лиам Хемсворт почти весь фильм говорят только по рации, и чем дальше, тем сильнее держит этот разговор.",
+      "ttsText": "Кро́у и Лиам Хе́мсворт почти весь фильм говорят только по рации, и чем дальше, тем сильнее держит этот разговор.",
       "emphasis": [
-        "Солнце,",
-        "костры,",
-        "свечи.",
-        "ожила."
+        "Кроу",
+        "Лиам",
+        "Хемсворт",
+        "разговор."
       ],
-      "sfx": [
-        {
-          "prompt": "campfire crackling and popping at night in a pine forest, gentle",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "old film projector whirring softly",
-          "at": 6,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "lake",
-      "voice": "Здесь нет погонь и громких сцен. Есть тишина, лес и гудок поезда вдалеке. И от этого почему-то невозможно оторваться.",
+      "set": "question",
+      "voice": "Как спасти человека, до которого не дотянуться?",
+      "ttsText": "Как спасти человека, до которого не дотянуться?",
       "emphasis": [
-        "тишина,",
-        "гудок",
-        "оторваться."
+        "не",
+        "дотянуться?"
       ],
-      "sfx": [
-        {
-          "prompt": "still lake at night in a misty forest, very quiet water lapping, loon call far away",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "lonely steam train whistle far away across a lake at night, long echo",
-          "at": 3.4,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "dawn",
-      "voice": "Четыре номинации на «Оскар». Кино, после которого хочется выключить свет и просто посидеть в тишине.",
-      "emphasis": [
-        "«Оскар».",
-        "тишине."
-      ],
-      "sfx": [
-        {
-          "prompt": "soft dawn in the mountains, first birds waking up, gentle breeze",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "finalTitle": "Сны поездов",
-      "pause": 28
+      "set": "poster",
+      "voice": "Фильм «Территория зла», две тысячи двадцать третий год. Отправь тому, кого уже ничем не удивить, и подпишись, здесь каждый день новый фильм.",
+      "ttsText": "Фильм «Террито́рия зла», две тысячи двадцать третий год. Отправь тому, кого уже ничем не удивить, и подпишись, здесь каждый день новый фильм.",
+      "onPoster": true,
+      "pause": 6
     }
   ],
-  "musicSeparate": true,
   "poster": {
-    "src": "assets/train-dreams/poster.jpg",
-    "titleRu": "Сны поездов",
-    "titleEn": "Train Dreams",
-    "year": "2025"
+    "src": "assets/land-of-bad/poster.jpg",
+    "titleRu": "Территория зла",
+    "titleEn": "Land of Bad",
+    "year": "2023",
+    "cta": "Отправь другу",
+    "seconds": 1.5
   },
   "instaCover": {
-    "top": "Одна жизнь",
-    "main": "Длиной\nв век",
+    "top": "Один",
+    "main": "В джунглях",
     "base": [
-      "#08130f",
-      "#0e2b25",
-      "#123630",
-      "#0a1a16"
+      "#060a07",
+      "#0e1a10",
+      "#16261a",
+      "#060a07"
     ],
     "glows": [
       {
         "x": 230,
         "y": 1650,
         "r": 540,
-        "color": "#d08a3a",
-        "opacity": 0.75
+        "color": "#f08a3c",
+        "opacity": 0.4
       },
       {
-        "x": 940,
-        "y": 1250,
+        "x": 930,
+        "y": 1300,
         "r": 420,
-        "color": "#b9925a",
-        "opacity": 0.45
+        "color": "#1f5a33",
+        "opacity": 0.55
       },
       {
-        "x": 700,
+        "x": 720,
         "y": 230,
         "r": 440,
-        "color": "#1d5a52",
-        "opacity": 0.55
+        "color": "#d8efe0",
+        "opacity": 0.18
       }
     ]
-  }
+  },
+  "art": "vector",
+  "fonts": "futura",
+  "textStyle": "pop",
+  "grain": false
 }
