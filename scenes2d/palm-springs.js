@@ -1,5 +1,6 @@
 // «Зависнуть в Палм-Спрингс» (Palm Springs, 2020) — 8 планов в 2D-векторе. Имя плана = set сцены в videos/palm-springs/script.json.
 // Пустыня Калифорнии: бирюза бассейнов, белые курортные домики середины века, пальмы, розово-лиловые горы, гирлянды свадьбы ночью.
+import { figure as rigFigure, mixExpr } from './rig.js';
 import { run, person, setProportions, V, R, grad, glow, rnd, reseed, shade, lerp, clamp, wave } from './core.js';
 
 const PROPS = { head: 0.64, legs: 1.35, torso: 1.15, slim: 0.84, hand: 0.72 };
@@ -216,6 +217,73 @@ const shots = {
       topShade(620, 0.45),
     ];
     return { cam: { z: lerp(1.0, 1.14, k), y: lerp(0, -70, k) }, els };
+  },
+
+  // 1'. Хук на риге v2: Найлз на круге в повороте 3/4; на «один и тот же день» вокруг него прокручиваются сутки,
+  // а он не меняется; затем наезд на лицо — «кем работал?» — вспоминает, ухмыляется и салютует банкой.
+  hook2(t, T) {
+    const w = (a) => t - D - a; // время от слова озвучки
+    // прокрутка суток: 0..1 между «один» и «давно»
+    const cyc = io(clamp(w(0.62) / 1.15));
+    const KEYS = [[0, ['#3f9ee6', '#9ad4f4', '#f4e0c8'], 0], [0.28, ['#2a2a6a', '#e8607a', '#ffb060'], 0.25], [0.5, ['#060a24', '#141a44', '#2a2a5a'], 0.62], [0.74, ['#5a78c8', '#f0a8a0', '#ffd8a8'], 0.2], [1, ['#3f9ee6', '#9ad4f4', '#f4e0c8'], 0]];
+    let i = 0; while (i < KEYS.length - 2 && cyc > KEYS[i + 1][0]) i++;
+    const [k0, c0, n0] = KEYS[i], [k1, c1, n1] = KEYS[i + 1], kk = clamp((cyc - k0) / (k1 - k0));
+    const mix = (a, b) => { const p = (h) => [1, 3, 5].map((j) => parseInt(h.slice(j, j + 2), 16)); const A = p(a), B = p(b); return '#' + A.map((v, j) => Math.round(lerp(v, B[j], kk)).toString(16).padStart(2, '0')).join(''); };
+    const skyC = c0.map((c, j) => mix(c, c1[j])), night = lerp(n0, n1, kk);
+    // солнце по дуге за один «день», потом луна
+    const sa = Math.PI * (1 - clamp(cyc / 0.45)), sunX = 540 + Math.cos(sa) * 520, sunY = 760 - Math.sin(sa) * 520;
+    const moonK = clamp((cyc - 0.35) / 0.3) * (1 - clamp((cyc - 0.68) / 0.12));
+    // камера: средний план → крупный на лицо к «кем работал»
+    const push = io(clamp(w(1.75) / 1.5));
+    const bob = wave(t, 0.35) * 12, bobV = Math.cos(t * 0.35 * Math.PI * 2);
+    // мимика по словам
+    const thinkK = io(clamp(w(2.3) / 0.45)), smugK = io(clamp(w(3.2) / 0.35));
+    let e = mixExpr('tired', 'think', thinkK); e = mixExpr(e, 'smirk', smugK);
+    const eyesClosed = t < D + 0.55 && cyc === 0; // дремлет на солнце до «проживает»
+    const toast = io(clamp(w(3.25) / 0.45)) * (1 - io(clamp(w(4.15) / 0.4)));
+    const sip = io(clamp(w(4.15) / 0.45));
+    const X = 560, Y = 1860 + bob, s = 1.62;
+    const hr = 96 * s * 1.3, shY = Y - 300 * s, hy = shY - hr * 1.18;
+    const tu = lerp(0.35, 0.2, thinkK) + wave(t, 0.18) * 0.04;
+    const shirtPat = (px, sy, hy2, sc) => { reseed(7); let g = ''; for (let j = 0; j < 26; j++) { const yy = sy + rnd() * (hy2 - sy), xx = px + (rnd() - 0.5) * 240 * sc; g += `<ellipse cx="${xx + 16 * sc}" cy="${yy + 10 * sc}" rx="${14 * sc}" ry="${6 * sc}" fill="#2a8a7a" transform="rotate(${rnd() * 180} ${xx} ${yy})"/>` + hibiscus(xx, yy, 12 * sc, j % 3 ? '#ffd24a' : '#fff0dc'); } return g; };
+    const canSvg = (k) => `<g transform="scale(${k * 0.9})"><rect x="-22" y="-40" width="44" height="80" rx="8" fill="${V('#e8403a', 0.3, 0.3)}"/><rect x="-22" y="-12" width="44" height="22" fill="#f4ece0"/><rect x="-18" y="-46" width="36" height="8" rx="3" fill="#c8c8c8"/><rect x="-14" y="-34" width="6" height="64" fill="#fff" opacity="0.35"/></g>`;
+    // руки: левая лежит на круге, правая с банкой — у круга → салют → ко рту
+    const rHand = { x: lerp(lerp(X + 330, X + 300, toast), X + 150, sip), y: lerp(lerp(1610 + bob, 1180 + bob, toast), hy + hr * 0.75, sip), pose: 'hold', item: canSvg, rot: lerp(0, -20, toast) };
+    const lHand = { x: X - 340, y: 1615 + bob + wave(t, 0.5) * 6, pose: 'open', rot: 70 };
+    const fig = rigFigure(X, Y, s, {
+      skin: '#e2b08a', hair: '#2a1e18', hairStyle: 'curly', shirt: '#d8443a', collar: 'open', sleeves: 'short', stubble: true, pose: 'sit',
+      turn: tu, tilt: lerp(-4, 3, thinkK) + wave(t, 0.3) * 1.5 - sip * 6, breathe: (wave(t, 0.25) + 1) / 2, hairLag: -bobV * 0.4,
+      expr: e, look: { x: lerp(0.2, 0.7, thinkK) - smugK * 0.9, y: lerp(0, 0.8, thinkK) * (1 - smugK) }, blink: eyesClosed || blink(t, 1.1),
+      pattern: shirtPat, hands: { l: lHand, r: rHand }, rim: { c: '#ffe2b8', dx: 9, dy: -5, op: 1 - night },
+    });
+    // очки на лбу
+    const fx = X + tu * 12 * s + tu * 0.26 * hr;
+    const shades = `<g transform="rotate(${lerp(-4, 3, thinkK) + wave(t, 0.3) * 1.5 - sip * 6} ${X} ${shY})">${[-1, 1].map((sd) => `<rect x="${fx + sd * 0.36 * hr - 0.27 * hr}" y="${hy - 0.86 * hr}" width="${0.54 * hr}" height="${0.34 * hr}" rx="${0.14 * hr}" fill="${V('#1a1a22', 0.3, 0.2)}"/><path d="M${fx + sd * 0.36 * hr - 0.15 * hr},${hy - 0.78 * hr} l${0.14 * hr},-${0.04 * hr}" stroke="#fff" stroke-width="${0.04 * hr}" opacity="0.5"/>`).join('')}<path d="M${fx - 0.09 * hr},${hy - 0.76 * hr} q${0.09 * hr},-${0.06 * hr} ${0.18 * hr},0" stroke="#1a1a22" stroke-width="${0.05 * hr}" fill="none"/></g>`;
+    const parX = push * 30;
+    const els = [
+      sky([[0, skyC[0]], [0.42, skyC[1]], [0.56, skyC[2]]]),
+      stars(80, 900, t, night * 1.3),
+      cyc < 0.47 ? glow(sunX, sunY, 260, '#fff2c0', 0.7) + `<circle cx="${sunX}" cy="${sunY}" r="58" fill="#fff6d8"/>` : '',
+      moonK > 0 ? `<g opacity="${moonK}">${glow(780, 330, 220, '#c8d4ff', 0.5)}<circle cx="780" cy="330" r="52" fill="#f2f0e6"/></g>` : '',
+      layer(1 - night, clouds(t * (1 + cyc * 30), 300, '#fff', 0.85)),
+      par(-parX * 0.3, push * 40, mountains(1020, t)),
+      par(-parX * 0.6, push * 20, bungalow(-60, 1080, 360, { h: 180, lit: night > 0.3 }) + bungalow(760, 1090, 400, { h: 190, door: '#f08a5a', lit: night > 0.3 }) + palm(330, 1090, 620, t, 0) + palm(700, 1100, 520, t, 1.4) + palm(980, 1080, 700, t, 2.6)),
+      layer(night, lights(-40, 820, 1120, 860, 50, 14, t)),
+      `<rect x="0" y="1060" width="1080" height="40" fill="#f2ece0"/>`,
+      pool(0, 1095, 1080, 1920, t),
+      `<ellipse cx="${X + 60}" cy="${1720 + bob}" rx="480" ry="120" fill="#06505a" opacity="0.25" filter="url(#blur20)"/>`,
+      ring(X, 1690 + bob, 430, 170, '#ff5fa2', 'back'),
+      fig,
+      shades,
+      `<rect x="0" y="${1655 + bob}" width="1080" height="400" fill="#2cc8d8" opacity="0.5"/>`,
+      ring(X, 1690 + bob, 430, 170, '#ff5fa2', 'front'),
+      // ночь и закат ложатся на всё, кроме неба
+      `<rect width="1080" height="1920" fill="#1a1f5a" opacity="${night * 0.55}" style="mix-blend-mode:multiply"/>`,
+      grade('#ffd8a0', 0.25 * (1 - night)),
+      topShade(620, 0.45),
+    ];
+    const z = lerp(1.0, 1.5, push);
+    return { cam: { z, x: lerp(0, -(fx - 540) * 1.5, push), y: lerp(0, -(hy - 960) * 1.5 + 140, push) }, els };
   },
 
   // 2. Свадьба в пустыне (Найлз скучает у арки) → утро: он снова просыпается, на телефоне «9 ноября»
