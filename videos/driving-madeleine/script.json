@@ -1,295 +1,171 @@
 {
-  "title": "Сны поездов (2025): о чём фильм — без спойлеров",
+  "title": "Великолепная поездка (2022): о чём фильм — без спойлеров",
   "style": "cinema",
   "brand": "kinoplot.film",
-  "accent": "#e3b46a",
+  "accent": "#f2a93b",
   "tts": {
-    "voiceId": "1kb4Md8n0kMNktygYhDF",
-    "model": "eleven_multilingual_v2",
+    "voiceId": "6A9D8WSMm4rFsg2DWFeE",
+    "model": "eleven_v4",
     "speed": 1.0,
     "settings": {
-      "stability": 0.55,
+      "stability": 0.35,
       "similarity_boost": 0.8,
-      "style": 0.3,
+      "style": 0.5,
       "use_speaker_boost": true
-    }
+    },
+    "tempo": 1.2
   },
-  "musicVolume": 0.3,
-  "coverFrame": 185,
-  "caption": "Целая жизнь длиной почти в век — тихое, невероятно красивое кино, снятое при свете солнца, костров и свечей 🌲🚂 Без спойлеров. Смотрели «Сны поездов»? 👇",
+  "caption": "Ей девяносто два, и это её последняя поездка по Парижу, а таксист спешит. Тёплое кино, после которого хочется позвонить родным 🎬 Название фильма в конце видео. Смотрели? 👇",
   "hashtags": [
     "#кино",
     "#чтопосмотреть",
     "#фильмы",
-    "#netflix",
-    "#сныпоездов",
-    "#traindreams",
-    "#джоэлэдгертон",
-    "#оскар"
+    "#драма",
+    "#париж",
+    "#французскоекино"
   ],
   "sources": [
-    "https://en.wikipedia.org/wiki/Train_Dreams_(film)",
-    "https://www.whats-on-netflix.com/news/train-dreams-netflix-movie-release-date-cast/",
-    "https://blackbearpictures.com/film-and-tv/train-dreams",
-    "https://www.screendaily.com/features/how-depression-era-photography-inspired-the-oscar-nominated-visuals-for-train-dreams/5213736.article",
-    "https://www.motionpictures.org/2026/03/train-dreams-behind-the-majestic-visuals-of-joel-edgertons-pacific-northwest-epic-2/",
-    "https://en.wikipedia.org/wiki/Adolpho_Veloso"
+    "https://en.wikipedia.org/wiki/Driving_Madeleine",
+    "https://www.allocine.fr/film/fichefilm_gen_cfilm=292290.html",
+    "https://cineuropa.org/en/film/429989",
+    "https://unifrance.org/film/53338/une-belle-course",
+    "https://pathefilms.com/en/movies/une-belle-course",
+    "https://kino.mail.ru/cinema/movies/935083_otlichnaya_gonka/",
+    "https://en.wikipedia.org/wiki/Line_Renaud",
+    "https://www.parismatch.be/actualites/people/2022/09/22/dany-est-le-fils-que-jaurais-aime-avoir-line-renaud-exprime-sa-tendresse-pour-dany-boon-QBVV6EGLR5AIJMS7CMACAK47EU/"
   ],
   "scenes": [
     {
-      "set": "station",
-      "voice": "Его привезли на поезде, когда ему было семь лет. Ни семьи, ни дома. Только железная дорога и бесконечный лес.",
+      "set": "hook",
+      "voice": "Что бы ты рассказал случайному таксисту, если бы это была твоя последняя поездка по родному городу?",
+      "ttsText": "Что бы ты рассказал случайному такси́сту, если бы это была твоя после́дняя пое́здка по родному городу?",
       "emphasis": [
-        "семь",
-        "бесконечный",
-        "лес."
+        "последняя",
+        "поездка"
       ],
-      "sfx": [
-        {
-          "prompt": "old steam locomotive slowly arriving at a small wooden country station at dawn, chuffing slowing down, brakes squealing, long steam hiss",
-          "at": 0,
-          "duration": 9,
-          "volume": 0.22
-        },
-        {
-          "prompt": "cold early morning forest ambience, light wind, distant crows",
-          "at": 0,
-          "duration": 10,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "valley",
-      "voice": "Так начинается «Сны поездов». История одной жизни длиной почти в целый век.",
+      "set": "home",
+      "voice": "Мадлен девяносто два, и сегодня она навсегда уезжает из дома в дом престарелых на другом конце Парижа.",
+      "ttsText": "Мадле́н девяносто два, и сегодня она навсегда уезжает из до́ма в дом престаре́лых на другом конце́ Пари́жа.",
       "emphasis": [
-        "«Сны",
-        "поездов».",
-        "век."
+        "навсегда"
       ],
-      "sfx": [
-        {
-          "prompt": "distant steam train whistle echoing across a wide night valley, then soft rumble of a far away train",
-          "at": 0.3,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "quiet night in the mountains, crickets, soft wind, an owl far away",
-          "at": 0,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 36
+      "pause": 6
     },
     {
-      "set": "logging",
-      "voice": "Роберт вырастает молчаливым лесорубом. Он валит сосны выше любого дома и строит мосты, по которым в эту глушь приходит новое время.",
+      "set": "charles",
+      "voice": "За рулём Шарль, уставший, злой и в долгах, ему нужен быстрый заказ, а не экскурсия.",
+      "ttsText": "За рулём Шарль, уставший, злой и в долга́х, ему нужен быстрый зака́з, а не экску́рсия.",
       "emphasis": [
-        "лесорубом.",
-        "сосны",
-        "новое",
-        "время."
+        "в",
+        "долгах,",
+        "быстрый"
       ],
-      "sfx": [
-        {
-          "prompt": "deep old growth forest ambience, birds singing, light breeze in tall pines",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "single heavy axe chop into a thick tree trunk, crisp wooden thunk",
-          "at": 0.9,
-          "duration": 1,
-          "volume": 0.22,
-          "repeat": {
-            "every": 1.4,
-            "count": 5
-          }
-        },
-        {
-          "prompt": "giant tree creaking and cracking then crashing down to the forest floor far away",
-          "at": 7,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "bridge",
-      "voice": "На одной из строек он видит то, что потом будет преследовать его годами.",
+      "set": "detour",
+      "voice": "Но Мадлен просит свернуть, потом ещё раз, туда, где она была молодой.",
+      "ttsText": "Но Мадле́н просит сверну́ть, потом ещё раз, туда, где она была молодо́й.",
       "emphasis": [
-        "видит",
-        "годами."
+        "свернуть,",
+        "молодой."
       ],
-      "sfx": [
-        {
-          "prompt": "railroad bridge construction at dusk, distant hammers striking wooden beams and iron spikes, gusty wind",
-          "at": 0,
-          "duration": 7,
-          "volume": 0.22
-        },
-        {
-          "prompt": "crows cawing ominously, low wind gust, tense atmosphere",
-          "at": 1.5,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "cabin",
-      "voice": "А потом появляется Глэдис. Они ставят маленький дом у реки, и впервые у Роберта есть место, куда хочется возвращаться.",
+      "set": "meter",
+      "voice": "Счётчик крутится, день уходит, а Шарль почему-то не может ей отказать.",
+      "ttsText": "Счётчик крутится, день ухо́дит, а Шарль почему-то не может ей отказа́ть.",
       "emphasis": [
-        "Глэдис.",
-        "дом",
-        "возвращаться."
+        "не",
+        "может",
+        "отказать."
       ],
-      "sfx": [
-        {
-          "prompt": "gentle river flowing past a cabin on a warm summer evening, crickets, soft frogs",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "crackling fireplace heard from a cabin porch, soft and cozy",
-          "at": 1,
-          "duration": 8,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "seasons",
-      "voice": "Но работа снова и снова уводит его в лес, на долгие месяцы. А мир вокруг меняется быстрее, чем он успевает заметить.",
+      "set": "paris",
+      "voice": "И чем дальше, тем яснее: эта тихая старушка прожила такую жизнь, что его беды рядом с ней кажутся мелочью.",
+      "ttsText": "И чем дальше, тем ясне́е: эта тихая стару́шка прожила такую жизнь, что его беды рядом с ней кажутся ме́лочью.",
       "emphasis": [
-        "лес,",
-        "месяцы.",
-        "быстрее,"
+        "прожила",
+        "мелочью."
       ],
-      "sfx": [
-        {
-          "prompt": "footsteps crunching on autumn leaves then on snow, wind through bare trees, wind slowly turning into winter blizzard",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "campfire",
-      "voice": "Фильм снимали почти без ламп. Солнце, костры, свечи. Поэтому каждый кадр похож на старую фотографию, которая вдруг ожила.",
+      "set": "star",
+      "voice": "Мадлен сыграла Лин Рено, звезда французской сцены, которой на съёмках было за девяносто.",
+      "ttsText": "Мадле́н сыграла Лин Рено́, звезда́ французской сце́ны, которой на съёмках было за девяносто.",
       "emphasis": [
-        "Солнце,",
-        "костры,",
-        "свечи.",
-        "ожила."
+        "Лин",
+        "Рено,"
       ],
-      "sfx": [
-        {
-          "prompt": "campfire crackling and popping at night in a pine forest, gentle",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "old film projector whirring softly",
-          "at": 6,
-          "duration": 5,
-          "volume": 0.12
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "lake",
-      "voice": "Здесь нет погонь и громких сцен. Есть тишина, лес и гудок поезда вдалеке. И от этого почему-то невозможно оторваться.",
+      "set": "question",
+      "voice": "Успеет ли она рассказать главное, пока не кончилась дорога?",
+      "ttsText": "Успеет ли она рассказать гла́вное, пока не ко́нчилась доро́га?",
       "emphasis": [
-        "тишина,",
-        "гудок",
-        "оторваться."
+        "главное,"
       ],
-      "sfx": [
-        {
-          "prompt": "still lake at night in a misty forest, very quiet water lapping, loon call far away",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        },
-        {
-          "prompt": "lonely steam train whistle far away across a lake at night, long echo",
-          "at": 3.4,
-          "duration": 5,
-          "volume": 0.22
-        }
-      ],
-      "pause": 28
+      "pause": 6
     },
     {
-      "set": "dawn",
-      "voice": "Четыре номинации на «Оскар». Кино, после которого хочется выключить свет и просто посидеть в тишине.",
-      "emphasis": [
-        "«Оскар».",
-        "тишине."
-      ],
-      "sfx": [
-        {
-          "prompt": "soft dawn in the mountains, first birds waking up, gentle breeze",
-          "at": 0,
-          "duration": 11,
-          "volume": 0.12
-        }
-      ],
-      "finalTitle": "Сны поездов",
-      "pause": 28
+      "set": "poster",
+      "voice": "Фильм «Великолепная поездка», две тысячи двадцать второй год. Сохрани на вечер, когда захочется и улыбнуться, и поплакать.",
+      "ttsText": "Фильм «Великоле́пная пое́здка», две тысячи двадцать второй год. Сохрани на ве́чер, когда захочется и улыбну́ться, и попла́кать.",
+      "onPoster": true,
+      "pause": 6
     }
   ],
-  "musicSeparate": true,
   "poster": {
-    "src": "assets/train-dreams/poster.jpg",
-    "titleRu": "Сны поездов",
-    "titleEn": "Train Dreams",
-    "year": "2025"
+    "src": "assets/driving-madeleine/poster.jpg",
+    "titleRu": "Великолепная поездка",
+    "titleEn": "Driving Madeleine",
+    "year": "2022",
+    "cta": "Сохрани",
+    "seconds": 2.5
   },
   "instaCover": {
-    "top": "Одна жизнь",
-    "main": "Длиной\nв век",
+    "top": "Последняя",
+    "main": "Поездка",
     "base": [
-      "#08130f",
-      "#0e2b25",
-      "#123630",
-      "#0a1a16"
+      "#06070d",
+      "#0f1220",
+      "#1a1420",
+      "#06070d"
     ],
     "glows": [
       {
         "x": 230,
         "y": 1650,
         "r": 540,
-        "color": "#d08a3a",
-        "opacity": 0.75
+        "color": "#f2a93b",
+        "opacity": 0.4
       },
       {
-        "x": 940,
-        "y": 1250,
+        "x": 930,
+        "y": 1300,
         "r": 420,
-        "color": "#b9925a",
+        "color": "#3a5a9a",
         "opacity": 0.45
       },
       {
-        "x": 700,
+        "x": 720,
         "y": 230,
         "r": 440,
-        "color": "#1d5a52",
-        "opacity": 0.55
+        "color": "#f3e6d0",
+        "opacity": 0.16
       }
     ]
-  }
+  },
+  "art": "vector",
+  "fonts": "futura",
+  "textStyle": "pop",
+  "grain": false
 }
