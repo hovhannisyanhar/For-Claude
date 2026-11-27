@@ -195,7 +195,6 @@ function windshieldShot(t, o) {
   g += `<g opacity="${mood === 'night' ? 0.12 : 0.22}"><path d="M${120 + rays * 200},560 L${300 + rays * 200},560 L${120 + rays * 200},1420 L${-60 + rays * 200},1420 Z" fill="#fff"/><path d="M${640 + rays * 160},560 L${700 + rays * 160},560 L${560 + rays * 160},1420 L${500 + rays * 160},1420 Z" fill="#fff"/></g>`;
   // рама, крыша, капот
   g += `<path d="M0,480 L1080,480 L1080,600 L990,560 L90,560 L0,600 Z" fill="${V('#1c1e22', 0.25, 0.3)}"/><path d="M40,1420 L90,560 L130,560 L90,1420 Z M1040,1420 L990,560 L950,560 L990,1420 Z" fill="#141518"/>`;
-  g += `<rect x="460" y="420" width="160" height="60" rx="10" fill="${mood === 'night' ? '#f0f0e8' : '#dcdcd4'}"/>${label(540, 460, 'TAXI', 34, '#1a1a1a', 1, 'middle', 'Arial')}${mood === 'night' ? glow(540, 450, 120, '#c8ffd0', 0.35) : ''}`;
   g += `<path d="M-20,1420 L1100,1420 L1100,1960 L-20,1960 Z" fill="${V('#1c1e22', 0.3, 0.35)}"/><path d="M-20,1420 Q540,1380 1100,1420 L1100,1470 Q540,1440 -20,1470 Z" fill="${shade('#1c1e22', 0.25)}"/>`;
   g += `<path d="M200,1520 Q540,1490 880,1520" stroke="#fff" stroke-width="5" opacity="0.12" fill="none"/>`;
   return g;
