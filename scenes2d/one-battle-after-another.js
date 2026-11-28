@@ -183,6 +183,53 @@ function neon(x, y, txt, c, size, t, ph = 0, flick = false) {
   const on = !flick || ((t * 7 + ph) % 5) > 0.4;
   return `${glow(x, y - size * 0.35, size * txt.length * 0.55, c, on ? 0.35 : 0.08)}<text x="${x}" y="${y}" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="${size}" fill="none" stroke="${c}" stroke-width="${size * 0.09}" opacity="${on ? 1 : 0.3}">${txt}</text><text x="${x}" y="${y}" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="${size}" fill="none" stroke="#fff" stroke-width="${size * 0.025}" opacity="${on ? 0.9 : 0.2}">${txt}</text>`;
 }
+// фасады улицы в перспективе: витрины, козырьки, окна, вывески-кронштейны на стенах (сцена run)
+function streetFacades(t) {
+  const W = (sd, u, v) => { const nx = sd < 0 ? 0 : 1080, fx = sd < 0 ? 450 : 630; return [lerp(nx, fx, u), lerp(lerp(1500, 1060, u), lerp(300, 860, u), v)]; };
+  const quad = (sd, u1, u2, v1, v2, fill, extra = '') => { const a = W(sd, u1, v1), b = W(sd, u2, v1), c = W(sd, u2, v2), d = W(sd, u1, v2); return `<path d="M${a}L${b}L${c}L${d}Z" fill="${fill}" ${extra}/>`; };
+  let g = '';
+  [-1, 1].forEach((sd) => {
+    // карниз, первый этаж, окна второго этажа
+    g += quad(sd, 0, 1, 0.38, 0.42, '#0c0a10');
+    g += quad(sd, 0, 1, 0, 0.04, '#2a2630');
+    [[0.04, 0.26], [0.34, 0.52], [0.6, 0.74], [0.8, 0.92]].forEach(([u1, u2], i) => {
+      const c = ['#ffcf80', '#8ad8ff', '#ff9ac8', '#ffd890'][(i + (sd > 0 ? 1 : 0)) % 4];
+      g += quad(sd, u1 - 0.01, u2 + 0.01, 0.04, 0.33, '#0a080c');
+      g += quad(sd, u1, u2, 0.06, 0.31, c, 'opacity="0.42"');
+      g += quad(sd, u1, u2, 0.06, 0.1, '#000', 'opacity="0.35"');
+      for (let j = 1; j < 3; j++) g += quad(sd, lerp(u1, u2, j / 3) - 0.003, lerp(u1, u2, j / 3) + 0.003, 0.06, 0.31, '#0a080c');
+      // козырёк в полоску
+      g += quad(sd, u1 - 0.015, u2 + 0.015, 0.33, 0.37, i % 2 ? '#7a2a3a' : '#2a4a6a');
+      [0.25, 0.5, 0.75].forEach((f) => { g += quad(sd, lerp(u1, u2, f) - 0.008, lerp(u1, u2, f) + 0.008, 0.33, 0.37, '#e8e0d0', 'opacity="0.5"'); });
+      [[0.5, 0.58], [0.66, 0.74]].forEach(([v1, v2]) => { g += quad(sd, u1 + 0.02, u2 - 0.02, v1, v2, (i + j(v1)) % 3 ? '#1a1620' : '#ffd890', 'opacity="0.7"'); });
+    });
+    // водосточная труба и пожарная лестница
+    g += quad(sd, 0.3, 0.305, 0.04, 1, '#0c0a10');
+  });
+  // вертикальная вывеска MOTEL на кронштейне у левой стены
+  {
+    const [xw, yw] = W(-1, 0.16, 0.62), sc = lerp(1, 0.35, 0.16), w = 96 * sc, h = 340 * sc, x0 = xw + 26 * sc, on = ((t * 7) % 5) > 0.4;
+    g += `<path d="M${xw},${yw - h * 0.4} L${x0 + w / 2},${yw - h * 0.4} M${xw},${yw + h * 0.35} L${x0 + w / 2},${yw + h * 0.35}" stroke="#2a2630" stroke-width="${7 * sc}"/>`;
+    g += glow(x0 + w / 2, yw, h * 0.7, '#ff4a8a', on ? 0.35 : 0.08);
+    g += `<rect x="${x0}" y="${yw - h / 2}" width="${w}" height="${h}" rx="${8 * sc}" fill="#14101a" stroke="#3a3040" stroke-width="${4 * sc}"/>`;
+    'MOTEL'.split('').forEach((ch, i) => { g += `<text x="${x0 + w / 2}" y="${yw - h / 2 + (i + 0.95) * h / 5.3}" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="${54 * sc}" fill="none" stroke="#ff4a8a" stroke-width="${5 * sc}" opacity="${on ? 1 : 0.3}">${ch}</text>`; });
+  }
+  // горизонтальная вывеска LIQUOR на кронштейне у правой стены
+  {
+    const [xw, yw] = W(1, 0.3, 0.47), sc = lerp(1, 0.35, 0.3), w = 250 * sc, h = 80 * sc, x1 = xw - 22 * sc;
+    g += `<path d="M${xw},${yw - h * 0.9} L${x1 - w * 0.5},${yw - h * 0.9} M${x1 - w * 0.2},${yw - h * 0.9} L${x1 - w * 0.2},${yw - h / 2} M${x1 - w * 0.8},${yw - h * 0.9} L${x1 - w * 0.8},${yw - h / 2}" stroke="#2a2630" stroke-width="${5 * sc}"/>`;
+    g += glow(x1 - w / 2, yw, w * 0.8, '#4af0ff', 0.3);
+    g += `<rect x="${x1 - w}" y="${yw - h / 2}" width="${w}" height="${h}" rx="${8 * sc}" fill="#14101a" stroke="#3a3040" stroke-width="${4 * sc}"/>`;
+    g += `<text x="${x1 - w / 2}" y="${yw + h * 0.25}" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="${52 * sc}" fill="none" stroke="#4af0ff" stroke-width="${4.5 * sc}">LIQUOR</text>`;
+  }
+  // OPEN в витрине справа
+  {
+    const [xa, ya] = W(1, 0.36, 0.22), [xb] = W(1, 0.5, 0.22), sc = lerp(1, 0.35, 0.43);
+    g += glow((xa + xb) / 2, ya, 90 * sc, '#ff8a30', 0.45) + `<text x="${(xa + xb) / 2}" y="${ya}" text-anchor="middle" font-family="Arial Black,Arial" font-weight="900" font-size="${34 * sc}" fill="none" stroke="#ff8a30" stroke-width="${3.5 * sc}">OPEN</text>`;
+  }
+  return g;
+}
+const j = (v) => Math.round(v * 10);
 // золотая статуэтка-награда (стилизованная)
 function statuette(x, y, h, rot = 0) {
   const k = h / 300;
@@ -359,10 +406,7 @@ const shots = {
         sky([[0, '#05060c'], [0.8, '#14182a'], [1, '#2a2440']], 1100),
         // дома по сторонам в перспективе
         `<path d="M0,300 L${vx - 90},${vy - 200} L${vx - 90},${vy} L0,1500 Z" fill="${V('#1e1a26', 0.08, 0.3)}"/><path d="M1080,300 L${vx + 90},${vy - 200} L${vx + 90},${vy} L1080,1500 Z" fill="${V('#221c28', 0.08, 0.3)}"/>`,
-        ...[[0.25, -1], [0.55, -1], [0.35, 1], [0.7, 1]].map(([f, sd]) => { const x0 = vx + sd * (90 + f * 450), y0 = vy - 200 - f * 700 * 0.55; return `<rect x="${sd < 0 ? x0 - 60 * (0.3 + f) : x0}" y="${y0 + 150}" width="${60 * (0.3 + f)}" height="${120 * (0.3 + f)}" fill="#ffd890" opacity="0.4"/>`; }),
-        neon(250, 640, 'MOTEL', '#ff4a8a', 70, t, 0, true),
-        neon(840, 720, 'LIQUOR', '#4af0ff', 60, t, 2),
-        neon(830, 820, 'OPEN', '#ff8a30', 40, t, 1),
+        streetFacades(t),
         // дорога, лужи с отражениями неона
         `<path d="M${vx - 90},${vy} L${vx + 90},${vy} L1080,1500 L1080,1920 L0,1920 L0,1500 Z" fill="${V('#1a1a22', 0.05, 0.3)}"/>`,
         `<g filter="url(#blur8)"><rect x="200" y="1300" width="140" height="300" fill="#ff4a8a" opacity="0.22"/><rect x="760" y="1300" width="120" height="340" fill="#4af0ff" opacity="0.2"/><rect x="${vx - 60}" y="1150" width="120" height="360" fill="#ff3030" opacity="${0.12 + 0.1 * (Math.floor(t * 6) % 2)}"/></g>`,
