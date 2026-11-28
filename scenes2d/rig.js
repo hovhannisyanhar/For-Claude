@@ -257,7 +257,7 @@ export function figure(x, y, s, o = {}) {
   if (o.collar === 'open' && !o.back) body += `<path d="M${f(px - 70 * s)},${f(shY - 12 * s)} L${f(px - 6 * s)},${f(shY + 110 * s)} L${f(px - 44 * s)},${f(shY + 40 * s)} L${f(px - 30 * s)},${f(shY - 8 * s)} Z M${f(px + 70 * s)},${f(shY - 12 * s)} L${f(px + 6 * s)},${f(shY + 110 * s)} L${f(px + 44 * s)},${f(shY + 40 * s)} L${f(px + 30 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(sh, 0.12), 0.15, 0.2)}"/>`;
   if (pose === 'sit' && o.legsDown) body += `<ellipse cx="${f(x)}" cy="${f(hipY + 14 * s)}" rx="${f(ww * 1.25)}" ry="${f(40 * s)}" fill="${V(o.skirt || pants, 0.12, 0.2)}"/>`;
   // руки: плечо → локоть → кисть (IK), рукав до локтя или до кисти
-  // плечо → кисть одной плавной дугой; локоть всегда смотрит наружу-вниз (полюс), поэтому не перескакивает
+  // плечо → локоть → кисть; локоть всегда смотрит наружу-вниз (полюс), поэтому не перескакивает
   const L1 = 158 * s, L2 = 150 * s;
   const arm = (sd) => {
     const ax = tx + sd * (sw - 18 * s), ay = shY + 30 * s, h = (o.hands || {})[sd < 0 ? 'l' : 'r'];
@@ -265,19 +265,17 @@ export function figure(x, y, s, o = {}) {
     const A = ik(ax, ay, tgt[0], tgt[1], L1, L2, 1), B = ik(ax, ay, tgt[0], tgt[1], L1, L2, -1);
     const px = ax + sd * 500 * s, py = ay + 420 * s; // полюс локтя
     const L = Math.hypot(A.ex - px, A.ey - py) <= Math.hypot(B.ex - px, B.ey - py) ? A : B;
-    // кривая через локоть: контрольная точка = 2·локоть − середина
-    const cx = 2 * L.ex - (ax + L.tx) / 2, cy = 2 * L.ey - (ay + L.ty) / 2;
-    const q = (t) => [(1 - t) ** 2 * ax + 2 * t * (1 - t) * cx + t * t * L.tx, (1 - t) ** 2 * ay + 2 * t * (1 - t) * cy + t * t * L.ty];
-    const part = (t0) => { const p1 = [lerp(ax, cx, t0), lerp(ay, cy, t0)], p2 = q(t0); return `M${f(ax)},${f(ay)} Q${f(p1[0])},${f(p1[1])} ${f(p2[0])},${f(p2[1])}`; };
-    const full = `M${f(ax)},${f(ay)} Q${f(cx)},${f(cy)} ${f(L.tx)},${f(L.ty)}`;
-    const endAng = Math.atan2(L.ty - cy, L.tx - cx);
+    // прямые плечо и предплечье, локоть скруглён (round join); рукав — по плечу
+    const full = `M${f(ax)},${f(ay)} L${f(L.ex)},${f(L.ey)} L${f(L.tx)},${f(L.ty)}`;
+    const endAng = Math.atan2(L.ty - L.ey, L.tx - L.ex);
     let a = '';
     if (o.sleeves === 'short') {
-      a += `<path d="${full}" stroke="${shade(skin, -0.06)}" stroke-width="${f(40 * s)}" stroke-linecap="round" fill="none"/>`;
-      a += `<path d="${part(0.42)}" stroke="${sh}" stroke-width="${f(58 * s)}" stroke-linecap="round" fill="none"/>`;
+      const mx = lerp(ax, L.ex, 0.6), my = lerp(ay, L.ey, 0.6);
+      a += `<path d="${full}" stroke="${shade(skin, -0.06)}" stroke-width="${f(40 * s)}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+      a += `<path d="M${f(ax)},${f(ay)} L${f(mx)},${f(my)}" stroke="${sh}" stroke-width="${f(58 * s)}" stroke-linecap="round" fill="none"/>`;
     } else {
-      a += `<path d="${full}" stroke="${shade(sh, -0.05)}" stroke-width="${f(50 * s)}" stroke-linecap="round" fill="none"/>`;
-      a += `<path d="${part(0.85)}" stroke="${shade(sh, 0.12)}" stroke-width="${f(14 * s)}" stroke-linecap="round" fill="none" opacity="0.3" transform="translate(${f(-sd * 8 * s)} ${f(-5 * s)})"/>`;
+      a += `<path d="${full}" stroke="${shade(sh, -0.05)}" stroke-width="${f(50 * s)}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+      a += `<path d="M${f(ax)},${f(ay)} L${f(L.ex)},${f(L.ey)}" stroke="${shade(sh, 0.12)}" stroke-width="${f(14 * s)}" stroke-linecap="round" fill="none" opacity="0.3" transform="translate(${f(-sd * 8 * s)} ${f(-5 * s)})"/>`;
     }
     a += hand(L.tx, L.ty, endAng, s * 1.05, skin, sd < 0 ? -1 : 1, h || {});
     return { a, front: h?.front };

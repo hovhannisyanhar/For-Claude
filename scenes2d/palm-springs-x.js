@@ -346,56 +346,36 @@ const shotsRaw = {
   party(t, T) {
     const els = [];
     let cam;
-    const dusk = (pan = 0) => sky([[0, '#1a1840'], [0.35, '#6a3a7a'], [0.5, '#f08a6a'], [0.62, '#2a2040']]) + stars(30, 500, t, 0.6)
-      + par(-pan * 0.2, 0, mountains(1050, t, { far: '#5a3a6a', mid: '#3a2a4a', near: '#2a1e34' }))
-      + par(-pan * 0.4, 0, palm(-40, 1150, 640, t, 0, '#1a2a2a') + palm(1100, 1150, 700, t, 1, '#1a2a2a'))
+    const dusk = () => sky([[0, '#1a1840'], [0.35, '#6a3a7a'], [0.5, '#f08a6a'], [0.62, '#2a2040']]) + stars(30, 500, t, 0.6)
+      + mountains(1050, t, { far: '#5a3a6a', mid: '#3a2a4a', near: '#2a1e34' })
+      + palm(-40, 1150, 640, t, 0, '#1a2a2a') + palm(1100, 1150, 700, t, 1, '#1a2a2a')
       + `<rect x="-600" y="1120" width="2400" height="1000" fill="${V('#3a2a3a', 0.05, 0.3)}"/>`;
-    const bulbs = (on) => lights(-200, 760, 560, 830, 60, 10, t, 1) + lights(560, 830, 1300, 760, 70, 10, t, 1);
-    if (t < ws(1.43)) { // А: пожал плечами
-      const sh = io(clamp((t - ws(0.45)) / 0.35));
-      const X = 540, Y = 1900, s = 1.25, H = headAt(X, Y, s);
-      const on = clamp((t - 0.1) / 1.0);
-      els.push(dusk(), layer(on, bulbs()),
-        [[150, 1500, 0], [300, 1460, 1], [800, 1470, 2], [950, 1510, 3]].map(([x, y, i]) => G2(i, x, y, 0.5, { turn: wave(t, 0.5, i) * 0.4, expr: 'smile', hands: { r: { x: x + 60, y: y - 380 + wave(t, 1.2, i) * 20, pose: 'wave' } }, knees: [wave(t, 1.2, i) * 0.3, -wave(t, 1.2, i) * 0.3] })).join(''),
-        N2(X, Y, s, { shades: 'up', turn: 0.15, tilt: sh * 6, expr: sh > 0.4 ? 'smirk' : 'tired', blink: blink(t, 0.4), breathe: (wave(t, 0.3) + 1) / 2,
-          hands: { l: { x: lerp(X - 160, X - 260, sh), y: lerp(Y - 500, H.y + 160, sh), pose: 'open', rot: lerp(0, -40, sh) }, r: { x: lerp(X + 170, X + 280, sh), y: lerp(Y - 480, H.y + 170, sh), pose: sh > 0.3 ? 'open' : 'hold', item: sh > 0.3 ? null : canItem, rot: lerp(0, 40, sh) } } }),
-        grade('#ff9ad0', 0.15));
-      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.08, X, H.y + 300, 540, 1150), io(clamp(t / 1.5)));
-    } else if (t < ws(2.43)) { // Б: вид сверху — Найлз раскинулся на круге, банку к камере
-      const k = clamp((t - ws(1.43)) / 1.0), rot = lerp(-8, 10, k);
+    const bulbs = () => lights(-200, 760, 560, 830, 60, 10, t, 1) + lights(560, 830, 1300, 760, 70, 10, t, 1);
+    if (t < ws(2.43)) { // А: «Он давно смирился: пиво в бассейне» — вид сверху, медленно кружится на круге
+      const k = clamp(t / ws(2.43)), rot = lerp(-10, 10, k);
       const X = 540, Y = 1150;
       let g = `<rect x="-800" y="-800" width="2680" height="3520" fill="${grad([[0, '#1ab8d0'], [1, '#0a7aa0']])}"/>`;
-      for (let i = 0; i < 18; i++) { reseed(i + 70); const cx = rnd() * 1080, cy = rnd() * 1920; g += `<path d="M${cx - 80},${cy} q40,${-20 + wave(t, 0.6, i) * 15} 80,0 t80,0" stroke="#bff8ff" stroke-width="4" fill="none" opacity="0.4"/>`; }
-      g += `<g transform="rotate(${rot} ${X} ${Y})">` + `<circle cx="${X}" cy="${Y}" r="${560 + k * 60}" fill="none" stroke="#e8ffff" stroke-width="5" opacity="${0.4 * (1 - k)}"/>`
+      for (let i = 0; i < 18; i++) { reseed(i + 70); const cx = rnd() * 1080, cy = rnd() * 1920; g += `<path d="M${cx - 80},${cy} q40,${-20 + wave(t, 0.4, i) * 15} 80,0 t80,0" stroke="#bff8ff" stroke-width="4" fill="none" opacity="0.4"/>`; }
+      const lift = io(clamp((t - ws(1.3)) / 0.6));
+      g += `<g transform="rotate(${rot} ${X} ${Y})">`
         + `<ellipse cx="${X + 30}" cy="${Y + 40}" rx="330" ry="330" fill="#06405a" opacity="0.3" filter="url(#blur20)"/><circle cx="${X}" cy="${Y}" r="270" fill="none" stroke="${V('#ff5fa2', 0.25, 0.2)}" stroke-width="150"/><path d="M${X - 230},${Y - 150} A270 270 0 0 1 ${X + 60},${Y - 268}" stroke="#fff" stroke-width="22" opacity="0.45" fill="none" stroke-linecap="round"/>`
-        + N2(X, Y + 440, 0.75, { shades: 'on', expr: 'grin', turn: 0, hands: { l: { x: X - 330, y: Y - 260, pose: 'open', rot: -40 }, r: { x: X + 260, y: Y - 380 - k * 60, pose: 'hold', item: canItem } }, knees: [-0.4, 0.4], shadow: false })
+        + N2(X, Y + 440, 0.75, { shades: 'on', expr: lift > 0.5 ? 'grin' : 'smirk', hands: { l: { x: X - 300, y: Y - 160, pose: 'open', rot: -40 }, r: { x: X + 240, y: lerp(Y - 140, Y - 300, lift), pose: 'hold', item: canItem } }, knees: [-0.4, 0.4], shadow: false })
         + `</g>`;
       els.push(g);
-      cam = { z: lerp(1.15, 1.0, io(k)), x: 0, y: 0, rot: 0 };
-    } else if (t < ws(3.08)) { // В: танцы, нижний ракурс
-      const k = clamp((t - ws(2.43)) / 0.65), beat = wave(t, 2.0);
-      const X = 540, Y = 2050, s = 1.3;
-      els.push(sky([[0, '#140c30'], [0.5, '#3a1a5a'], [0.8, '#6a2a6a']]),
-        ...[0, 1, 2].map((i) => `<path d="M${200 + i * 340},0 L${100 + i * 340 + beat * 120},1900 L${300 + i * 340 + beat * 120},1900 Z" fill="${['#ff5fa2', '#4ae0e8', '#ffd24a'][i]}" opacity="0.18"/>`),
-        lights(-200, 600, 560, 700, 60, 10, t) + lights(560, 700, 1300, 600, 70, 10, t),
-        [[120, 1700, 1], [960, 1720, 3], [300, 1600, 0], [800, 1620, 4]].map(([x, y, i]) => G2(i, x, y, 0.55, { turn: x < 540 ? 0.5 : -0.5, expr: 'laugh', hands: { l: { x: x - 20, y: y - 300 + Math.abs(beat) * 20, pose: 'open', rot: 90 }, r: { x: x + 20, y: y - 300 + Math.abs(beat) * 20, pose: 'open', rot: -90 } } })).join(''),
-        N2(X, Y, s, { shades: 'on', expr: 'grin', turn: beat * 0.4, tilt: beat * 8, lean: beat * 6, hairLag: -beat, knees: [Math.max(0, beat) * 0.6, Math.max(0, -beat) * 0.6],
-          hands: { l: { x: X - 260, y: 820 + beat * 120, pose: 'wave' }, r: { x: X + 270, y: 820 - beat * 120, pose: 'hold', item: canItem } } }),
-        grade('#ff5fa2', 0.12));
-      cam = { z: 1.05, x: 0, y: 0, rot: beat * 1.2 };
-    } else { // Г+Д: тост крупно → стоп-кадр, цвет уходит
-      const tf = Math.min(t, ws(4.3)); // после «ведь» всё замирает
-      const talk = t < ws(4.2) ? Math.abs(Math.sin(t * 13)) * 0.8 : 0;
+      cam = { z: 1.0, x: 0, y: 0 };
+    } else { // Б: «танцы, дерзкие тосты» — один план: танцует → берёт микрофон и бокал → «никто ничего не вспомнит» — всё замирает и теряет цвет
+      const tf = Math.min(t, ws(4.3));
+      const toast = io(clamp((tf - ws(2.95)) / 0.5));
+      const beat = wave(tf, 1.0) * (1 - toast);
+      const talk = t > ws(3.1) && t < ws(4.2) ? Math.abs(Math.sin(t * 13)) * 0.8 : 0;
       const X = 600, Y = 2150, s = 1.5, H = headAt(X, Y, s);
       const freeze = io(clamp((t - ws(4.3)) / 1.0));
-      const guestsShock = [[160, 1500, 1, 0.6], [330, 1440, 3, 0.6], [880, 1470, 5, -0.5]].map(([x, y, i, tu]) => G2(i, x, y, 0.55, { turn: tu, expr: 'surprised', look: { x: tu > 0 ? 0.8 : -0.8, y: 0.2 }, blink: blink(tf, i), hands: i === 1 ? { l: { x: x + 10, y: y - 470, pose: 'open', rot: -90 } } : undefined })).join('');
-      els.push(dusk(), bulbs(),
-        `<g filter="url(#blur4)">${guestsShock}</g>`,
-        `<rect x="1580" y="1240" width="200" height="140" fill="#f8f4ec"/>`,
-        N2(X, Y, s, { shades: 'up', turn: -0.3, tilt: wave(tf, 0.7) * 3, expr: 'smirk', talk, look: { x: -0.6, y: 0.1 }, blink: blink(tf, 0.6),
-          hands: { r: { x: X + 280, y: H.y - 60 + wave(tf, 0.8) * 20, pose: 'hold', item: glassItem }, l: { x: H.x - 150, y: H.y + H.r * 0.9, pose: 'hold', item: micItem, rot: -70 } } }),
+      const guests = [[160, 1500, 1, 0.6], [330, 1440, 3, 0.6], [880, 1470, 5, -0.5]].map(([x, y, i, tu]) => G2(i, x, y, 0.55, { turn: tu, expr: toast > 0.5 ? 'surprised' : 'laugh', look: { x: tu > 0 ? 0.8 : -0.8, y: 0.2 }, blink: blink(tf, i), tilt: wave(tf, 1.0, i) * 3 * (1 - toast) })).join('');
+      els.push(dusk(), bulbs(), `<g filter="url(#blur4)">${guests}</g>`,
+        N2(X, Y, s, { shades: toast > 0.5 ? 'up' : 'on', turn: lerp(beat * 0.25, -0.3, toast), tilt: beat * 5 + wave(tf, 0.7) * 2 * toast, lean: beat * 3, expr: toast > 0.5 ? 'smirk' : 'grin', talk, look: { x: -0.6 * toast, y: 0.1 }, blink: blink(tf, 0.6), hairLag: -beat * 0.6,
+          hands: { r: { x: lerp(X + 230, X + 260, toast), y: lerp(H.y - 40 + beat * 40, H.y - 20, toast), pose: 'hold', item: toast > 0.5 ? glassItem : canItem }, l: { x: lerp(X - 240, H.x - 130, toast), y: lerp(H.y - 20 - beat * 40, H.y + H.r * 0.95, toast), pose: toast > 0.5 ? 'hold' : 'open', item: toast > 0.5 ? micItem : null, rot: toast > 0.5 ? -70 : 0 } } }),
         grade('#ff9ad0', 0.15));
-      cam = { ...aim(lerp(1.05, 0.95, freeze), X, H.y + 260, 540, 1180), sat: 1 - freeze * 0.85 };
+      cam = { ...aim(lerp(1.0, 0.96, freeze), X, H.y + 300, 540, 1180), sat: 1 - freeze * 0.85 };
     }
     els.push(topShade(620, 0.5));
     return { cam, els };
@@ -415,21 +395,21 @@ const shotsRaw = {
       + glow(cx, 1340, 380 * pulse, '#ff8a30', 0.6) + `<path d="M${cx - 50},1500 L${cx - 30},1220 Q${cx},1170 ${cx + 20},1230 L${cx + 40},1500 Z" fill="${V('#ffb050', 0.3, 0.2)}" opacity="${0.8 * pulse}"/>`;
     const ground = `<rect x="-600" y="1480" width="2400" height="700" fill="${V('#3a2a2a', 0.05, 0.4)}"/>`;
     const fin = clamp(1 - t / 0.25); // приход из темноты
-    if (t < ws(2.4)) { // А: со спины, идёт к пещере
+    if (false) { // (план «со спины» убран: меньше смен кадра)
       const k = io(clamp(t / ws(2.4)));
       const s = lerp(1.25, 0.55, k), y = lerp(2150, 1560, k);
       els.push(night(k), rock(690), ground, glow(690, 1350, 500, '#ff8a30', 0.15 * pulse),
         N2(lerp(420, 640, k), y, s, { back: true, knees: [wave(t, 1.4) * 0.5, -wave(t, 1.4) * 0.5], tilt: wave(t, 1.4) * 2, hairLag: wave(t, 1.4) * 0.3, rim: { c: '#ffb070', dx: -8, dy: -4 } }));
       cam = { z: lerp(1.0, 1.12, k), x: 0, y: lerp(0, -40, k) };
     } else if (t < ws(4.45)) { // Б: встречный план — Сара идёт следом; Найлз у входа оборачивается
-      const k = clamp((t - ws(2.4)) / (ws(4.45) - ws(2.4))), walk = io(clamp(k * 1.6));
-      const sx = lerp(-80, 330, walk), SY = 1900, ss = 1.15, HS = headAt(sx, SY, ss);
+      const walk = io(clamp((t - ws(2.2)) / 1.6)), k = walk;
+      const sx = lerp(-320, 330, walk), SY = 1900, ss = 1.15, HS = headAt(sx, SY, ss);
       const stop = io(clamp((t - ws(2.75)) / 0.3));
       els.push(night(0.5), rock(800), ground,
-        N2(820, 1520, 0.6, { turn: -0.5, expr: stop > 0.5 ? 'surprised' : 'neutral', talk: t > ws(2.9) && t < ws(3.6) ? Math.abs(Math.sin(t * 12)) : 0, look: { x: -0.9, y: 0 }, rim: { c: '#ffb070', dx: 8, dy: -4 }, hands: { l: { x: 700, y: lerp(1300, 1060, stop), pose: 'open', rot: -80 } } }),
+        N2(820, 1520, 0.6, { turn: lerp(0.8, -0.5, stop), expr: stop > 0.5 ? 'surprised' : 'neutral', talk: t > ws(2.9) && t < ws(3.6) ? Math.abs(Math.sin(t * 12)) : 0, look: { x: lerp(0.9, -0.9, stop), y: 0 }, rim: { c: '#ffb070', dx: 8, dy: -4 }, hands: { l: { x: lerp(760, 700, stop), y: lerp(1330, 1120, stop), pose: 'open', rot: -80 } } }),
         S2(sx, SY, ss, { turn: 0.45, expr: mixExpr('think', 'angry', clamp((k - 0.4) / 0.3)), look: { x: 0.9, y: 0.25 }, knees: walk < 0.98 ? [wave(t, 1.6) * 0.5, -wave(t, 1.6) * 0.5] : [0, 0], tilt: wave(t, 1.6) * 2 * (1 - walk), hairLag: wave(t, 1.6) * 0.4, blink: blink(t, 0.4), rim: { c: '#ffb070', dx: 10, dy: -4 } }),
         glow(sx + 80, HS.y, 280, '#ff8a30', 0.22));
-      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.18, sx + 60, HS.y + 260, 540, 1100), io(clamp((t - ws(3.2)) / 1.0)));
+      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.12, sx + 120, HS.y + 300, 540, 1100), io(clamp((t - ws(3.2)) / 1.2)));
     } else { // В: вспышка → утро, Сара садится
       const k = clamp((t - ws(4.55)) / 0.4), up = io(k);
       const X = 380, Y = 1640, s = 1.2, H = headAt(X, Y, s, 'sit');
@@ -439,7 +419,7 @@ const shotsRaw = {
         blanket(1340, '#fdfcf8'), phone(940, 1210, 0.8, t, '7:00', 0));
       cam = lerpCam(aim(1.0, 540, 1150, 540, 1150), aim(1.25, X + 60, H.y + 200, 540, 1120), io(clamp((t - ws(5.4)) / 1.0)));
     }
-    const fl = Math.max(0, 1 - Math.abs(t - ws(4.5)) / 0.5);
+    const fl = Math.max(0, 1 - Math.abs(t - ws(4.5)) / 0.7);
     els.push(flashRect(ease3(fl) * 1.15, '#fff4d8'), topShade(620, 0.5));
     return { cam, els };
   },
@@ -483,9 +463,9 @@ const shotsRaw = {
     const desert = sky([[0, '#3a9ae8'], [0.4, '#a8d8f4'], [0.53, '#f8e4c8']]) + clouds(t, 340, '#fff', 0.85, 4) + glow(820, 640, 280, '#fff8d0', 0.6)
       + mountains(hy, t, { far: '#c8a0b0', mid: '#b08890', near: '#a07a6a' }) + `<rect x="-600" y="${hy}" width="2300" height="${1100}" fill="${V('#e8c898', 0.05, 0.15)}"/>`
       + `<path d="M${vx - 20},${hy} L${vx + 20},${hy} L1500,2100 L-420,2100 Z" fill="${V('#5a5458', 0.05, 0.2)}"/>`;
-    if (t >= ws(1.2) && t < ws(2.15)) { // сверху: дорога-кольцо, крошечная машинка бежит по кругу
-      const k = clamp((t - ws(1.2)) / 0.95);
-      const a = -Math.PI / 2 + k * Math.PI * 1.2;
+    if (t < ws(1.95)) { // сверху: дорога-кольцо, крошечная машинка бежит по кругу
+      const k = clamp(t / ws(1.95));
+      const a = -Math.PI / 2 + k * Math.PI * 1.4;
       let g = `<rect x="-800" y="-800" width="2680" height="3520" fill="${V('#e4c494', 0.05, 0.1)}"/>`;
       reseed(51); for (let i = 0; i < 40; i++) { const x = rnd() * 1080, y = rnd() * 1920; g += rnd() < 0.5 ? `<circle cx="${x}" cy="${y}" r="${10 + rnd() * 14}" fill="#7a9a5a" opacity="0.8"/>` : `<circle cx="${x}" cy="${y}" r="${4 + rnd() * 6}" fill="#b89a74"/>`; }
       g += `<ellipse cx="540" cy="1150" rx="380" ry="380" fill="none" stroke="#5a5458" stroke-width="90"/><ellipse cx="540" cy="1150" rx="380" ry="380" fill="none" stroke="#f4d04a" stroke-width="5" stroke-dasharray="30 30"/>`;
@@ -496,9 +476,7 @@ const shotsRaw = {
       cam = { z: 1.05, x: 0, y: 0, rot: lerp(-4, 4, k) };
     } else {
       els.push(desert, dashes, roadside(), car());
-      if (t < ws(1.2)) cam = lerpCam({ z: 1.0, x: 0, y: 0 }, { z: 1.08, x: 0, y: -40 }, io(clamp(t / 1.3)));
-      else if (t < ws(3.65)) cam = aim(1.25, 380, 1320, 540, 1160);
-      else cam = lerpCam(aim(1.25, 380, 1320, 540, 1160), aim(1.25, 700, 1320, 540, 1160), io(clamp((t - ws(3.65)) / 0.6)));
+      cam = lerpCam(aim(1.15, 400, 1320, 540, 1160), aim(1.15, 680, 1320, 540, 1160), io(clamp((t - ws(3.5)) / 1.0)));
       if (t > ws(2.6)) els.push(...Array.from({ length: 14 }, (_, i) => { reseed(i + 900); const y = 900 + rnd() * 900, l = (t * 2000 + rnd() * 1080) % 1500; return `<path d="M${rnd() < 0.5 ? -100 + l * 0.2 : 1180 - l * 0.2},${y} l${rnd() < 0.5 ? 160 : -160},${(y - 1020) * 0.2}" stroke="#fff" stroke-width="3" opacity="0.35"/>`; }));
     }
     els.push(grade('#ffd8a0', 0.22), topShade(620, 0.45));
@@ -510,13 +488,13 @@ const shotsRaw = {
   hiding(t, T) {
     const els = [];
     let cam;
-    if (t < ws(0.95)) {
-      const k = clamp(t / ws(0.95)), rot = lerp(-12, 12, k);
+    if (t < ws(2.3)) {
+      const k = clamp(t / ws(2.3)), rot = lerp(-10, 10, k);
       let g = `<rect x="-800" y="-800" width="2680" height="3520" fill="${grad([[0, '#1ab8d0'], [1, '#0a7aa0']])}"/>`;
       for (let i = 0; i < 18; i++) { reseed(i + 70); const cx = rnd() * 1080, cy = rnd() * 1920; g += `<path d="M${cx - 80},${cy} q40,${-20 + wave(t, 0.6, i) * 15} 80,0 t80,0" stroke="#bff8ff" stroke-width="4" fill="none" opacity="0.4"/>`; }
       g += `<g transform="rotate(${rot} 540 1150)">` + [[330, 1000, '#ffd24a', 'S'], [760, 1300, '#ff5fa2', 'N']].map(([x, y, c, who]) => `<circle cx="${x}" cy="${y}" r="190" fill="none" stroke="${V(c, 0.25, 0.2)}" stroke-width="100"/>` + (who === 'S' ? S2(x, y + 300, 0.5, { expr: 'laugh', turn: 0.3, hands: { r: { x: x + 260, y: y - 110, pose: 'open' }, l: { x: x - 200, y: y - 200, pose: 'open' } }, shadow: false }) : N2(x, y + 300, 0.5, { shades: 'on', expr: 'grin', turn: -0.3, hands: { l: { x: x - 260, y: y - 110, pose: 'open' }, r: { x: x + 200, y: y - 200, pose: 'hold', item: canItem } }, shadow: false }))).join('') + `</g>`;
-      els.push(g); cam = { z: lerp(1.1, 1.0, k), x: 0, y: 0 };
-    } else if (t < ws(1.75)) {
+      els.push(g); cam = { z: 1.0, x: 0, y: 0 };
+    } else if (false) { // бар и стрела убраны: меньше смен кадра
       const beat = wave(t, 2.0);
       els.push(`<rect x="-800" y="-800" width="2680" height="3520" fill="${V('#2a1a24', 0.1, 0.3)}"/>` + Array.from({ length: 9 }, (_, i) => `<rect x="${i * 130}" y="0" width="8" height="1920" fill="#1a0e14" opacity="0.6"/>`).join(''),
         `<text x="540" y="860" font-family="'Brush Script MT', cursive" font-size="110" fill="#ff7ac0" text-anchor="middle" opacity="${0.85 + 0.15 * wave(t, 3)}">kinoplot.film</text>` + glow(540, 830, 420, '#ff5fa2', 0.35),
@@ -526,7 +504,7 @@ const shotsRaw = {
         N2(720, 1900, 0.9, { turn: -0.5, expr: 'grin', tilt: -beat * 6, lean: -beat * 5, knees: [Math.max(0, -beat) * 0.5, Math.max(0, beat) * 0.5], hands: { r: { x: 900, y: 1000 - beat * 60, pose: 'wave' }, l: { x: 540, y: 1060 + beat * 60, pose: 'open' } } }),
         `<rect x="-800" y="-800" width="2680" height="3520" fill="#ff5fa2" opacity="0.08"/>`);
       cam = { z: 1.05, x: 0, y: 0, rot: beat * 2 };
-    } else if (t < ws(2.45)) {
+    } else if (false) {
       const hit = clamp((t - ws(1.95)) / 0.12);
       const X = 470, Y = 2300, s = 1.5, H = headAt(X, Y, s);
       els.push(sky([[0, '#e8a868'], [0.5, '#f4d4a8']]), mountains(1100, t, { far: '#c89088', mid: '#a87068', near: '#8a5a50' }),
@@ -537,7 +515,7 @@ const shotsRaw = {
         hit >= 1 ? `<path d="M830,${H.y - 50} l-40,-25 M830,${H.y + 10} l-40,25 M825,${H.y - 20} l-50,0" stroke="#5a3a2a" stroke-width="6"/>` : '');
       cam = aim(1.0, 600, H.y + 200, 540, 1150);
     } else {
-      const k = io(clamp((t - ws(2.45)) / (VIS(T) - ws(2.45))));
+      const k = io(clamp((t - ws(2.3)) / (VIS(T) - ws(2.3))));
       const X = 540, Y = 1330, s = 1.05, H = headAt(X, Y, s, 'sit');
       const away = io(clamp((t - ws(3.95)) / 0.5));
       const fig = (o = {}) => N2(X, Y, s, { pose: 'sit', legsDown: 210, noFeet: true, turn: lerp(0, -0.35, away), expr: 'sad', look: { x: lerp(0, -0.8, away), y: -0.6 }, blink: blink(t, 1.4), tilt: lerp(8, 3, away), breathe: (wave(t, 0.2) + 1) / 2, footSwing: wave(t, 0.4),
@@ -627,12 +605,12 @@ const shotsRaw = {
 };
 const shotsX = {
   hook: shotsRaw.hook,
-  morning: smooth(shotsRaw.morning, [ws(2.73)], 0.45),
-  party: smooth(shotsRaw.party, [ws(1.43), ws(2.43), ws(3.08)]),
-  cave: smooth(shotsRaw.cave, [ws(2.4)], 0.45),
-  road: smooth(shotsRaw.road, [ws(1.2), ws(2.15)]),
-  hiding: smooth(shotsRaw.hiding, [ws(0.95), ws(1.75), ws(2.45)]),
-  globes: smooth(shotsRaw.globes, [ws(2.5)], 0.45),
-  question: smooth(shotsRaw.question, [ws(2.75)], 0.6),
+  morning: smooth(shotsRaw.morning, [ws(2.73)], 0.8),
+  party: smooth(shotsRaw.party, [ws(2.43)], 0.8),
+  cave: shotsRaw.cave,
+  road: smooth(shotsRaw.road, [ws(1.95)], 0.8),
+  hiding: smooth(shotsRaw.hiding, [ws(2.3)], 0.8),
+  globes: smooth(shotsRaw.globes, [ws(2.5)], 0.8),
+  question: smooth(shotsRaw.question, [ws(2.75)], 0.9),
 };
 run(shotsX);
