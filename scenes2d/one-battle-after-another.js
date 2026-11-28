@@ -10,7 +10,7 @@ const BOB = { shirt: '#a8443a', pants: '#3e4a62', skin: '#d39a74', hair: '#6a4a3
 // молодой Боб (пролог): усы без бороды, тёмная куртка, шапка-бини
 const YOUNG = { shirt: '#2e3038', pants: '#2a2a30', skin: '#d8a27c', hair: '#5a3a24', iris: '#4a6a7a', beard: false, moustache: true, cap: '#3a3a3c', frown: 0.2 };
 // полковник Локджо: седой ёжик, камуфляжная кепка, камуфляж, бронежилет
-const LOCK = { worried: true, shirt: '#6e6c50', pants: '#5a5a42', skin: '#d8a088', hair: '#c8c4bc', iris: '#6a8a9a', beard: false, frown: 0.75, squint: true, camoCap: true, plate: true, boots: true };
+const LOCK = { worried: true, slim: 0.92, head: 0.7, shirt: '#6e6c50', pants: '#5a5a42', skin: '#d8a088', hair: '#c8c4bc', iris: '#6a8a9a', beard: false, frown: 0.75, squint: true, camoCap: true, plate: true, boots: true };
 
 const blink = (t, ph = 0) => ((t + ph) % 3.7) < 0.13;
 const sky = (stops, h = 1300) => `<rect width="1080" height="${h}" fill="${grad(stops)}"/>`;
@@ -52,6 +52,7 @@ function dress(x, y, s, o) {
     b += `<rect x="${x - 98 * s}" y="${top + 10 * s}" width="${196 * s}" height="${ty - top}" fill="${grad([[0, '#fff', 0.12], [0.5, '#000', 0], [1, '#000', 0.3]], false)}"/>`;
   }
   if (o.plate) {
+    b += `<rect x="${x - hr * 0.5}" y="${headY + hr * 0.5}" width="${hr}" height="${top - headY}" fill="${V(shade(o.skin, -0.06), 0.05, 0.2)}"/>` + [-0.25, -0.08, 0.08, 0.25].map((k) => `<path d="M${x + hr * k},${headY + hr * 1.05} q${hr * 0.04},${hr * 0.3} 0,${hr * 0.6}" stroke="${shade(o.skin, -0.3)}" stroke-width="${hr * 0.02}" fill="none"/>`).join('');
     // бронежилет с подсумками, лямки, нашивка-флаг
     b += `<path d="M${x - 86 * s},${top + 40 * s} L${x - 70 * s},${top - 4 * s} L${x - 30 * s},${top - 4 * s} L${x - 24 * s},${top + 40 * s} L${x + 24 * s},${top + 40 * s} L${x + 30 * s},${top - 4 * s} L${x + 70 * s},${top - 4 * s} L${x + 86 * s},${top + 40 * s} L${x + 90 * s},${ty - 20 * s} L${x - 90 * s},${ty - 20 * s} Z" fill="${V('#4e4d3a', 0.15, 0.3)}"/>`;
     [-56, 0, 56].forEach((dx) => { b += `<rect x="${x + (dx - 24) * s}" y="${ty - 110 * s}" width="${48 * s}" height="${70 * s}" rx="${6 * s}" fill="${V('#5a5944', 0.2, 0.25)}" stroke="#2e2d22" stroke-width="${2 * s}"/><rect x="${x + (dx - 24) * s}" y="${ty - 110 * s}" width="${48 * s}" height="${16 * s}" rx="${4 * s}" fill="#3e3d2e"/>`; });
@@ -83,8 +84,31 @@ function dress(x, y, s, o) {
     let sp = ''; for (let i = 0; i < 9; i++) sp += `<ellipse cx="${x + (rnd() * 1.6 - 0.8) * hr}" cy="${headY - hr * (0.65 + rnd() * 0.4)}" rx="${hr * (0.1 + rnd() * 0.1)}" ry="${hr * 0.06}" fill="${rnd() < 0.5 ? '#9a987a' : '#4a4a36'}" opacity="0.75"/>`;
     front += `<path d="M${x - hr * 0.98},${headY - hr * 0.42} L${x - hr * 0.9},${headY - hr * 1.2} L${x + hr * 0.9},${headY - hr * 1.2} L${x + hr * 0.98},${headY - hr * 0.42} Z" fill="${V('#7a7858', 0.15, 0.25)}"/>${sp}`;
     front += `<path d="M${x - hr * 1.0},${headY - hr * 0.42} Q${x},${headY - hr * 0.62} ${x + hr * 1.0},${headY - hr * 0.42} Q${x + hr * 0.6},${headY - hr * 0.12} ${x},${headY - hr * 0.16} Q${x - hr * 0.6},${headY - hr * 0.12} ${x - hr * 1.0},${headY - hr * 0.42} Z" fill="${V('#6a6848', 0.1, 0.35)}"/>`;
-    // жёсткая челюсть и морщины
-    front += `<path d="M${x - hr * 0.7},${headY + hr * 0.55} Q${x},${headY + hr * 1.1} ${x + hr * 0.7},${headY + hr * 0.55}" stroke="${shade(o.skin, -0.25)}" stroke-width="${hr * 0.04}" fill="none" opacity="0.6"/><path d="M${x - hr * 0.62},${headY + hr * 0.1} q${hr * 0.1},${hr * 0.25} ${hr * 0.05},${hr * 0.45} M${x + hr * 0.62},${headY + hr * 0.1} q${-hr * 0.1},${hr * 0.25} ${-hr * 0.05},${hr * 0.45}" stroke="${shade(o.skin, -0.2)}" stroke-width="${hr * 0.018}" fill="none" opacity="0.5"/>`;
+    // лицо: тяжёлые веки, низкие тёмные брови, тонкий сжатый рот, квадратный подбородок с ямкой, складки
+    const ey = headY + 2 * hs, lk = o.look || 0, sk = o.skin;
+    front += [-1, 1].map((sd) => `<ellipse cx="${x + sd * 55 * hs}" cy="${ey + 32 * hs}" rx="${19 * hs}" ry="${12 * hs}" fill="${shade(sk, -0.04)}"/>`).join('');
+    front += `<path d="M${x - hr * 0.42},${headY + hr * 0.72} L${x - hr * 0.5},${headY + hr * 1.02} Q${x},${headY + hr * 1.12} ${x + hr * 0.5},${headY + hr * 1.02} L${x + hr * 0.42},${headY + hr * 0.72} Z" fill="${V(sk, 0.02, 0.12)}"/><path d="M${x},${headY + hr * 0.95} l0,${hr * 0.1}" stroke="${shade(sk, -0.3)}" stroke-width="${hr * 0.025}"/>`;
+    front += `<ellipse cx="${x}" cy="${ey + 56 * hs}" rx="${30 * hs}" ry="${14 * hs}" fill="${shade(sk, -0.02)}"/><path d="M${x - 28 * hs},${ey + 60 * hs} Q${x},${ey + 55 * hs} ${x + 28 * hs},${ey + 60 * hs}" stroke="#6a2a24" stroke-width="${5 * hs}" fill="none" stroke-linecap="round"/>`;
+    [-1, 1].forEach((sd) => {
+      const ex = x + sd * 34 * hs + lk * 8 * hs;
+      front += `<path d="M${ex - 19 * hs},${ey - 2 * hs} Q${ex},${ey - 24 * hs} ${ex + 19 * hs},${ey - 2 * hs} L${ex + 19 * hs},${ey - 22 * hs} L${ex - 19 * hs},${ey - 22 * hs} Z" fill="${shade(sk, -0.08)}"/><path d="M${ex - 18 * hs},${ey - 3 * hs} Q${ex},${ey - 11 * hs} ${ex + 18 * hs},${ey - 3 * hs}" stroke="${shade(sk, -0.45)}" stroke-width="${3.5 * hs}" fill="none"/>`;
+      front += `<path d="M${ex + sd * 24 * hs},${ey - 34 * hs} L${ex - sd * 20 * hs},${ey - 18 * hs}" stroke="#6e6a60" stroke-width="${11 * hs}" stroke-linecap="round"/>`;
+      front += `<path d="M${x + sd * 24 * hs},${ey + 26 * hs} Q${x + sd * 42 * hs},${ey + 48 * hs} ${x + sd * 36 * hs},${ey + 70 * hs}" stroke="${shade(sk, -0.28)}" stroke-width="${3 * hs}" fill="none"/>`;
+      front += `<path d="M${ex - 14 * hs},${ey + 16 * hs} q${14 * hs},${8 * hs} ${28 * hs},0" stroke="${shade(sk, -0.25)}" stroke-width="${2.5 * hs}" fill="none" opacity="0.7"/>`;
+    });
+    front += `<path d="M${x - 8 * hs},${ey - 26 * hs} l${4 * hs},${12 * hs} M${x + 8 * hs},${ey - 26 * hs} l${-4 * hs},${12 * hs}" stroke="${shade(sk, -0.3)}" stroke-width="${3 * hs}"/>`;
+    // мощные руки в камуфляже: толстые рукава с пятнами, кулаки
+    if (!o.arms || o.arms === 'down') {
+      const sy = top + 40 * s, sl = geo(x, y, s, o).sl;
+      let sv = '';
+      [-1, 1].forEach((side) => {
+        const sx = x + side * 108 * s, hx = x + side * 128 * s, hy = sy + 250 * s, ex2 = x + side * 134 * s, ey2 = sy + 110 * s, d = `M${sx},${sy} Q${ex2},${ey2} ${hx},${hy}`;
+        sv += `<path d="${d}" stroke="#3e3d2c" stroke-width="${74 * s}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${V('#7a7858', 0.12, 0.2)}" stroke-width="${68 * s}" fill="none" stroke-linecap="round"/>`;
+        [['#4a4a34', '26 34', 0], ['#9a987a', '14 46', 18], ['#5a5a40', '20 40', 33]].forEach(([c, da, off], k) => { sv += `<path d="${d}" stroke="${c}" stroke-width="${(40 - k * 8) * s}" fill="none" stroke-dasharray="${da.split(' ').map((v) => v * s).join(' ')}" stroke-dashoffset="${off * s}" transform="translate(${(k - 1) * 12 * s} 0)" opacity="0.8"/>`; });
+        sv += `<ellipse cx="${hx}" cy="${hy + 8 * s}" rx="${28 * s}" ry="${30 * s}" fill="${R(sk, 0.1, 0.25)}"/>` + [-1, 0, 1].map((f) => `<path d="M${hx + f * 10 * s - 4 * s},${hy + 30 * s} l${8 * s},0" stroke="${shade(sk, -0.3)}" stroke-width="${2.5 * s}"/>`).join('');
+      });
+      front = `<g transform="translate(${x} 0) scale(${sl} 1) translate(${-x} 0)">${sv}</g>` + front;
+    }
   }
   return { b, front };
 }
@@ -317,7 +341,7 @@ const shots = {
         `<g filter="url(#blur20)">${[...Array(8)].map((_, i) => `<ellipse cx="${(i * 180 - t * 120 + 2000) % 1400 - 160}" cy="${1460 - (i % 3) * 30}" rx="160" ry="40" fill="#d8a878" opacity="0.35"/>`).join('')}</g>`,
         // Локджо снизу
         glow(770, 1100, 520, '#ffb070', 0.2),
-        man(770, 2500, 2.0, { ...LOCK, arms: 'down', look: -0.5, blink: blink(t, 1.6), nod: -1 }),
+        man(760, 2420, 1.85, { ...LOCK, arms: 'down', look: -0.5, blink: blink(t, 1.6), nod: -1 }),
         grade('#ff9a60', 0.25),
         topShade(820, 0.5),
       ],
