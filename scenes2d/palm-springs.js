@@ -252,8 +252,8 @@ const shots = {
       + `<rect x="700" y="1260" width="1500" height="700" fill="${V('#6a4a3a', 0.1, 0.3)}"/>` + Array.from({ length: 12 }, (_, i) => `<path d="M${700 + i * 130},1260 l-40,700" stroke="#4a3228" stroke-width="4"/>`).join('')
       + [[860, 1500, 0], [1060, 1450, 1], [1700, 1450, 2], [1880, 1520, 3], [1240, 1440, 4]].map(([x, y, i]) => guest(x, y, 0.85, i, t, { arms: i % 2 ? 'raise' : 'down', smile: true, lean: 6 })).join('')
       + `<rect x="1580" y="1240" width="200" height="140" fill="#f8f4ec"/><rect x="1610" y="1150" width="140" height="90" fill="#f4ece0"/><rect x="1640" y="1090" width="80" height="60" fill="#fff8f0"/>${glow(1680, 1200, 200, '#ffd890', 0.25)}`
-      + nil(1400, 1900, 1.7, { arms: toast > 0.5 ? 'raise' : (wave(t, 1.1) > 0 ? 'raise' : 'hold'), lean: dance * wave(t, 1.1) * 9, step: dance * wave(t, 2.2), look: toast > 0.5 ? -0.4 : wave(t, 0.6) * 0.6, frown: -0.1, smirk: true, blink: blink(t, 0.5), nod: wave(t, 2.2) * 2 * dance, shades: 'eyes' })
-      + (toast > 0.5 ? `<g transform="translate(1700 650)"><path d="M-22,-70 L22,-70 L10,-10 L-10,-10 Z" fill="#fff8d0" opacity="0.8"/><rect x="-3" y="-10" width="6" height="50" fill="#fff" opacity="0.8"/><rect x="-18" y="38" width="36" height="6" fill="#fff" opacity="0.8"/></g>${glow(1700, 620, 120, '#fff0b0', 0.4 * toast)}` : '')
+      + nil(1400, 1900, 1.7, { arms: toast > 0.5 || wave(t, 1.1) > 0 ? 'cheers' : 'hold', lean: dance * wave(t, 1.1) * 9, step: dance * wave(t, 2.2), look: toast > 0.5 ? -0.4 : wave(t, 0.6) * 0.6, frown: -0.1, smirk: true, blink: blink(t, 0.5), nod: wave(t, 2.2) * 2 * dance, shades: 'eyes' })
+      + (toast > 0.5 ? `<g transform="translate(${1400 + 160 * 1.7 * 0.84} ${1075 - 130 * 1.7 - 30})"><path d="M-22,-70 L22,-70 L10,-10 L-10,-10 Z" fill="#fff8d0" opacity="0.8"/><rect x="-3" y="-10" width="6" height="50" fill="#fff" opacity="0.8"/><rect x="-18" y="38" width="36" height="6" fill="#fff" opacity="0.8"/></g>${glow(1628, 800, 120, '#fff0b0', 0.4 * toast)}` : '')
       + `<g filter="url(#soft)"><rect x="1172" y="1220" width="10" height="300" fill="#2a2a2a"/><circle cx="1177" cy="1210" r="20" fill="#3a3a3a"/></g>`;
     return {
       cam: { z: lerp(1.0, 1.08, k), y: lerp(0, -30, k) },
@@ -340,8 +340,8 @@ const shots = {
       + `<g><text x="540" y="860" font-family="'Brush Script MT', cursive" font-size="110" fill="#ff7ac0" text-anchor="middle" opacity="${0.85 + 0.15 * wave(t, 3)}">kinoplot.film</text></g>` + glow(540, 830, 420, '#ff5fa2', 0.35)
       + `<rect x="0" y="1150" width="1080" height="60" fill="#5a3a24"/>` + Array.from({ length: 12 }, (_, i) => `<rect x="${40 + i * 88}" y="${1060 + (i % 3) * 10}" width="26" height="${90 - (i % 3) * 10}" rx="6" fill="${['#3a8a5a', '#8a3a2a', '#c8a03a', '#4a6a9a'][i % 4]}" opacity="0.8"/>`).join('')
       + `<rect x="0" y="1500" width="1080" height="500" fill="${V('#4a2a20', 0.1, 0.3)}"/>`
-      + sar(360, 1820, 1.45, { arms: wave(t, 1.2) > 0 ? 'raise' : 'hold', lean: wave(t, 1.2) * 8, step: wave(t, 2.4), soft: true, look: 0.5, nod: wave(t, 2.4) * 2 })
-      + nil(720, 1820, 1.45, { arms: wave(t, 1.2) > 0 ? 'raise' : 'hold', lean: wave(t, 1.2) * 8, step: wave(t, 2.4), smirk: true, look: -0.5, nod: wave(t, 2.4) * 2 })
+      + sar(360, 1820, 1.45, { arms: wave(t, 1.2) > 0 ? 'cheers' : 'hold', lean: wave(t, 1.2) * 8, step: wave(t, 2.4), soft: true, look: 0.5, nod: wave(t, 2.4) * 2 })
+      + nil(720, 1820, 1.45, { arms: wave(t, 1.2) > 0 ? 'cheers' : 'hold', lean: wave(t, 1.2) * 8, step: wave(t, 2.4), smirk: true, look: -0.5, nod: wave(t, 2.4) * 2 })
       + `<rect width="1080" height="1920" fill="#ff5fa2" opacity="0.08"/>`;
     // В: стрела вонзается в столб рядом с Найлзом
     const hit = clamp((tt - 1.7) / 0.18);
@@ -357,8 +357,9 @@ const shots = {
       + bungalow(330, 1150, 420, { h: 190, lit: true, c: '#3a3a50' })
       + `<rect x="0" y="1150" width="1080" height="120" fill="#3a3a48"/>`
       + pool(0, 1270, 1080, 1920, t, { c: '#1290b8', night: true }) + glow(540, 1600, 600, '#30d8ff', 0.3)
-      + `<path d="M470,1250 L460,1560 M610,1250 L620,1560" stroke="#2a6a8a" stroke-width="56" stroke-linecap="round" opacity="0.8"/><g transform="translate(0 2540) scale(1 -1)" opacity="0.12" filter="url(#blur8)">${nil(540, 1270, 1.5, { pose: 'sit', look: 0, frown: 0.4, sil: '' })}</g>`
+      + `<path d="M480,1290 L470,1440 M600,1290 L610,1440" stroke="#2a5a7a" stroke-width="54" stroke-linecap="round" opacity="0.75"/>` + [470, 610].map((x) => `<ellipse cx="${x}" cy="1300" rx="${50 + 8 * wave(t, 0.8, x)}" ry="12" fill="none" stroke="#bff4ff" stroke-width="3" opacity="0.5"/>`).join('') + `<g transform="translate(0 2540) scale(1 -1)" opacity="0.12" filter="url(#blur8)">${nil(540, 1270, 1.5, { pose: 'sit', look: 0, frown: 0.4, sil: '' })}</g>`
       + nil(540, 1270, 1.5, { pose: 'sit', arms: 'hold', look: 0, lookUp: -1.2, frown: 0.45, blink: blink(t, 1.4), nod: 1.5 + wave(t, 0.3) * 0.6 })
+      + `<rect x="0" y="1262" width="1080" height="26" fill="${V('#d8d4c8', 0.1, 0.3)}"/><rect x="0" y="1288" width="1080" height="6" fill="#000" opacity="0.25"/>`
       + glow(540, 1100, 300, '#40c8ff', 0.18);
     return {
       cam: { z: lerp(1.0, 1.06, clamp(tt / 2.3)) * (fD > 0 ? lerp(1.0, 1.12, dz) : 1), y: fD > 0 ? lerp(0, -60, dz) : 0 },

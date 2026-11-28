@@ -97,6 +97,7 @@ export function person(x, y, s, o) {
     if (mode === 'rifle') { hx = side < 0 ? x - 60 * s : x + 30 * s; hy = side < 0 ? sy + 210 * s : sy + 150 * s; ex = x + side * 120 * s; ey = sy + 150 * s; }
     if (mode === 'hold') { hx = x + side * 40 * s; hy = sy + 170 * s; ex = x + side * 130 * s; ey = sy + 140 * s; }
     if ((mode === 'raise' || mode === 'point') && side === 1) { hx = x + 210 * s; hy = sy - (mode === 'raise' ? 230 : 40) * s; ex = x + 190 * s; ey = sy - (mode === 'raise' ? 60 : 10) * s; }
+    if (mode === 'cheers' && side === 1) { hx = x + 160 * s; hy = sy - 130 * s; ex = x + 185 * s; ey = sy + 40 * s; } // рука с бокалом: локоть вниз, кисть у головы
     if (mode === 'phone' && side === 1) { hx = x + 95 * s; hy = top - hr * 0.7; ex = x + 190 * s; ey = sy + 60 * s; }
     if (mode === 'salute' && side === 1) { hx = x + hr * 0.92; hy = top - hr * 1.25; ex = x + 215 * s; ey = sy - 10 * s; }
     if (mode === 'table') { hx = x + side * 70 * s; hy = sy + 175 * s; ex = x + side * 150 * s; ey = sy + 130 * s; }
