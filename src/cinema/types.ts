@@ -33,6 +33,8 @@ export type Sfx = {src: string; at: number; duration: number; volume: number};
 
 export type CinemaShot = {
 	voice: string;
+	/** Эксперимент: вход в сцену без растворения (переход сделан в самом клипе) */
+	cut?: boolean;
 	audio?: string;
 	duration?: number;
 	words?: Word[];
@@ -71,6 +73,8 @@ export type CinemaShot = {
 
 export type CinemaProps = {
 	title: string;
+	/** Эксперимент: тонкая полоска прогресса вверху кадра */
+	progress?: boolean;
 	style: 'cinema';
 	/** Цвет акцента (тёплый янтарь по умолчанию) */
 	accent?: string;

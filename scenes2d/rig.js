@@ -101,6 +101,14 @@ export function head(hx, hy, hr, o) {
   const rim = o.rim === false ? null : { c: shade(skin, 0.45), dx: 9 * hr / 90, dy: -4 * hr / 90, op: 0.95, ...(o.rim || {}) };
   const fx = hx + tu * 0.26 * hr; // центр лица смещается в сторону поворота
   let g = '';
+  if (o.back) { // вид со спины: затылок, уши, волосы
+    g += `<path d="M${hx - 0.34 * hr},${hy + 0.5 * hr} L${hx - 0.32 * hr},${hy + 1.45 * hr} L${hx + 0.32 * hr},${hy + 1.45 * hr} L${hx + 0.34 * hr},${hy + 0.5 * hr} Z" fill="${shade(skin, -0.2)}"/>`;
+    [-1, 1].forEach((sd) => g += `<ellipse cx="${hx + sd * 0.9 * hr}" cy="${hy + 0.08 * hr}" rx="${0.14 * hr}" ry="${0.22 * hr}" fill="${shade(skin, -0.12)}"/>`);
+    g += `<ellipse cx="${hx}" cy="${hy}" rx="${0.92 * hr}" ry="${1.02 * hr}" fill="${shade(skin, -0.1)}"/>`;
+    if (o.hairStyle === 'curly') { const cs = [[-0.7, -0.6, 0.36], [-0.25, -0.9, 0.4], [0.25, -0.9, 0.4], [0.7, -0.6, 0.36], [-0.8, -0.1, 0.32], [0.8, -0.1, 0.32], [-0.4, -0.3, 0.42], [0.4, -0.3, 0.42], [0, -0.5, 0.42], [-0.45, 0.25, 0.34], [0.45, 0.25, 0.34], [0, 0.2, 0.38]]; g += cs.map(([dx, dy, r]) => `<circle cx="${f(hx + dx * hr)}" cy="${f(hy + dy * hr)}" r="${f(r * hr)}" fill="${R(shade(hairC, 0.05), 0.18, 0.3)}"/>`).join(''); }
+    else g += `<path d="M${hx - 1.02 * hr},${hy + (o.hairStyle === 'bob' ? 0.95 : 0.35) * hr} Q${hx - 1.1 * hr},${hy - 1.15 * hr} ${hx},${hy - 1.12 * hr} Q${hx + 1.1 * hr},${hy - 1.15 * hr} ${hx + 1.02 * hr},${hy + (o.hairStyle === 'bob' ? 0.95 : 0.35) * hr} Q${hx},${hy + (o.hairStyle === 'bob' ? 1.08 : 0.55) * hr} ${hx - 1.02 * hr},${hy + (o.hairStyle === 'bob' ? 0.95 : 0.35) * hr} Z" fill="${V(hairC, 0.15, 0.25)}"/>`;
+    return g;
+  }
   // задние волосы
   if (o.hairStyle === 'bob') g += `<path d="M${hx - 1.08 * hr},${hy + 0.9 * hr} Q${hx - 1.25 * hr},${hy - 1.25 * hr} ${hx},${hy - 1.18 * hr} Q${hx + 1.25 * hr},${hy - 1.25 * hr} ${hx + 1.08 * hr},${hy + 0.9 * hr} Q${hx},${hy + 1.05 * hr} ${hx - 1.08 * hr},${hy + 0.9 * hr} Z" fill="${V(hairC, 0.12, 0.25)}"/>`;
   // шея
@@ -190,6 +198,12 @@ export function head(hx, hy, hr, o) {
   } else if (o.hairStyle !== 'bald') {
     g += `<path d="M${hx - 0.93 * hr},${hy - 0.1 * hr} Q${hx - 0.95 * hr},${hy - 1.15 * hr} ${hx},${hy - 1.12 * hr} Q${hx + 0.95 * hr},${hy - 1.15 * hr} ${hx + 0.93 * hr},${hy - 0.1 * hr} Q${hx + 0.75 * hr},${hy - 0.6 * hr} ${f(hx + tu * 0.2 * hr + lag)},${hy - 0.62 * hr} Q${hx - 0.75 * hr},${hy - 0.6 * hr} ${hx - 0.93 * hr},${hy - 0.1 * hr} Z" fill="${V(hairC, 0.15, 0.2)}"/>`;
   }
+  // тёмные очки: 'up' — подняты на лоб, 'on' — на глазах
+  if (o.shades) {
+    const sy = o.shades === 'up' ? hy - 0.86 * hr : ey - 0.05 * hr;
+    g += [-1, 1].map((sd) => { const ex = fx + sd * 0.36 * hr * (1 - sd * tu * 0.25), w = 0.3 * hr * (1 - clamp(-sd * tu) * 0.3); return `<rect x="${f(ex - w)}" y="${f(sy - 0.17 * hr)}" width="${f(w * 2)}" height="${f(0.36 * hr)}" rx="${f(0.14 * hr)}" fill="${V('#1a1a22', 0.3, 0.2)}"/><path d="M${f(ex - w * 0.5)},${f(sy - 0.08 * hr)} l${f(0.14 * hr)},${f(-0.04 * hr)}" stroke="#fff" stroke-width="${f(0.04 * hr)}" opacity="0.5"/>`; }).join('');
+    g += `<path d="M${f(fx - 0.09 * hr)},${f(sy - 0.06 * hr)} q${f(0.09 * hr)},${f(-0.06 * hr)} ${f(0.18 * hr)},0" stroke="#1a1a22" stroke-width="${f(0.05 * hr)}" fill="none"/>`;
+  }
   return g;
 }
 
@@ -214,6 +228,16 @@ export function figure(x, y, s, o = {}) {
       body += `<path d="M${f(L.tx - 28 * s)},${f(L.ty + 4 * s)} q0,${-26 * s} ${30 * s},${-26 * s} l${18 * s},0 q${44 * s},0 ${44 * s},${30 * s} l0,${8 * s} l${-92 * s},0 Z" fill="${V(o.shoes || '#3a2a1c', 0.2, 0.2)}" transform="translate(${tu * 10 * s} 0)"/>`;
     });
   }
+  if (o.skirt && pose === 'stand') { const sl = 300 * s * (o.legs ?? 0.85), fl = (o.flare ?? 0) * 30 * s; body += `<path d="M${f(x - ww)},${f(hipY - 10 * s)} L${f(x - ww * 1.55 - fl)},${f(hipY + sl)} Q${f(x)},${f(hipY + sl + 26 * s)} ${f(x + ww * 1.55 + fl)},${f(hipY + sl)} L${f(x + ww)},${f(hipY - 10 * s)} Z" fill="${V(o.skirt, 0.15, 0.3)}"/>`; }
+  if (o.skirt && pose === 'sit') { body += `<path d="M${f(x - ww * 1.1)},${f(hipY - 10 * s)} L${f(x - ww * 1.7)},${f(hipY + 60 * s)} L${f(x + ww * 1.7)},${f(hipY + 60 * s)} L${f(x + ww * 1.1)},${f(hipY - 10 * s)} Z" fill="${V(o.skirt, 0.15, 0.3)}"/>`; }
+  // сидя: голени вниз (стул, край бассейна); legsDown — длина до стопы в единицах s
+  if (pose === 'sit' && o.legsDown) {
+    [-1, 1].forEach((sd) => {
+      const hx = x + sd * 46 * s, kx = x + sd * 56 * s, ky = hipY + 30 * s, fx = x + sd * 60 * s + (o.footSwing ? o.footSwing * sd * 20 * s : 0), fy = hipY + o.legsDown * s;
+      body += `<path d="M${f(hx)},${f(hipY - 10 * s)} L${f(kx)},${f(ky)} L${f(fx)},${f(fy - 20 * s)}" stroke="${o.skirt ? shade(skin, -0.06) : shade(pants, -0.05)}" stroke-width="${f(54 * s)}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+      if (!o.noFeet) body += `<ellipse cx="${f(fx + sd * 6 * s)}" cy="${f(fy)}" rx="${f(40 * s)}" ry="${f(20 * s)}" fill="${V(o.shoes || '#3a2a1c', 0.2, 0.2)}"/>`;
+    });
+  }
   // торс: плечи, талия; шов-планка смещается с поворотом
   const tx = x + tu * 8 * s;
   const torso = `M${f(tx - sw)},${f(shY + 40 * s)} Q${f(tx - sw)},${f(shY)} ${f(tx - sw + 50 * s)},${f(shY - 6 * s)} L${f(tx + sw - 50 * s)},${f(shY - 6 * s)} Q${f(tx + sw)},${f(shY)} ${f(tx + sw)},${f(shY + 40 * s)} L${f(x + ww)},${f(hipY + 10 * s)} Q${f(x)},${f(hipY + 24 * s)} ${f(x - ww)},${f(hipY + 10 * s)} Z`;
@@ -222,13 +246,14 @@ export function figure(x, y, s, o = {}) {
   const px = x + tu * 40 * s; // планка/центр груди
   body += `<g clip-path="url(#${tc})">`;
   if (o.pattern) body += o.pattern(px, shY, hipY, s);
-  if (o.collar === 'open') body += `<path d="M${f(px - 46 * s)},${f(shY - 8 * s)} L${f(px)},${f(shY + 120 * s)} L${f(px + 46 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(skin, -0.04), 0.06, 0.12)}"/>`;
-  if (o.collar === 'round') body += `<path d="M${f(px - 52 * s)},${f(shY - 8 * s)} Q${f(px)},${f(shY + 80 * s)} ${f(px + 52 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(skin, -0.04), 0.06, 0.12)}"/>`;
+  if (o.collar === 'open' && !o.back) body += `<path d="M${f(px - 46 * s)},${f(shY - 8 * s)} L${f(px)},${f(shY + 120 * s)} L${f(px + 46 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(skin, -0.04), 0.06, 0.12)}"/>`;
+  if (o.collar === 'round' && !o.back) body += `<path d="M${f(px - 52 * s)},${f(shY - 8 * s)} Q${f(px)},${f(shY + 80 * s)} ${f(px + 52 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(skin, -0.04), 0.06, 0.12)}"/>`;
   // складки ткани
   body += `<path d="M${f(px - 70 * s)},${f(hipY - 60 * s)} q${30 * s},${-20 * s} ${60 * s},${-6 * s} M${f(px + 30 * s)},${f(hipY - 40 * s)} q${30 * s},${-14 * s} ${50 * s},0" stroke="${shade(sh, -0.3)}" stroke-width="${3 * s}" fill="none" opacity="0.5"/>`;
   // тень от головы на груди
   body += `<ellipse cx="${f(px)}" cy="${f(shY + 4 * s)}" rx="${70 * s}" ry="${22 * s}" fill="#000" opacity="0.18" filter="url(#blur4)"/></g>`;
-  if (o.collar === 'open') body += `<path d="M${f(px - 70 * s)},${f(shY - 12 * s)} L${f(px - 6 * s)},${f(shY + 110 * s)} L${f(px - 44 * s)},${f(shY + 40 * s)} L${f(px - 30 * s)},${f(shY - 8 * s)} Z M${f(px + 70 * s)},${f(shY - 12 * s)} L${f(px + 6 * s)},${f(shY + 110 * s)} L${f(px + 44 * s)},${f(shY + 40 * s)} L${f(px + 30 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(sh, 0.12), 0.15, 0.2)}"/>`;
+  if (o.collar === 'open' && !o.back) body += `<path d="M${f(px - 70 * s)},${f(shY - 12 * s)} L${f(px - 6 * s)},${f(shY + 110 * s)} L${f(px - 44 * s)},${f(shY + 40 * s)} L${f(px - 30 * s)},${f(shY - 8 * s)} Z M${f(px + 70 * s)},${f(shY - 12 * s)} L${f(px + 6 * s)},${f(shY + 110 * s)} L${f(px + 44 * s)},${f(shY + 40 * s)} L${f(px + 30 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(sh, 0.12), 0.15, 0.2)}"/>`;
+  if (pose === 'sit' && o.legsDown) body += `<ellipse cx="${f(x)}" cy="${f(hipY + 14 * s)}" rx="${f(ww * 1.25)}" ry="${f(40 * s)}" fill="${V(o.skirt || pants, 0.12, 0.2)}"/>`;
   // руки: плечо → локоть → кисть (IK), рукав до локтя или до кисти
   const arm = (sd) => {
     const ax = tx + sd * (sw - 18 * s), ay = shY + 30 * s, h = (o.hands || {})[sd < 0 ? 'l' : 'r'];

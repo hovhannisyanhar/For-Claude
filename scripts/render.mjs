@@ -27,6 +27,7 @@ const props = {
 	fonts: script.fonts,
 	textStyle: script.textStyle,
 	brand: script.brand,
+	progress: script.progress,
 	film: script.film,
 	grain: script.grain,
 	theme: script.theme || 'midnight',

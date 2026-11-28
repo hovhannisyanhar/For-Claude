@@ -307,6 +307,16 @@ const FilmLook: React.FC<{film?: boolean; grain?: boolean}> = ({film = false, gr
 	);
 };
 
+/** Эксперимент: полоска прогресса вверху кадра */
+const ProgressBar: React.FC<{color: string; total: number}> = ({color, total}) => {
+	const frame = useCurrentFrame();
+	return (
+		<div style={{position: 'absolute', left: 0, right: 0, top: 0, height: 9, background: 'rgba(255,255,255,0.18)'}}>
+			<div style={{height: '100%', width: `${(frame / Math.max(1, total - 1)) * 100}%`, background: color, boxShadow: `0 0 14px ${color}`}} />
+		</div>
+	);
+};
+
 /** Лёгкое дрожание кадра, как у проектора */
 const GateWeave: React.FC<{children: React.ReactNode; on?: boolean}> = ({children, on = false}) => {
 	const frame = useCurrentFrame();
@@ -319,7 +329,7 @@ const GateWeave: React.FC<{children: React.ReactNode; on?: boolean}> = ({childre
 
 const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first: boolean}> = ({shot, frames, total, first}) => {
 	const frame = useCurrentFrame();
-	const op = first ? 1 : interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
+	const op = first || shot.cut ? 1 : interpolate(frame, [0, DISSOLVE], [0, 1], {...clamp, easing: Easing.inOut(Easing.quad)});
 	return (
 		<AbsoluteFill style={{opacity: op}}>
 			{shot.clip ? <OffthreadVideo src={staticFile(shot.clip)} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} /> : <SetView set={shot.set as CinemaSet} frame={frame} frames={total} />}
@@ -327,7 +337,7 @@ const ShotView: React.FC<{shot: CinemaShot; frames: number; total: number; first
 	);
 };
 
-export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, grain = true, textStyle, brand}) => {
+export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', music, musicVolume = 0.25, showCaptions = true, poster, fonts, film = false, grain = true, textStyle, brand, progress}) => {
 	setKineticFonts(fonts);
 	const {durationInFrames} = useVideoConfig();
 	const timeline = useMemo(() => {
@@ -403,6 +413,7 @@ export const CinemaVideo: React.FC<CinemaProps> = ({scenes, accent = '#e3b46a', 
 				}),
 			)}
 			<FilmLook film={film} grain={grain} />
+			{progress && <ProgressBar color={accent} total={durationInFrames} />}
 			{music && (
 				<Audio
 					src={staticFile(music)}

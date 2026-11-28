@@ -165,7 +165,12 @@ export function run(shots) {
     if (!shot) { root.innerHTML = `<svg width="${W}" height="${H}"><rect width="100%" height="100%" fill="#300"/><text x="40" y="200" fill="#fff" font-size="60">нет сцены «${name}»</text></svg>`; return; }
     const { els, cam = {} } = shot(t, T);
     const z = cam.z ?? 1, cx = cam.x ?? 0, cy = cam.y ?? 0;
-    const body = `<g transform="translate(${540 + cx} ${960 + cy}) scale(${z}) translate(-540 -960)">${els.join('\n')}</g>`;
+    // необязательно: cam.rot (°), cam.blur (размытие в движении по горизонтали, px), cam.sat (насыщенность 0..1)
+    let fx = '';
+    if (cam.blur > 0.5) { defs.push(`<filter id="mblur" x="-10%" y="-5%" width="120%" height="110%"><feGaussianBlur stdDeviation="${cam.blur.toFixed(1)} ${(cam.blurY ?? 0).toFixed(1)}"/></filter>`); fx += ' filter="url(#mblur)"'; }
+    let body = `<g transform="translate(${540 + cx} ${960 + cy}) scale(${z}) rotate(${cam.rot ?? 0}) translate(-540 -960)">${els.join('\n')}</g>`;
+    if (cam.sat != null && cam.sat < 0.999) { defs.push(`<filter id="csat"><feColorMatrix type="saturate" values="${Math.max(0, cam.sat).toFixed(3)}"/></filter>`); body = `<g filter="url(#csat)">${body}</g>`; }
+    if (fx) body = `<g${fx}>${body}</g>`;
     root.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 1080 1920"><defs>${BASE_DEFS}${defs.join('')}</defs>${body}<rect width="1080" height="1920" fill="url(#vig)"/></svg>`;
   };
   window.renderAt(+(P.get('t') || 0));
