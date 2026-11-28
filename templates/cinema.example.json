@@ -257,7 +257,8 @@
     "src": "assets/train-dreams/poster.jpg",
     "titleRu": "Сны поездов",
     "titleEn": "Train Dreams",
-    "year": "2025"
+    "year": "2025",
+    "seconds": 1
   },
   "instaCover": {
     "top": "Одна жизнь",
