@@ -2,6 +2,7 @@
 // переходы-рывки. Фоны и предметы скопированы из scenes2d/palm-springs.js. Сценарий — videos/palm-springs-x/script.json.
 // Пустыня Калифорнии: бирюза бассейнов, белые курортные домики середины века, пальмы, розово-лиловые горы, гирлянды свадьбы ночью.
 import { figure as fig2, head as head2, mixExpr } from './rig.js';
+import { def } from './core.js';
 import { run, person, setProportions, V, R, grad, glow, rnd, reseed, shade, lerp, clamp, wave } from './core.js';
 
 const PROPS = { head: 0.64, legs: 1.35, torso: 1.15, slim: 0.84, hand: 0.72 };
@@ -188,6 +189,23 @@ const lerpCam = (a, b, k) => ({ z: lerp(a.z, b.z, k), x: lerp(a.x, b.x, k), y: l
 // голова фигуры (для предметов у рта, наведения камеры)
 const headAt = (x, y, s, pose = 'stand', legs = 0.85) => { const hr = 96 * s * 1.3, legL = pose === 'stand' ? 430 * s * legs : 0; return { x, y: y - legL - 300 * s - hr * 1.18, r: hr }; };
 
+// группа с собственной камерой (для плавной смены планов внутри сцены)
+let satN = 0;
+const camG = (c, els) => {
+  let g = `<g transform="translate(${540 + (c.x || 0)} ${960 + (c.y || 0)}) scale(${c.z ?? 1}) rotate(${c.rot || 0}) translate(-540 -960)">${els.join('')}</g>`;
+  if (c.sat != null && c.sat < 0.999) { const id = 'sat' + (satN++); def(`<filter id="${id}"><feColorMatrix type="saturate" values="${Math.max(0, c.sat).toFixed(3)}"/></filter>`); g = `<g filter="url(#${id})">${g}</g>`; }
+  return g;
+};
+// смена плана внутри сцены — мягким растворением: новый план проявляется поверх последнего кадра прежнего
+const smooth = (fn, bounds, fade = 0.4) => (t, T) => {
+  const cur = fn(t, T);
+  for (const b of bounds) if (t >= b && t < b + fade) {
+    const prev = fn(b - 0.001, T), w = ease3((t - b) / fade);
+    return { cam: { z: 1, x: 0, y: 0 }, els: [camG(prev.cam, prev.els), `<g opacity="${w.toFixed(3)}">${camG(cur.cam, cur.els)}</g>`] };
+  }
+  return cur;
+};
+
 const shirtPat = (px, sy, hy2, sc) => { reseed(7); let g = ''; for (let j = 0; j < 26; j++) { const yy = sy + rnd() * (hy2 - sy), xx = px + (rnd() - 0.5) * 240 * sc; g += `<ellipse cx="${xx + 16 * sc}" cy="${yy + 10 * sc}" rx="${14 * sc}" ry="${6 * sc}" fill="#2a8a7a" transform="rotate(${rnd() * 180} ${xx} ${yy})"/>` + hibiscus(xx, yy, 12 * sc, j % 3 ? '#ffd24a' : '#fff0dc'); } return g; };
 const NX = { skin: '#e2b08a', hair: '#2a1e18', hairStyle: 'curly', shirt: '#d8443a', pants: '#2a6a8a', collar: 'open', sleeves: 'short', stubble: true, pattern: shirtPat, iris: '#4a3422' };
 const SX = { skin: '#f0c6a6', hair: '#3a2418', hairStyle: 'bob', shirt: '#d9789a', skirt: '#d9789a', pants: '#f0c6a6', collar: 'round', sleeves: 'short', earrings: '#f0c850', lips: '#c0505a', iris: '#5a3a24', shoes: '#b85a7a' };
@@ -233,7 +251,7 @@ function bedroom2(t, o = {}) {
 }
 const blanket = (y0 = 1330, c = '#ffffff') => `<path d="M-60,${y0 + 40} Q300,${y0 - 40} 860,${y0 + 20} L860,2000 L-60,2000 Z" fill="${V(c, 0, 0.16)}"/><path d="M-60,${y0 + 40} Q300,${y0 - 40} 860,${y0 + 20}" stroke="#e4e0d8" stroke-width="10" fill="none"/>`;
 
-const shotsX = {
+const shotsRaw = {
   // 1. Хук: прокрутка суток вокруг невозмутимого Найлза → наезд → «кем работал?» → ухмылка и салют банкой; уход рывком
   hook(t, T) {
     const w = (a) => t - D - a;
@@ -274,9 +292,9 @@ const shotsX = {
       grade('#ffd8a0', 0.25 * (1 - night)),
       topShade(620, 0.45),
     ];
-    const z = lerp(1.0, 1.5, push);
-    const cam = { z, x: lerp(0, -(fx - 540) * 1.5, push), y: lerp(0, -(H.y - 960) * 1.5 + 140, push) };
-    return { cam: camMix(cam, whipOut(t, T)), els };
+    const z = lerp(1.0, 1.3, push);
+    const cam = { z, x: lerp(0, -(fx - 540) * 1.3, push), y: lerp(0, -(H.y - 960) * 1.3 + 120, push) };
+    return { cam, els };
   },
 
   // 2. Свадьба в пустыне: Найлз зевает в последнем ряду → наезд в солнце, вспышка → телефон крупно 6:59 → 7:00 → отъезд: он снова в кровати, «заново» — глаза открываются
@@ -308,21 +326,20 @@ const shotsX = {
         grade('#ffe0b0', 0.22),
       );
       // камера: общий → к Найлзу; в конце — рывок к солнцу и вспышка
-      const toSun = io(clamp((t - (tA - 0.28)) / 0.28));
-      cam = lerpCam(lerpCam({ z: 1, x: 0, y: 0 }, aim(1.55, X - 40, H.y + 60, 540, 1150), io(clamp((t - 0.2) / 2.3))), aim(3.2, 760, 300, 540, 960), toSun);
-      els.push(flashRect(toSun * 1.2));
+      cam = lerpCam({ z: 1, x: 0, y: 0 }, aim(1.25, X - 40, H.y + 80, 540, 1150), io(clamp((t - 0.2) / 2.4)));
     } else {
       const ph = phone(940, 1210, 1, t, t < ws(3.38) ? '6:59' : '7:00', t > ws(3.38) ? 1 - clamp((t - ws(3.38)) / 1.2) : 0);
       const wake = clamp((t - ws(4.5)) / 0.12);
       const e = wake > 0 ? mixExpr('surprised', 'tired', clamp((t - ws(4.9)) / 0.5)) : 'neutral';
-      const hd = `<g transform="rotate(-72 300 1120)">${head2(300, 1120, 130, { ...NX, shades: false, expr: e, blink: wake < 1, turn: 0.1, look: { x: 0.6, y: 0 } })}</g>`;
-      els.push(bedroom2(t), hd, blanket(1300, '#fdfcf8'), `<path d="M520,1350 q60,-30 120,0" stroke="#e8e4dc" stroke-width="8" fill="none"/>`, ph, grade('#ffd8a0', 0.22));
+      // лежит на спине: фигура повёрнута на 90°, голова на подушке, тело под одеялом, рука поверх
+      const body = `<g transform="rotate(-90 230 1150)">${N2(230, 1150 + 812 * 0.74, 0.74, { shades: false, expr: e, blink: wake < 1, turn: 0.1, look: { x: 0, y: 0.6 }, breathe: (wave(t, 0.25) + 1) / 2, shadow: false, hands: { l: { x: 230 - 30, y: 1150 + 330, pose: 'open', rot: 90 } } })}</g>`;
+      const bump = `<path d="M440,1250 Q470,1060 600,1070 Q740,1080 860,1100 L860,1460 L440,1460 Z" fill="${V('#fdfcf8', 0, 0.14)}"/><path d="M440,1250 Q470,1060 600,1070 Q740,1080 860,1100" stroke="#e4e0d8" stroke-width="8" fill="none"/>`;
+      els.push(bedroom2(t), body, bump, blanket(1360, '#fdfcf8'), ph, grade('#ffd8a0', 0.22));
       const out = io(clamp((t - tB) / 1.0));
-      cam = lerpCam(aim(2.4, 940, 1210, 540, 1150), aim(1.1, 560, 1180, 540, 1180), out);
-      els.push(flashRect(1 - clamp((t - tA) / 0.2)));
+      cam = lerpCam(aim(2.2, 940, 1210, 540, 1150), aim(1.0, 540, 1180, 540, 1180), out);
     }
     els.push(topShade(620, 0.45));
-    return { cam: camMix(cam, whipIn(t), whipOut(t, T)), els };
+    return { cam, els };
   },
   // 3. Вечеринка в ритм слов: «смирился» — пожал плечами под гирляндами → «пиво в бассейне» — вид сверху на круг →
   // «танцы» — нижний ракурс → «тосты» — крупно с микрофоном, гости в шоке → «никто не вспомнит» — стоп-кадр, цвет уходит
@@ -343,7 +360,7 @@ const shotsX = {
         N2(X, Y, s, { shades: 'up', turn: 0.15, tilt: sh * 6, expr: sh > 0.4 ? 'smirk' : 'tired', blink: blink(t, 0.4), breathe: (wave(t, 0.3) + 1) / 2,
           hands: { l: { x: lerp(X - 160, X - 260, sh), y: lerp(Y - 500, H.y + 160, sh), pose: 'open', rot: lerp(0, -40, sh) }, r: { x: lerp(X + 170, X + 280, sh), y: lerp(Y - 480, H.y + 170, sh), pose: sh > 0.3 ? 'open' : 'hold', item: sh > 0.3 ? null : canItem, rot: lerp(0, 40, sh) } } }),
         grade('#ff9ad0', 0.15));
-      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.25, X, H.y + 200, 540, 1150), io(clamp(t / 1.5)));
+      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.08, X, H.y + 300, 540, 1150), io(clamp(t / 1.5)));
     } else if (t < ws(2.43)) { // Б: вид сверху — Найлз раскинулся на круге, банку к камере
       const k = clamp((t - ws(1.43)) / 1.0), rot = lerp(-8, 10, k);
       const X = 540, Y = 1150;
@@ -365,7 +382,7 @@ const shotsX = {
         N2(X, Y, s, { shades: 'on', expr: 'grin', turn: beat * 0.4, tilt: beat * 8, lean: beat * 6, hairLag: -beat, knees: [Math.max(0, beat) * 0.6, Math.max(0, -beat) * 0.6],
           hands: { l: { x: X - 260, y: 820 + beat * 120, pose: 'wave' }, r: { x: X + 270, y: 820 - beat * 120, pose: 'hold', item: canItem } } }),
         grade('#ff5fa2', 0.12));
-      cam = { z: 1.05 + Math.abs(beat) * 0.03, x: 0, y: 0, rot: beat * 2.5 };
+      cam = { z: 1.05, x: 0, y: 0, rot: beat * 1.2 };
     } else { // Г+Д: тост крупно → стоп-кадр, цвет уходит
       const tf = Math.min(t, ws(4.3)); // после «ведь» всё замирает
       const talk = t < ws(4.2) ? Math.abs(Math.sin(t * 13)) * 0.8 : 0;
@@ -379,10 +396,9 @@ const shotsX = {
           hands: { r: { x: X + 280, y: H.y - 60 + wave(tf, 0.8) * 20, pose: 'hold', item: glassItem }, l: { x: H.x - 150, y: H.y + H.r * 0.9, pose: 'hold', item: micItem, rot: -70 } } }),
         grade('#ff9ad0', 0.15));
       cam = { ...aim(lerp(1.05, 0.95, freeze), X, H.y + 260, 540, 1180), sat: 1 - freeze * 0.85 };
-      els.push(`<rect x="-2000" y="-2000" width="5080" height="5920" fill="#000" opacity="${clamp((t - (VIS(T) - 0.25)) / 0.25).toFixed(3)}"/>`);
     }
     els.push(topShade(620, 0.5));
-    return { cam: camMix(cam, whipIn(t)), els };
+    return { cam, els };
   },
 
   // 4. Ночь: Найлз (со спины) уходит к светящейся расщелине → встречный план: Сара идёт следом, он оборачивается «Не ходи!» →
@@ -413,7 +429,7 @@ const shotsX = {
         N2(820, 1520, 0.6, { turn: -0.5, expr: stop > 0.5 ? 'surprised' : 'neutral', talk: t > ws(2.9) && t < ws(3.6) ? Math.abs(Math.sin(t * 12)) : 0, look: { x: -0.9, y: 0 }, rim: { c: '#ffb070', dx: 8, dy: -4 }, hands: { l: { x: 700, y: lerp(1300, 1060, stop), pose: 'open', rot: -80 } } }),
         S2(sx, SY, ss, { turn: 0.45, expr: mixExpr('think', 'angry', clamp((k - 0.4) / 0.3)), look: { x: 0.9, y: 0.25 }, knees: walk < 0.98 ? [wave(t, 1.6) * 0.5, -wave(t, 1.6) * 0.5] : [0, 0], tilt: wave(t, 1.6) * 2 * (1 - walk), hairLag: wave(t, 1.6) * 0.4, blink: blink(t, 0.4), rim: { c: '#ffb070', dx: 10, dy: -4 } }),
         glow(sx + 80, HS.y, 280, '#ff8a30', 0.22));
-      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.45, sx + 40, HS.y + 120, 540, 1100), io(clamp((t - ws(3.2)) / 0.9)));
+      cam = lerpCam({ z: 1.0, x: 0, y: 0 }, aim(1.18, sx + 60, HS.y + 260, 540, 1100), io(clamp((t - ws(3.2)) / 1.0)));
     } else { // В: вспышка → утро, Сара садится
       const k = clamp((t - ws(4.55)) / 0.4), up = io(k);
       const X = 380, Y = 1640, s = 1.2, H = headAt(X, Y, s, 'sit');
@@ -421,11 +437,11 @@ const shotsX = {
         S2(X, Y, s, { pose: 'sit', lean: lerp(-75, 0, up), expr: up > 0.5 ? mixExpr('surprised', { brows: [0.6, 0.6], browTilt: -0.2, lid: 0.0, mouth: 'o' }, clamp((t - ws(5.2)) / 0.4)) : { brows: [0, 0], browTilt: 0, lid: 1, mouth: 'flat' }, look: { x: lerp(0, 0.7, clamp((t - ws(5.5)) / 0.4)), y: 0 }, hairLag: (1 - up) * 1.5, shirt: '#f4f0ea', collar: 'round', earrings: false,
           hands: { l: { x: X - 100, y: 1420, pose: 'fist' }, r: { x: X + 110, y: 1420, pose: 'fist' } } }),
         blanket(1340, '#fdfcf8'), phone(940, 1210, 0.8, t, '7:00', 0));
-      cam = lerpCam(aim(1.0, 540, 1150, 540, 1150), aim(1.7, X + 10, H.y + 40, 540, 1120), io(clamp((t - ws(5.4)) / 0.9)));
+      cam = lerpCam(aim(1.0, 540, 1150, 540, 1150), aim(1.25, X + 60, H.y + 200, 540, 1120), io(clamp((t - ws(5.4)) / 1.0)));
     }
-    const fl = Math.max(0, 1 - Math.abs(t - ws(4.5)) / 0.3);
-    els.push(flashRect(fl * 1.3, '#fff4d8'), `<rect x="-2000" y="-2000" width="5080" height="5920" fill="#000" opacity="${fin.toFixed(3)}"/>`, topShade(620, 0.5));
-    return { cam: camMix(cam, whipOut(t, T, -1)), els };
+    const fl = Math.max(0, 1 - Math.abs(t - ws(4.5)) / 0.5);
+    els.push(flashRect(ease3(fl) * 1.15, '#fff4d8'), topShade(620, 0.5));
+    return { cam, els };
   },
 
   // 5. Дорога: двое в кабриолете → «выхода нет» — сверху: шоссе замкнуто в кольцо → Сара крупно, газ в пол → проезд к Найлзу: пиво и ухмылка
@@ -477,16 +493,16 @@ const shotsX = {
       const cx = 540 + Math.cos(a) * 380, cy = 1150 + Math.sin(a) * 380;
       g += `<g transform="translate(${cx} ${cy}) rotate(${deg(a) + 90})"><rect x="-22" y="-40" width="44" height="80" rx="12" fill="#5ad0d0"/><rect x="-18" y="-14" width="36" height="30" fill="#1e2a30"/><circle cx="-8" cy="0" r="7" fill="#d9789a"/><circle cx="8" cy="2" r="7" fill="#2a1e18"/></g>`;
       els.push(g);
-      cam = { z: lerp(1.25, 1.05, io(k)), x: 0, y: 0, rot: lerp(-6, 6, k) };
+      cam = { z: 1.05, x: 0, y: 0, rot: lerp(-4, 4, k) };
     } else {
       els.push(desert, dashes, roadside(), car());
       if (t < ws(1.2)) cam = lerpCam({ z: 1.0, x: 0, y: 0 }, { z: 1.08, x: 0, y: -40 }, io(clamp(t / 1.3)));
-      else if (t < ws(3.65)) cam = lerpCam(aim(1.3, 330, 1300, 540, 1160), aim(1.5, 330, 1270, 540, 1150), io(clamp((t - ws(2.15)) / 1.2)));
-      else cam = lerpCam(aim(1.5, 330, 1270, 540, 1150), aim(1.45, 760, 1290, 540, 1150), io(clamp((t - ws(3.65)) / 0.45)));
+      else if (t < ws(3.65)) cam = aim(1.25, 380, 1320, 540, 1160);
+      else cam = lerpCam(aim(1.25, 380, 1320, 540, 1160), aim(1.25, 700, 1320, 540, 1160), io(clamp((t - ws(3.65)) / 0.6)));
       if (t > ws(2.6)) els.push(...Array.from({ length: 14 }, (_, i) => { reseed(i + 900); const y = 900 + rnd() * 900, l = (t * 2000 + rnd() * 1080) % 1500; return `<path d="M${rnd() < 0.5 ? -100 + l * 0.2 : 1180 - l * 0.2},${y} l${rnd() < 0.5 ? 160 : -160},${(y - 1020) * 0.2}" stroke="#fff" stroke-width="3" opacity="0.35"/>`; }));
     }
     els.push(grade('#ffd8a0', 0.22), topShade(620, 0.45));
-    return { cam: camMix(cam, whipIn(t, -1), whipOut(t, T)), els };
+    return { cam, els };
   },
 
   // 6. Мелькающие кадры (голос их не называет): сверху двое на кругах → бар с неоном kinoplot.film → стрела рядом с Найлзом →
@@ -519,7 +535,7 @@ const shotsX = {
         N2(X, Y, s, { turn: 0.5, expr: hit > 0 ? 'surprised' : 'neutral', look: { x: 1, y: 0.2 }, lean: -hit * 6, shades: 'up', hands: { l: { x: X - 200, y: H.y + 300, pose: 'open', rot: -60 } } }),
         `<g transform="translate(${lerp(1500, 840, hit)} ${H.y - 20}) rotate(-4)"><rect x="0" y="-5" width="280" height="10" fill="#4a3a2a"/><path d="M-26,0 L4,-14 L4,14 Z" fill="#8a8a8a"/><path d="M240,-5 L285,-26 L276,0 L285,26 L240,5 Z" fill="#c83a3a"/></g>`,
         hit >= 1 ? `<path d="M830,${H.y - 50} l-40,-25 M830,${H.y + 10} l-40,25 M825,${H.y - 20} l-50,0" stroke="#5a3a2a" stroke-width="6"/>` : '');
-      cam = aim(1.0 + hit * 0.06, 600, H.y + 200, 540, 1150);
+      cam = aim(1.0, 600, H.y + 200, 540, 1150);
     } else {
       const k = io(clamp((t - ws(2.45)) / (VIS(T) - ws(2.45))));
       const X = 540, Y = 1330, s = 1.05, H = headAt(X, Y, s, 'sit');
@@ -533,10 +549,10 @@ const shotsX = {
         fig(), `<rect x="-200" y="1470" width="1480" height="500" fill="#1290b8" opacity="0.55"/>`, `<rect x="-200" y="1338" width="1480" height="26" fill="${V('#d8d4cc', 0.15, 0.3)}"/>`,
         ...[0, 1].map((i) => { const r = ((t * 0.6 + i * 0.5) % 1); return `<ellipse cx="540" cy="1480" rx="${120 + r * 300}" ry="${20 + r * 50}" fill="none" stroke="#bff8ff" stroke-width="3" opacity="${(1 - r) * 0.5}"/>`; }),
         glow(540, 1100, 300, '#40c8ff', 0.15));
-      cam = lerpCam(aim(1.0, 540, 1200, 540, 1200), aim(1.45, X, H.y + 100, 540, 1130), k);
+      cam = lerpCam(aim(1.0, 540, 1200, 540, 1200), aim(1.15, X, H.y + 260, 540, 1150), k);
     }
-    els.push(flashRect([ws(0.95), ws(1.75), ws(2.45)].reduce((a, c) => Math.max(a, 1 - Math.abs(t - c) / 0.07), 0) * 0.5), grade('#9ad0ff', 0.12), topShade(620, 0.5));
-    return { cam: camMix(cam, whipIn(t)), els };
+    els.push(grade('#9ad0ff', 0.12), topShade(620, 0.5));
+    return { cam, els };
   },
 
   // 7. Фейерверк: «две» — два золотых залпа над ними → «Золотой глобус» — огромный золотой шар → «лучшая комедия» — разбег и прыжок в бассейн, всплеск, выныривают со смехом
@@ -574,7 +590,7 @@ const shotsX = {
         [[880, 1500, 0], [990, 1510, 2], [100, 1500, 5]].map(([x, y, i]) => G2(i, x, y, 0.42, { expr: 'laugh', turn: x > 540 ? -0.4 : 0.4, hands: { l: { x: x - 60, y: y - 420, pose: 'wave' }, r: { x: x + 60, y: y - 420, pose: 'wave' } } })).join(''),
         pool(-200, 1500, 1280, 2100, t, { c: '#18a8c8', night: true }), glow(540, 1700, 600, '#30e0ff', 0.3),
         heads, `<rect x="-200" y="1600" width="1480" height="500" fill="#18a8c8" opacity="${surf > 0 ? 0.55 : 0}"/>`, figs, sp, grade('#ff9ad0', 0.12));
-      cam = lerpCam({ z: 1.0, x: 0, y: -60 }, aim(1.3, 570, 1500, 540, 1150), io(clamp((t - ws(4.1)) / 0.7)));
+      cam = lerpCam({ z: 1.0, x: 0, y: -60 }, aim(1.1, 570, 1450, 540, 1150), io(clamp((t - ws(4.1)) / 0.8)));
     }
     els.push(topShade(560, 0.35));
     return { cam, els };
@@ -590,23 +606,33 @@ const shotsX = {
       + Array.from({ length: 30 }, (_, i) => { reseed(i + 600); return `<circle cx="${180 + rnd() * 420}" cy="${1250 + rnd() * 70}" r="${3 + rnd() * 3}" fill="#ffd890" opacity="${0.5 + 0.5 * wave(t, 0.9, i)}"/>`; }).join('') + glow(390, 1290, 240, '#ffc870', 0.45);
     if (t < ws(2.75)) {
       const k = clamp(t / ws(2.75));
-      els.push(sunset(k * 0.4), firework(380, 1050, t - D, 1.3, '#ffd24a', 90), firework(440, 1010, t - D, 1.9, '#ff5fa2', 70),
+      els.push(sunset(k * 0.4),
         `<path d="M-300,1640 Q300,1540 540,1570 Q800,1600 1400,1520 L1400,2100 L-300,2100 Z" fill="${V('#2a1a24', 0.08, 0.3)}"/>`, joshua(960, 1560, 1.2, '#2a3024'),
         S2(410, 1700, 0.85, { pose: 'sit', back: true, tilt: -6 + wave(t, 0.3) * 2, rim: { c: '#ffb070', dx: 0, dy: -6 } }),
         N2(640, 1710, 0.88, { pose: 'sit', back: true, tilt: 4 + wave(t, 0.3, 1) * 2, rim: { c: '#ffb070', dx: 0, dy: -6 } }));
-      cam = lerpCam({ z: 1.08, x: 0, y: 80 }, { z: 1.0, x: 0, y: 0 }, io(k));
+      cam = lerpCam({ z: 1.04, x: 0, y: 40 }, { z: 1.0, x: 0, y: 0 }, io(k));
     } else {
       const k = clamp((t - ws(2.75)) / (T - ws(2.75)));
-      const turnN = io(clamp((t - ws(3.0)) / 0.5)), turnS = io(clamp((t - ws(3.5)) / 0.5));
+      const turnN = io(clamp((t - ws(3.0)) / 0.8)), turnS = io(clamp((t - ws(3.6)) / 0.8));
       els.push(`<g transform="translate(0 -120)">${sunset(0.6)}</g>`,
         `<path d="M-300,1560 Q300,1500 540,1520 Q800,1540 1400,1480 L1400,2100 L-300,2100 Z" fill="${V('#2a1a24', 0.08, 0.3)}"/>`,
-        S2(360, 1900, 1.05, { pose: 'sit', turn: lerp(0.1, 0.6, turnS), expr: mixExpr('neutral', 'smile', turnS), look: { x: lerp(-0.2, 0.9, turnS), y: 0 }, blink: blink(t, 0.5), tilt: lerp(0, 5, turnS), rim: { c: '#ffb070', dx: 10, dy: -6 }, hands: { l: { x: 300, y: 2080, pose: 'open' }, r: { x: 440, y: 2080, pose: 'open' } } }),
-        N2(720, 1910, 1.08, { pose: 'sit', turn: lerp(-0.1, -0.6, turnN), expr: mixExpr('tired', 'smile', turnN), look: { x: lerp(0.2, -0.9, turnN), y: 0 }, blink: blink(t, 1.6), tilt: lerp(0, -5, turnN), shades: 'up', rim: { c: '#ffb070', dx: -10, dy: -6 }, hands: { r: { x: 800, y: 2090, pose: 'open' }, l: { x: 640, y: 2090, pose: 'open' } } }),
+        S2(360, 1900, 1.05, { pose: 'sit', turn: lerp(0.15, 0.3, turnS), expr: mixExpr('neutral', 'smile', turnS * 0.7), look: { x: lerp(-0.1, 0.8, turnS), y: 0 }, blink: blink(t, 0.5), tilt: lerp(0, 2, turnS), rim: { c: '#ffb070', dx: 10, dy: -6 }, hands: { l: { x: 300, y: 2080, pose: 'open' }, r: { x: 440, y: 2080, pose: 'open' } } }),
+        N2(720, 1910, 1.08, { pose: 'sit', turn: lerp(-0.15, -0.3, turnN), expr: mixExpr('tired', 'smile', turnN * 0.7), look: { x: lerp(0.1, -0.8, turnN), y: 0 }, blink: blink(t, 1.6), tilt: lerp(0, -2, turnN), shades: 'up', rim: { c: '#ffb070', dx: -10, dy: -6 }, hands: { r: { x: 800, y: 2090, pose: 'open' }, l: { x: 640, y: 2090, pose: 'open' } } }),
         grade('#ffb070', 0.18));
-      cam = lerpCam({ z: 1.0, x: 0, y: -40 }, { z: 1.15, x: 0, y: -160 }, io(k));
+      cam = { z: 1.06, x: 0, y: -80 };
     }
     els.push(topShade(560, 0.45));
     return { cam, els };
   },
+};
+const shotsX = {
+  hook: shotsRaw.hook,
+  morning: smooth(shotsRaw.morning, [ws(2.73)], 0.45),
+  party: smooth(shotsRaw.party, [ws(1.43), ws(2.43), ws(3.08)]),
+  cave: smooth(shotsRaw.cave, [ws(2.4)], 0.45),
+  road: smooth(shotsRaw.road, [ws(1.2), ws(2.15)]),
+  hiding: smooth(shotsRaw.hiding, [ws(0.95), ws(1.75), ws(2.45)]),
+  globes: smooth(shotsRaw.globes, [ws(2.5)], 0.45),
+  question: smooth(shotsRaw.question, [ws(2.75)], 0.6),
 };
 run(shotsX);

@@ -68,25 +68,27 @@ function ik(ax, ay, tx, ty, l1, l2, bend, pref) {
 const limb = (ax, ay, ex, ey, tx, ty, w1, w2, c) =>
   `<path d="M${f(ax)},${f(ay)} L${f(ex)},${f(ey)}" stroke="${c}" stroke-width="${f(w1 * 2)}" stroke-linecap="round"/><path d="M${f(ex)},${f(ey)} L${f(tx)},${f(ty)}" stroke="${c}" stroke-width="${f((w1 + w2))}" stroke-linecap="round"/>`;
 
-// кисть: ладонь, пальцы, большой палец; item — предмет в руке (локальные координаты, рисуется между ладонью и пальцами)
+// кисть-варежка: ладонь с пальцами одним мягким контуром + большой палец; item — предмет в руке (между ладонью и пальцами)
 function hand(x, y, ang, s, skin, side, o = {}) {
   const pose = o.pose || 'open', k = s;
-  const dark = shade(skin, -0.22), fill = R(skin, 0.12, 0.15);
+  const dark = shade(skin, -0.2), fill = R(skin, 0.12, 0.15);
   let g = `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg(ang) + (o.rot || 0))}) scale(1 ${side})">`;
-  g += `<ellipse cx="${18 * k}" cy="0" rx="${26 * k}" ry="${22 * k}" fill="${fill}"/>`;
-  if (o.item) g += typeof o.item === 'function' ? `<g transform="translate(${18 * k} 0) scale(1 ${side}) rotate(${f(-(deg(ang) + (o.rot || 0)) * side)})">${o.item(k)}</g>` : o.item;
+  const thumb = (cx, cy, a) => `<ellipse cx="${f(cx * k)}" cy="${f(cy * k)}" rx="${f(13 * k)}" ry="${f(8.5 * k)}" fill="${fill}" transform="rotate(${a} ${f(cx * k)} ${f(cy * k)})"/>`;
   if (pose === 'fist' || pose === 'hold') {
-    g += `<path d="M${24 * k},${-20 * k} q${22 * k},${2 * k} ${22 * k},${20 * k} q0,${18 * k} ${-22 * k},${20 * k}" fill="${fill}" stroke="${dark}" stroke-width="${2.5 * k}"/>`;
-    g += [-10, 0, 10].map((d) => `<path d="M${36 * k},${d * k} h${8 * k}" stroke="${dark}" stroke-width="${2.2 * k}" stroke-linecap="round"/>`).join('');
-    g += `<ellipse cx="${26 * k}" cy="${-18 * k}" rx="${14 * k}" ry="${8 * k}" fill="${fill}" stroke="${dark}" stroke-width="${2 * k}" transform="rotate(-20 ${26 * k} ${-18 * k})"/>`;
+    g += `<ellipse cx="${f(16 * k)}" cy="0" rx="${f(24 * k)}" ry="${f(21 * k)}" fill="${fill}"/>`;
+    if (o.item) g += typeof o.item === 'function' ? `<g transform="translate(${18 * k} 0) scale(1 ${side}) rotate(${f(-(deg(ang) + (o.rot || 0)) * side)})">${o.item(k)}</g>` : o.item;
+    g += `<path d="M${f(20 * k)},${f(-18 * k)} q${f(20 * k)},${f(4 * k)} ${f(19 * k)},${f(18 * k)} q0,${f(15 * k)} ${f(-19 * k)},${f(18 * k)}" fill="${fill}" stroke="${dark}" stroke-width="${f(1.6 * k)}"/>`;
+    g += thumb(22, -17, -25);
   } else if (pose === 'point') {
-    g += `<rect x="${30 * k}" y="${-18 * k}" width="${44 * k}" height="${13 * k}" rx="${6.5 * k}" fill="${fill}"/>`;
-    g += `<path d="M${30 * k},${-4 * k} q${16 * k},${4 * k} ${10 * k},${22 * k}" stroke="${dark}" stroke-width="${2.2 * k}" fill="none"/>`;
-    g += `<ellipse cx="${20 * k}" cy="${-22 * k}" rx="${13 * k}" ry="${7 * k}" fill="${fill}" transform="rotate(-30 ${20 * k} ${-22 * k})"/>`;
-  } else { // open / wave — веер пальцев
-    const sp = pose === 'wave' ? 1.6 : 1;
-    [-15, -5, 5, 15].forEach((a, i) => g += `<rect x="${30 * k}" y="${-5 * k}" width="${(i === 0 || i === 3 ? 26 : 32) * k}" height="${11 * k}" rx="${5.5 * k}" fill="${fill}" transform="rotate(${a * sp} ${24 * k} 0) translate(0 ${(i - 1.5) * 8 * k})"/>`);
-    g += `<ellipse cx="${18 * k}" cy="${-24 * k}" rx="${16 * k}" ry="${8 * k}" fill="${fill}" transform="rotate(-35 ${18 * k} ${-24 * k})"/>`;
+    g += `<ellipse cx="${f(16 * k)}" cy="${f(2 * k)}" rx="${f(23 * k)}" ry="${f(19 * k)}" fill="${fill}"/>`;
+    g += `<rect x="${f(26 * k)}" y="${f(-14 * k)}" width="${f(38 * k)}" height="${f(13 * k)}" rx="${f(6.5 * k)}" fill="${fill}"/>`;
+    g += thumb(18, -18, -30);
+  } else { // open / wave: варежка, лёгкие линии между пальцами
+    const sp = pose === 'wave' ? 1.25 : 1;
+    g += `<path d="M${f(-2 * k)},${f(-17 * k)} Q${f(30 * k)},${f(-24 * k * sp)} ${f(50 * k)},${f(-8 * k * sp)} Q${f(60 * k)},0 ${f(50 * k)},${f(8 * k * sp)} Q${f(30 * k)},${f(24 * k * sp)} ${f(-2 * k)},${f(17 * k)} Z" fill="${fill}"/>`;
+    g += [-6, 2, 9].map((d) => `<path d="M${f(34 * k)},${f(d * k * sp)} L${f(50 * k)},${f(d * 1.25 * k * sp)}" stroke="${dark}" stroke-width="${f(1.5 * k)}" stroke-linecap="round" opacity="0.55"/>`).join('');
+    g += thumb(14, -19, -40);
+    if (o.item) g += typeof o.item === 'function' ? `<g transform="translate(${18 * k} 0) scale(1 ${side}) rotate(${f(-(deg(ang) + (o.rot || 0)) * side)})">${o.item(k)}</g>` : o.item;
   }
   return g + '</g>';
 }
@@ -255,24 +257,29 @@ export function figure(x, y, s, o = {}) {
   if (o.collar === 'open' && !o.back) body += `<path d="M${f(px - 70 * s)},${f(shY - 12 * s)} L${f(px - 6 * s)},${f(shY + 110 * s)} L${f(px - 44 * s)},${f(shY + 40 * s)} L${f(px - 30 * s)},${f(shY - 8 * s)} Z M${f(px + 70 * s)},${f(shY - 12 * s)} L${f(px + 6 * s)},${f(shY + 110 * s)} L${f(px + 44 * s)},${f(shY + 40 * s)} L${f(px + 30 * s)},${f(shY - 8 * s)} Z" fill="${V(shade(sh, 0.12), 0.15, 0.2)}"/>`;
   if (pose === 'sit' && o.legsDown) body += `<ellipse cx="${f(x)}" cy="${f(hipY + 14 * s)}" rx="${f(ww * 1.25)}" ry="${f(40 * s)}" fill="${V(o.skirt || pants, 0.12, 0.2)}"/>`;
   // руки: плечо → локоть → кисть (IK), рукав до локтя или до кисти
+  // плечо → кисть одной плавной дугой; локоть всегда смотрит наружу-вниз (полюс), поэтому не перескакивает
+  const L1 = 158 * s, L2 = 150 * s;
   const arm = (sd) => {
     const ax = tx + sd * (sw - 18 * s), ay = shY + 30 * s, h = (o.hands || {})[sd < 0 ? 'l' : 'r'];
-    const tgt = h ? [h.x, h.y] : [ax + sd * 30 * s, ay + 400 * s];
-    const L = h?.bend ? ik(ax, ay, tgt[0], tgt[1], 200 * s, 190 * s, h.bend) : ik(ax, ay, tgt[0], tgt[1], 200 * s, 190 * s, 0, [sd, 0.6]);
-    const short = o.sleeves === 'short';
+    const tgt = h ? [h.x, h.y] : [ax + sd * 22 * s, ay + 300 * s];
+    const A = ik(ax, ay, tgt[0], tgt[1], L1, L2, 1), B = ik(ax, ay, tgt[0], tgt[1], L1, L2, -1);
+    const px = ax + sd * 500 * s, py = ay + 420 * s; // полюс локтя
+    const L = Math.hypot(A.ex - px, A.ey - py) <= Math.hypot(B.ex - px, B.ey - py) ? A : B;
+    // кривая через локоть: контрольная точка = 2·локоть − середина
+    const cx = 2 * L.ex - (ax + L.tx) / 2, cy = 2 * L.ey - (ay + L.ty) / 2;
+    const q = (t) => [(1 - t) ** 2 * ax + 2 * t * (1 - t) * cx + t * t * L.tx, (1 - t) ** 2 * ay + 2 * t * (1 - t) * cy + t * t * L.ty];
+    const part = (t0) => { const p1 = [lerp(ax, cx, t0), lerp(ay, cy, t0)], p2 = q(t0); return `M${f(ax)},${f(ay)} Q${f(p1[0])},${f(p1[1])} ${f(p2[0])},${f(p2[1])}`; };
+    const full = `M${f(ax)},${f(ay)} Q${f(cx)},${f(cy)} ${f(L.tx)},${f(L.ty)}`;
+    const endAng = Math.atan2(L.ty - cy, L.tx - cx);
     let a = '';
-    if (short) {
-      a = `<path d="M${f(L.ex)},${f(L.ey)} L${f(L.tx)},${f(L.ty)}" stroke="${shade(skin, -0.06)}" stroke-width="${40 * s}" stroke-linecap="round"/>`;
-      a += `<path d="M${f(ax)},${f(ay)} L${f(L.ex)},${f(L.ey)}" stroke="${shade(skin, -0.06)}" stroke-width="${44 * s}" stroke-linecap="round"/>`;
-      // короткий рукав: до середины плеча
-      const mx = lerp(ax, L.ex, 0.62), my = lerp(ay, L.ey, 0.62);
-      a += `<path d="M${f(ax)},${f(ay)} L${f(mx)},${f(my)}" stroke="${sh}" stroke-width="${62 * s}" stroke-linecap="round"/>`;
-      if (o.sleevePattern) a += o.sleevePattern(ax, ay, mx, my, s);
+    if (o.sleeves === 'short') {
+      a += `<path d="${full}" stroke="${shade(skin, -0.06)}" stroke-width="${f(40 * s)}" stroke-linecap="round" fill="none"/>`;
+      a += `<path d="${part(0.42)}" stroke="${sh}" stroke-width="${f(58 * s)}" stroke-linecap="round" fill="none"/>`;
     } else {
-      a += `<path d="M${f(ax)},${f(ay)} L${f(L.ex)},${f(L.ey)} L${f(L.tx)},${f(L.ty)}" stroke="${shade(sh, -0.05)}" stroke-width="${60 * s}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
-      a += `<path d="M${f(ax)},${f(ay)} L${f(L.ex)},${f(L.ey)} L${f(L.tx)},${f(L.ty)}" stroke="${shade(sh, 0.12)}" stroke-width="${18 * s}" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.35" transform="translate(${-sd * 10 * s} ${-6 * s})"/>`;
+      a += `<path d="${full}" stroke="${shade(sh, -0.05)}" stroke-width="${f(50 * s)}" stroke-linecap="round" fill="none"/>`;
+      a += `<path d="${part(0.85)}" stroke="${shade(sh, 0.12)}" stroke-width="${f(14 * s)}" stroke-linecap="round" fill="none" opacity="0.3" transform="translate(${f(-sd * 8 * s)} ${f(-5 * s)})"/>`;
     }
-    a += hand(L.tx, L.ty, L.ang, s * 1.1, skin, sd < 0 ? -1 : 1, h || {});
+    a += hand(L.tx, L.ty, endAng, s * 1.05, skin, sd < 0 ? -1 : 1, h || {});
     return { a, front: h?.front };
   };
   const AL = arm(-1), AR = arm(1);

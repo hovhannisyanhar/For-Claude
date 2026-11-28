@@ -54,8 +54,7 @@
       "emphasis": [
         "заново."
       ],
-      "pause": 6,
-      "cut": true
+      "pause": 6
     },
     {
       "set": "party",
@@ -67,8 +66,7 @@
         "не",
         "вспомнит."
       ],
-      "pause": 6,
-      "cut": true
+      "pause": 6
     },
     {
       "set": "cave",
@@ -80,8 +78,7 @@
         "же",
         "утре."
       ],
-      "pause": 6,
-      "cut": true
+      "pause": 6
     },
     {
       "set": "road",
@@ -92,8 +89,7 @@
         "нет,",
         "сдаваться"
       ],
-      "pause": 6,
-      "cut": true
+      "pause": 6
     },
     {
       "set": "hiding",
@@ -104,8 +100,7 @@
         "самом",
         "деле"
       ],
-      "pause": 6,
-      "cut": true
+      "pause": 6
     },
     {
       "set": "globes",
@@ -182,6 +177,5 @@
   "art": "vector",
   "fonts": "futura",
   "textStyle": "pop",
-  "grain": false,
-  "progress": true
+  "grain": false
 }
